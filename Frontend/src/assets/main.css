@@ -1,1 +1,86 @@
 @import "tailwindcss";
+
+:root {
+  --sc-dark: #4a0a0a;
+  --sc-primary: #6a9a2a;
+  --sc-secondary: #b6c65b;
+  --sc-danger: #e31e24;
+  --sc-warning: #ff6a00;
+  --sc-attention: #e8b300;
+  --sc-bg: #f7f9f3;
+  --sc-surface: #ffffff;
+  --sc-border: rgba(74, 10, 10, 0.1);
+  --sc-muted: rgba(74, 10, 10, 0.62);
+  --sc-soft-primary: rgba(106, 154, 42, 0.14);
+  --sc-soft-secondary: rgba(182, 198, 91, 0.2);
+  --sc-soft-danger: rgba(227, 30, 36, 0.12);
+  --sc-soft-warning: rgba(255, 106, 0, 0.12);
+  --sc-soft-attention: rgba(232, 179, 0, 0.16);
+  --sc-shadow: 0 14px 34px rgba(74, 10, 10, 0.07);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #app {
+  background: #10170d;
+  color: #edf6dc;
+}
+
+:root[data-theme='dark'] .bg-slate-50,
+:root[data-theme='dark'] .bg-white {
+  background-color: #121c0f !important;
+}
+
+:root[data-theme='dark'] .bg-slate-100,
+:root[data-theme='dark'] .bg-green-50,
+:root[data-theme='dark'] .bg-blue-50,
+:root[data-theme='dark'] .bg-emerald-50,
+:root[data-theme='dark'] .bg-amber-50,
+:root[data-theme='dark'] .bg-rose-50,
+:root[data-theme='dark'] .bg-indigo-50 {
+  background-color: #1c2816 !important;
+}
+
+:root[data-theme='dark'] .text-slate-900,
+:root[data-theme='dark'] .text-slate-800,
+:root[data-theme='dark'] .text-slate-700 {
+  color: #f3f9e8 !important;
+}
+
+:root[data-theme='dark'] .text-slate-500,
+:root[data-theme='dark'] .text-slate-600 {
+  color: #b8c7aa !important;
+}
+
+:root[data-theme='dark'] .border-slate-100,
+:root[data-theme='dark'] .border-slate-200,
+:root[data-theme='dark'] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(215, 236, 120, 0.18) !important;
+}
+
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea {
+  background-color: #10170d !important;
+  border-color: rgba(215, 236, 120, 0.22) !important;
+  color: #f3f9e8 !important;
+}
+
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder {
+  color: #8fa181 !important;
+}
+
+:root[data-theme='dark'] .shadow-sm,
+:root[data-theme='dark'] .shadow-lg {
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28) !important;
+}
+
+:root[data-theme='dark'] .sidebar-toggle {
+  background: #172112 !important;
+  color: #edf6dc !important;
+  border-color: rgba(215, 236, 120, 0.2) !important;
+}

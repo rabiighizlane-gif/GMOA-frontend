@@ -1,0 +1,1900 @@
+<template>
+  <main class="users-layout min-h-screen bg-slate-50 text-slate-800" :dir="language === 'AR' ? 'rtl' : 'ltr'">
+    <button
+      type="button"
+      class="sidebar-toggle"
+      :class="{ 'is-hidden': isSidebarOpen }"
+      :aria-label="content.sidebarToggle"
+      :aria-expanded="isSidebarOpen"
+      @click="toggleSidebar"
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+
+    <div v-if="isSidebarOpen" class="sidebar-backdrop" aria-hidden="true" @click="closeSidebar"></div>
+    <Sidebar :open="isSidebarOpen" @close="closeSidebar" />
+
+    <section class="users-page">
+      <header class="users-header">
+        <div>
+          <h1>{{ content.title }}</h1>
+          <p>{{ content.subtitle }}</p>
+        </div>
+
+        <div class="users-header-actions">
+          <button type="button" class="primary-button" @click="openCreateModal">
+            <span aria-hidden="true">+</span>
+            {{ content.addUser }}
+          </button>
+        </div>
+      </header>
+
+      <AdminTopControls v-model="searchQuery" />
+
+      <div class="stats-grid">
+        <article v-for="stat in stats" :key="stat.label" :class="stat.tone">
+          <span>{{ stat.label }}</span>
+          <strong>{{ stat.value }}</strong>
+        </article>
+      </div>
+
+      <section class="users-panel">
+        <div class="toolbar">
+          <label>
+            <span>{{ content.search }}</span>
+            <input v-model="searchQuery" type="search" :placeholder="content.searchPlaceholder" />
+          </label>
+
+          <label>
+            <span>{{ content.role }}</span>
+            <select v-model="selectedRole">
+              <option value="all">{{ content.allRoles }}</option>
+              <option value="admin">{{ roleLabels.admin }}</option>
+              <option value="technician">{{ roleLabels.technician }}</option>
+              <option value="operator">{{ roleLabels.operator }}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{{ content.status }}</span>
+            <select v-model="selectedStatus">
+              <option value="all">{{ content.allStatuses }}</option>
+              <option value="active">{{ content.active }}</option>
+              <option value="pending">{{ content.pending }}</option>
+              <option value="blocked">{{ content.blocked }}</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ content.user }}</th>
+                <th>{{ content.role }}</th>
+                <th>{{ content.department }}</th>
+                <th>{{ content.status }}</th>
+                <th>{{ content.lastLogin }}</th>
+                <th>{{ content.actions }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.id">
+                <td>
+                  <div class="user-cell">
+                    <span :class="avatarTone(user.name)">{{ getInitials(user.name) }}</span>
+                    <div>
+                      <strong>{{ displayName(user.name) }}</strong>
+                      <small>{{ user.email }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-pill" :class="user.role">{{ roleLabels[user.role] }}</span>
+                </td>
+                <td>{{ departmentLabel(user.department) }}</td>
+                <td>
+                  <span class="status-pill" :class="user.status">{{ statusLabel(user.status) }}</span>
+                </td>
+                <td>{{ displayDate(user.lastLogin) }}</td>
+                <td>
+                  <div class="actions">
+                    <button type="button" @click="openUserProfile(user)">{{ content.view }}</button>
+                    <button type="button" @click="openEditModal(user)">{{ content.edit }}</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <div v-if="isUserModalOpen" class="modal-backdrop" @click.self="closeUserModal">
+      <form class="user-modal" @submit.prevent="saveUser">
+        <div class="modal-heading">
+          <h2>{{ editingUserId ? content.edit : content.addUser }}</h2>
+          <button type="button" class="modal-close" :aria-label="content.close" @click="closeUserModal">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <label>
+          <span>{{ content.fullName }}</span>
+          <input v-model="newUser.name" type="text" required />
+        </label>
+
+        <label>
+          <span>{{ content.email }}</span>
+          <input v-model="newUser.email" type="email" required />
+        </label>
+
+        <label>
+          <span>{{ content.role }}</span>
+          <select v-model="newUser.role" @change="syncPermissionDefaults">
+            <option value="admin">{{ roleLabels.admin }}</option>
+            <option value="technician">{{ roleLabels.technician }}</option>
+            <option value="operator">{{ roleLabels.operator }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>{{ content.department }}</span>
+          <input v-model="newUser.department" type="text" required />
+        </label>
+
+        <section v-if="editingUserId" class="edit-permissions-panel">
+          <h3>{{ pickText({ FR: 'Permissions', EN: 'Permissions', AR: 'الصلاحيات' }) }}</h3>
+          <label v-for="permission in editablePermissions" :key="permission.key" class="permission-toggle">
+            <span>{{ permission.label }}</span>
+            <input v-model="permissionForm[permission.key]" type="checkbox" />
+          </label>
+        </section>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-button" @click="closeUserModal">{{ content.cancel }}</button>
+          <button type="submit" class="primary-button">{{ content.save }}</button>
+        </div>
+      </form>
+    </div>
+
+    <div v-if="selectedUser" class="modal-backdrop" @click.self="closeUserProfile">
+      <article class="user-profile-modal" :class="selectedUser.role">
+        <button type="button" class="modal-close profile-close" :aria-label="content.close" @click="closeUserProfile">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+
+        <div class="user-profile-card">
+          <div class="profile-identity-preview">
+            <div class="profile-photo" :class="avatarTone(selectedUser.name)">
+              {{ getInitials(displayName(selectedUser.name)) }}
+            </div>
+            <div>
+              <span class="profile-kicker">{{ content.user }}</span>
+              <h2>{{ displayName(selectedUser.name) }}</h2>
+              <p>{{ roleLabels[selectedUser.role] }}</p>
+            </div>
+          </div>
+
+          <div class="profile-info-list">
+            <ul>
+              <li>
+                <span aria-hidden="true">✉</span>
+                <strong>{{ selectedUser.email }}</strong>
+              </li>
+              <li>
+                <span aria-hidden="true">☎</span>
+                <strong>{{ selectedUser.phone || '+212 6 12 34 56 78' }}</strong>
+              </li>
+              <li>
+                <span aria-hidden="true">⌖</span>
+                <strong>{{ selectedUser.location || locationLabel }}</strong>
+              </li>
+              <li>
+                <span aria-hidden="true">◎</span>
+                <strong>{{ languageLabel }}</strong>
+              </li>
+              <li>
+                <span aria-hidden="true">◷</span>
+                <strong>GMT+1 (Europe/Casablanca)</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="profile-role-line">
+          <span class="role-pill" :class="selectedUser.role">{{ roleLabels[selectedUser.role] }}</span>
+          <span class="status-pill" :class="selectedUser.status">{{ statusLabel(selectedUser.status) }}</span>
+        </div>
+
+        <dl class="profile-detail-grid">
+          <div>
+            <dt>{{ content.fullName }}</dt>
+            <dd>{{ displayName(selectedUser.name) }}</dd>
+          </div>
+          <div>
+            <dt>{{ content.email }}</dt>
+            <dd>{{ selectedUser.email }}</dd>
+          </div>
+          <div>
+            <dt>{{ content.role }}</dt>
+            <dd>{{ roleLabels[selectedUser.role] }}</dd>
+          </div>
+          <div>
+            <dt>{{ content.department }}</dt>
+            <dd>{{ departmentLabel(selectedUser.department) }}</dd>
+          </div>
+          <div>
+            <dt>{{ content.status }}</dt>
+            <dd>{{ statusLabel(selectedUser.status) }}</dd>
+          </div>
+          <div>
+            <dt>{{ content.lastLogin }}</dt>
+            <dd>{{ displayDate(selectedUser.lastLogin) }}</dd>
+          </div>
+        </dl>
+
+        <section class="user-activity-card">
+          <div class="activity-heading">
+            <h3>{{ pickText({ FR: 'Activité récente', EN: 'Recent activity', AR: 'النشاط الأخير' }) }}</h3>
+          </div>
+
+          <ol class="user-activity-list">
+            <li v-for="activity in userActivities(selectedUser)" :key="activity.title">
+              <span class="activity-icon" :class="activity.tone" aria-hidden="true">{{ activity.icon }}</span>
+              <div>
+                <strong>{{ activity.title }}</strong>
+                <small>{{ activity.time }}</small>
+              </div>
+              <span class="activity-dot" :class="activity.tone" aria-hidden="true"></span>
+            </li>
+          </ol>
+
+          <button type="button" class="view-activity-button">
+            {{ pickText({ FR: "Voir toute l'activité", EN: 'View all activity', AR: 'عرض كل النشاط' }) }}
+          </button>
+        </section>
+
+        <section class="user-permissions-card">
+          <div class="activity-heading">
+            <h3>{{ pickText({ FR: 'Permissions', EN: 'Permissions', AR: 'الصلاحيات' }) }}</h3>
+          </div>
+
+          <ul class="permissions-mini-list">
+            <li v-for="permission in userPermissions(selectedUser)" :key="permission.label">
+              <span>{{ permission.label }}</span>
+              <strong :class="{ denied: !permission.allowed }" aria-hidden="true">
+                {{ permission.allowed ? '✓' : '×' }}
+              </strong>
+            </li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </main>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import AdminTopControls from '@/Components/AdminTopControls.vue'
+import Sidebar from '@/Components/sidebar.vue'
+import { useLanguageStore } from '@/stores/language'
+
+const languageStore = useLanguageStore()
+const isSidebarOpen = ref(false)
+const isUserModalOpen = ref(false)
+const selectedUser = ref(null)
+const editingUserId = ref(null)
+const searchQuery = ref('')
+const selectedRole = ref('all')
+const selectedStatus = ref('all')
+const permissionForm = ref({})
+const users = ref([
+  {
+    id: 1,
+    name: 'Ghizlane Rabii',
+    email: 'ghizlane@smartcalyx.ma',
+    role: 'admin',
+    department: 'administration',
+    status: 'active',
+    lastLogin: '2026-07-16 15:30',
+  },
+  {
+    id: 2,
+    name: 'Ahmed El Mansouri',
+    email: 'ahmed@smartcalyx.ma',
+    role: 'technician',
+    department: 'maintenance',
+    status: 'active',
+    lastLogin: '2026-07-16 12:10',
+  },
+  {
+    id: 3,
+    name: 'Nabil Amrani',
+    email: 'nabil@smartcalyx.ma',
+    role: 'operator',
+    department: 'production',
+    status: 'pending',
+    lastLogin: '2026-07-15 18:22',
+  },
+  {
+    id: 4,
+    name: 'Youssef Berrada',
+    email: 'youssef@smartcalyx.ma',
+    role: 'technician',
+    department: 'maintenance',
+    status: 'blocked',
+    lastLogin: '2026-07-10 09:42',
+  },
+])
+const newUser = ref(createEmptyUser())
+
+const language = computed(() => languageStore.language)
+
+const pageContent = {
+  FR: {
+    sidebarToggle: 'Afficher le menu',
+    title: 'Gestion des utilisateurs',
+    subtitle: 'Ajoutez, filtrez et suivez les comptes de la plateforme.',
+    addUser: 'Ajouter un utilisateur',
+    search: 'Recherche',
+    searchPlaceholder: 'Rechercher par nom ou e-mail...',
+    role: 'Rôle',
+    allRoles: 'Tous les rôles',
+    status: 'Statut',
+    allStatuses: 'Tous les statuts',
+    active: 'Actif',
+    pending: 'En attente',
+    blocked: 'Bloqué',
+    user: 'Utilisateur',
+    department: 'Département',
+    lastLogin: 'Dernière connexion',
+    actions: 'Actions',
+    view: 'Voir',
+    edit: 'Modifier',
+    close: 'Fermer',
+    fullName: 'Nom complet',
+    email: 'E-mail',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+    totalUsers: 'Utilisateurs',
+    activeUsers: 'Actifs',
+    pendingUsers: 'En attente',
+    blockedUsers: 'Bloqués',
+  },
+  EN: {
+    sidebarToggle: 'Show menu',
+    title: 'User management',
+    subtitle: 'Add, filter, and monitor platform accounts.',
+    addUser: 'Add user',
+    search: 'Search',
+    searchPlaceholder: 'Search by name or e-mail...',
+    role: 'Role',
+    allRoles: 'All roles',
+    status: 'Status',
+    allStatuses: 'All statuses',
+    active: 'Active',
+    pending: 'Pending',
+    blocked: 'Blocked',
+    user: 'User',
+    department: 'Department',
+    lastLogin: 'Last login',
+    actions: 'Actions',
+    view: 'View',
+    edit: 'Edit',
+    close: 'Close',
+    fullName: 'Full name',
+    email: 'E-mail',
+    cancel: 'Cancel',
+    save: 'Save',
+    totalUsers: 'Users',
+    activeUsers: 'Active',
+    pendingUsers: 'Pending',
+    blockedUsers: 'Blocked',
+  },
+  AR: {
+    sidebarToggle: 'إظهار القائمة',
+    title: 'إدارة المستخدمين',
+    subtitle: 'إضافة الحسابات وتصفيتها ومتابعتها داخل المنصة.',
+    addUser: 'إضافة مستخدم',
+    search: 'البحث',
+    searchPlaceholder: 'ابحث بالاسم أو البريد الإلكتروني...',
+    role: 'الدور',
+    allRoles: 'كل الأدوار',
+    status: 'الحالة',
+    allStatuses: 'كل الحالات',
+    active: 'نشط',
+    pending: 'في الانتظار',
+    blocked: 'محظور',
+    user: 'المستخدم',
+    department: 'القسم',
+    lastLogin: 'آخر دخول',
+    actions: 'الإجراءات',
+    view: 'عرض',
+    edit: 'تعديل',
+    close: 'إغلاق',
+    fullName: 'الاسم الكامل',
+    email: 'البريد الإلكتروني',
+    cancel: 'إلغاء',
+    save: 'حفظ',
+    totalUsers: 'المستخدمون',
+    activeUsers: 'نشطون',
+    pendingUsers: 'في الانتظار',
+    blockedUsers: 'محظورون',
+  },
+}
+
+const content = computed(() => pageContent[language.value] || pageContent.FR)
+
+const languageLabel = computed(() =>
+  pickText({
+    FR: 'Français',
+    EN: 'English',
+    AR: 'العربية',
+  }),
+)
+
+const locationLabel = computed(() =>
+  pickText({
+    FR: 'Casablanca, Maroc',
+    EN: 'Casablanca, Morocco',
+    AR: 'الدار البيضاء، المغرب',
+  }),
+)
+
+const roleLabels = computed(() => ({
+  admin: pickText({ FR: 'Administratrice', EN: 'Administrator', AR: 'مديرة' }),
+  technician: pickText({ FR: 'Technicien', EN: 'Technician', AR: 'تقني' }),
+  operator: pickText({ FR: 'Opérateur', EN: 'Operator', AR: 'مشغل' }),
+}))
+
+const stats = computed(() => [
+  { label: content.value.totalUsers, value: users.value.length, tone: 'total' },
+  { label: content.value.activeUsers, value: users.value.filter((user) => user.status === 'active').length, tone: 'active' },
+  { label: content.value.pendingUsers, value: users.value.filter((user) => user.status === 'pending').length, tone: 'pending' },
+  { label: content.value.blockedUsers, value: users.value.filter((user) => user.status === 'blocked').length, tone: 'blocked' },
+])
+
+const filteredUsers = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+
+  return users.value.filter((user) => {
+    const matchesSearch = !query || user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
+    const matchesRole = selectedRole.value === 'all' || user.role === selectedRole.value
+    const matchesStatus = selectedStatus.value === 'all' || user.status === selectedStatus.value
+
+    return matchesSearch && matchesRole && matchesStatus
+  })
+})
+
+const editablePermissions = computed(() => permissionDefinitions())
+
+function pickText(texts) {
+  return texts[language.value] || texts.FR
+}
+
+function departmentLabel(department) {
+  const labels = {
+    administration: {
+      FR: 'Administration générale',
+      EN: 'General administration',
+      AR: 'الإدارة العامة',
+    },
+    maintenance: {
+      FR: 'Maintenance',
+      EN: 'Maintenance',
+      AR: 'الصيانة',
+    },
+    production: {
+      FR: 'Production',
+      EN: 'Production',
+      AR: 'الإنتاج',
+    },
+  }
+
+  return labels[department]?.[language.value] || department
+}
+
+function normalizeDepartment(department) {
+  const value = String(department || '').trim().toLowerCase()
+
+  if (value.includes('admin') || value.includes('الإدارة')) return 'administration'
+  if (value.includes('maintenance') || value.includes('صيانة')) return 'maintenance'
+  if (value.includes('production') || value.includes('إنتاج')) return 'production'
+
+  return department
+}
+
+function statusLabel(status) {
+  return content.value[status] || status
+}
+
+function userActivities(user) {
+  const commonTimes = {
+    now: pickText({ FR: "Aujourd'hui à 08:42", EN: 'Today at 08:42', AR: 'اليوم على 08:42' }),
+    morning: pickText({ FR: "Aujourd'hui à 08:15", EN: 'Today at 08:15', AR: 'اليوم على 08:15' }),
+    yesterdayLate: pickText({ FR: 'Hier à 17:21', EN: 'Yesterday at 17:21', AR: 'أمس على 17:21' }),
+    yesterdayMid: pickText({ FR: 'Hier à 16:48', EN: 'Yesterday at 16:48', AR: 'أمس على 16:48' }),
+    yesterdayEarly: pickText({ FR: 'Hier à 15:33', EN: 'Yesterday at 15:33', AR: 'أمس على 15:33' }),
+  }
+
+  const activitiesByRole = {
+    admin: [
+      {
+        icon: '↗',
+        tone: 'blue',
+        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
+        time: commonTimes.now,
+      },
+      {
+        icon: '⚙',
+        tone: 'purple',
+        title: pickText({ FR: 'Modification des permissions', EN: 'Updated permissions', AR: 'تعديل الصلاحيات' }),
+        time: commonTimes.morning,
+      },
+      {
+        icon: '▣',
+        tone: 'slate',
+        title: pickText({ FR: "Mise à jour d'un rapport", EN: 'Updated a report', AR: 'تحديث تقرير' }),
+        time: commonTimes.yesterdayLate,
+      },
+      {
+        icon: '✓',
+        tone: 'green',
+        title: pickText({ FR: "Validation d'une intervention", EN: 'Approved an intervention', AR: 'المصادقة على تدخل' }),
+        time: commonTimes.yesterdayMid,
+      },
+      {
+        icon: '!',
+        tone: 'red',
+        title: pickText({ FR: "Ajout d'une pièce de rechange", EN: 'Added a spare part', AR: 'إضافة قطعة غيار' }),
+        time: commonTimes.yesterdayEarly,
+      },
+    ],
+    technician: [
+      {
+        icon: '↗',
+        tone: 'blue',
+        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
+        time: commonTimes.now,
+      },
+      {
+        icon: '🔧',
+        tone: 'purple',
+        title: pickText({ FR: "Création d'une intervention", EN: 'Created an intervention', AR: 'إنشاء تدخل' }),
+        time: commonTimes.morning,
+      },
+      {
+        icon: '▣',
+        tone: 'slate',
+        title: pickText({ FR: "Mise à jour d'un rapport", EN: 'Updated a report', AR: 'تحديث تقرير' }),
+        time: commonTimes.yesterdayLate,
+      },
+      {
+        icon: '✓',
+        tone: 'green',
+        title: pickText({ FR: "Validation d'une intervention", EN: 'Validated an intervention', AR: 'تأكيد تدخل' }),
+        time: commonTimes.yesterdayMid,
+      },
+      {
+        icon: '!',
+        tone: 'red',
+        title: pickText({ FR: "Signalement d'une panne", EN: 'Reported a breakdown', AR: 'التبليغ عن عطل' }),
+        time: commonTimes.yesterdayEarly,
+      },
+    ],
+    operator: [
+      {
+        icon: '↗',
+        tone: 'blue',
+        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
+        time: commonTimes.now,
+      },
+      {
+        icon: '!',
+        tone: 'red',
+        title: pickText({ FR: "Signalement d'une panne", EN: 'Reported a breakdown', AR: 'التبليغ عن عطل' }),
+        time: commonTimes.morning,
+      },
+      {
+        icon: '▣',
+        tone: 'slate',
+        title: pickText({ FR: "Ajout d'une demande", EN: 'Added a request', AR: 'إضافة طلب' }),
+        time: commonTimes.yesterdayLate,
+      },
+      {
+        icon: '✓',
+        tone: 'green',
+        title: pickText({ FR: 'Clôture d’une demande', EN: 'Closed a request', AR: 'إغلاق طلب' }),
+        time: commonTimes.yesterdayMid,
+      },
+      {
+        icon: '↻',
+        tone: 'purple',
+        title: pickText({ FR: "Mise à jour de l'état machine", EN: 'Updated machine status', AR: 'تحديث حالة الآلة' }),
+        time: commonTimes.yesterdayEarly,
+      },
+    ],
+  }
+
+  return activitiesByRole[user.role] || activitiesByRole.operator
+}
+
+function permissionDefinitions() {
+  return [
+    {
+      key: 'viewMachines',
+      label: pickText({ FR: 'Consulter les machines', EN: 'View machines', AR: 'عرض الآلات' }),
+      roles: ['admin', 'technician', 'operator'],
+    },
+    {
+      key: 'createIntervention',
+      label: pickText({ FR: 'Créer une intervention', EN: 'Create an intervention', AR: 'إنشاء تدخل' }),
+      roles: ['admin', 'technician'],
+    },
+    {
+      key: 'editIntervention',
+      label: pickText({ FR: 'Modifier les interventions', EN: 'Edit interventions', AR: 'تعديل التدخلات' }),
+      roles: ['admin', 'technician'],
+    },
+    {
+      key: 'validateIntervention',
+      label: pickText({ FR: 'Valider les interventions', EN: 'Approve interventions', AR: 'المصادقة على التدخلات' }),
+      roles: ['admin'],
+    },
+    {
+      key: 'manageUsers',
+      label: pickText({ FR: 'Gérer les utilisateurs', EN: 'Manage users', AR: 'إدارة المستخدمين' }),
+      roles: ['admin'],
+    },
+    {
+      key: 'editSettings',
+      label: pickText({ FR: 'Modifier les paramètres', EN: 'Edit settings', AR: 'تعديل الإعدادات' }),
+      roles: ['admin'],
+    },
+    {
+      key: 'addReports',
+      label: pickText({ FR: 'Ajouter des rapports', EN: 'Add reports', AR: 'إضافة تقارير' }),
+      roles: ['admin', 'technician'],
+    },
+    {
+      key: 'viewReports',
+      label: pickText({ FR: 'Consulter les rapports', EN: 'View reports', AR: 'عرض التقارير' }),
+      roles: ['admin', 'technician'],
+    },
+  ]
+}
+
+function defaultPermissionsForRole(role) {
+  return permissionDefinitions().reduce((permissions, permission) => {
+    permissions[permission.key] = permission.roles.includes(role)
+    return permissions
+  }, {})
+}
+
+function userPermissions(user) {
+  const savedPermissions = user.permissions || defaultPermissionsForRole(user.role)
+
+  return permissionDefinitions().map((permission) => ({
+    ...permission,
+    allowed: Boolean(savedPermissions[permission.key]),
+  }))
+}
+
+function displayDate(date) {
+  if (language.value === 'AR') {
+    return date
+      .replace('2026-07-16', '16 يوليو 2026')
+      .replace('2026-07-15', '15 يوليو 2026')
+      .replace('2026-07-10', '10 يوليو 2026')
+  }
+
+  if (language.value === 'EN') {
+    return date
+      .replace('2026-07-16', 'July 16, 2026')
+      .replace('2026-07-15', 'July 15, 2026')
+      .replace('2026-07-10', 'July 10, 2026')
+  }
+
+  return date
+    .replace('2026-07-16', '16 juillet 2026')
+    .replace('2026-07-15', '15 juillet 2026')
+    .replace('2026-07-10', '10 juillet 2026')
+}
+
+function displayName(name) {
+  if (language.value !== 'AR') return name
+
+  const names = {
+    'Ghizlane Rabii': 'غزلان ربيعي',
+    'Ahmed El Mansouri': 'أحمد المنصوري',
+    'Nabil Amrani': 'نبيل العمراني',
+    'Youssef Berrada': 'يوسف برادة',
+  }
+
+  return names[name] || name
+}
+
+function getInitials(name) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+}
+
+function avatarTone(name) {
+  const tones = ['avatar-slate', 'avatar-indigo', 'avatar-teal', 'avatar-stone']
+  const seed = String(name || '')
+    .split('')
+    .reduce((total, char) => total + char.charCodeAt(0), 0)
+
+  return tones[seed % tones.length]
+}
+
+function createEmptyUser() {
+  return {
+    name: '',
+    email: '',
+    role: 'operator',
+    department: '',
+  }
+}
+
+function openCreateModal() {
+  editingUserId.value = null
+  permissionForm.value = {}
+  newUser.value = createEmptyUser()
+  isUserModalOpen.value = true
+}
+
+function openEditModal(user) {
+  editingUserId.value = user.id
+  newUser.value = {
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    department: departmentLabel(user.department),
+  }
+  permissionForm.value = {
+    ...defaultPermissionsForRole(user.role),
+    ...(user.permissions || {}),
+  }
+  isUserModalOpen.value = true
+}
+
+function closeUserModal() {
+  isUserModalOpen.value = false
+  editingUserId.value = null
+  permissionForm.value = {}
+}
+
+function openUserProfile(user) {
+  selectedUser.value = user
+}
+
+function closeUserProfile() {
+  selectedUser.value = null
+}
+
+function syncPermissionDefaults() {
+  if (!editingUserId.value) return
+
+  permissionForm.value = defaultPermissionsForRole(newUser.value.role)
+}
+
+function saveUser() {
+  if (editingUserId.value) {
+    const userIndex = users.value.findIndex((user) => user.id === editingUserId.value)
+
+    if (userIndex !== -1) {
+      users.value[userIndex] = {
+        ...users.value[userIndex],
+        ...newUser.value,
+        department: normalizeDepartment(newUser.value.department),
+        permissions: { ...permissionForm.value },
+      }
+    }
+
+    closeUserModal()
+    return
+  }
+
+  users.value.unshift({
+    id: Date.now(),
+    ...newUser.value,
+    department: normalizeDepartment(newUser.value.department),
+    status: 'pending',
+    lastLogin: '2026-07-16 00:00',
+  })
+  closeUserModal()
+}
+
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+function closeSidebar() {
+  isSidebarOpen.value = false
+}
+</script>
+
+<style scoped>
+.users-layout {
+  position: relative;
+  background: #f7f9f3;
+}
+
+.users-page {
+  min-height: 100vh;
+  padding: 28px 28px 48px 88px;
+}
+
+[dir='rtl'] .users-page {
+  padding-right: 88px;
+  padding-left: 28px;
+}
+
+.users-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.users-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.users-header h1 {
+  margin: 0;
+  color: #4a0a0a;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.users-header p {
+  margin: 6px 0 0;
+  color: rgba(74, 10, 10, 0.66);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.primary-button {
+  background: #6a9a2a;
+  color: #f7f9f3;
+}
+
+.secondary-button {
+  background: #f7f9f3;
+  color: #4a0a0a;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+  margin-bottom: 18px;
+}
+
+.stats-grid article,
+.users-panel {
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.06);
+}
+
+.stats-grid article {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.stats-grid article::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--stat-color, #b6c65b);
+}
+
+.stats-grid article::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--stat-color, #b6c65b);
+  box-shadow: 0 0 0 6px var(--stat-soft, rgba(182, 198, 91, 0.18));
+}
+
+[dir='rtl'] .stats-grid article::after {
+  right: auto;
+  left: 18px;
+}
+
+.stats-grid article.total {
+  --stat-color: #6a9a2a;
+  --stat-soft: rgba(106, 154, 42, 0.18);
+}
+
+.stats-grid article.active {
+  --stat-color: #b6c65b;
+  --stat-soft: rgba(182, 198, 91, 0.2);
+}
+
+.stats-grid article.pending {
+  --stat-color: #e8b300;
+  --stat-soft: rgba(232, 179, 0, 0.2);
+}
+
+.stats-grid article.blocked {
+  --stat-color: #e31e24;
+  --stat-soft: rgba(227, 30, 36, 0.16);
+}
+
+.stats-grid span {
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.stats-grid strong {
+  color: var(--stat-color, #4a0a0a);
+  font-size: 30px;
+  font-weight: 950;
+}
+
+.users-panel {
+  overflow: hidden;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 180px 180px;
+  gap: 14px;
+  padding: 24px 22px;
+  border-bottom: 1px solid rgba(74, 10, 10, 0.1);
+}
+
+.toolbar label,
+.user-modal label {
+  display: grid;
+  gap: 7px;
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.toolbar input,
+.toolbar select,
+.user-modal input,
+.user-modal select {
+  height: 42px;
+  width: 100%;
+  border: 1px solid rgba(74, 10, 10, 0.14);
+  border-radius: 12px;
+  padding: 0 12px;
+  color: #4a0a0a;
+  font-size: 14px;
+  font-weight: 700;
+  outline: none;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(74, 10, 10, 0.1);
+  text-align: start;
+  vertical-align: middle;
+}
+
+th {
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+th:last-child,
+td:last-child {
+  text-align: center;
+}
+
+td {
+  color: #4a0a0a;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-cell > span {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.avatar-slate {
+  background: #f7f9f3;
+  color: #4a0a0a;
+}
+
+.avatar-indigo {
+  background: rgba(106, 154, 42, 0.14);
+  color: #4a0a0a;
+}
+
+.avatar-teal {
+  background: rgba(182, 198, 91, 0.28);
+  color: #4a0a0a;
+}
+
+.avatar-stone {
+  background: rgba(232, 179, 0, 0.18);
+  color: #4a0a0a;
+}
+
+.user-cell strong,
+.user-cell small {
+  display: block;
+}
+
+.user-cell small {
+  margin-top: 3px;
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.role-pill {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.role-pill.admin {
+  background: #6a9a2a;
+  color: #f7f9f3;
+}
+
+.role-pill.technician {
+  background: #ff6a00;
+  color: #ffffff;
+}
+
+.role-pill.operator {
+  background: #e31e24;
+  color: #ffffff;
+}
+
+.status-pill.active {
+  background: rgba(182, 198, 91, 0.24);
+  color: #6a9a2a;
+}
+
+.status-pill.pending {
+  background: rgba(232, 179, 0, 0.22);
+  color: #8a6700;
+}
+
+.status-pill.blocked {
+  background: rgba(227, 30, 36, 0.12);
+  color: #e31e24;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(182, 198, 91, 0.2);
+  color: #6a9a2a;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 50;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 16px;
+  background: #ffffff;
+  color: #4a0a0a;
+  box-shadow: 0 12px 28px rgba(74, 10, 10, 0.12);
+}
+
+[dir='rtl'] .sidebar-toggle {
+  right: 24px;
+  left: auto;
+}
+
+.sidebar-toggle.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sidebar-toggle span {
+  width: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.sidebar-backdrop,
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: rgba(74, 10, 10, 0.28);
+}
+
+.modal-backdrop {
+  z-index: 70;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: 48px 20px;
+  overflow-y: auto;
+}
+
+.user-modal {
+  width: min(100%, 460px);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 125, 32, 0.38) transparent;
+  -webkit-overflow-scrolling: touch;
+  display: grid;
+  gap: 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 22px;
+  box-shadow: 0 24px 70px rgba(74, 10, 10, 0.22);
+}
+
+.user-profile-modal {
+  --role-color: #6a9a2a;
+  --role-soft: rgba(106, 154, 42, 0.18);
+  position: relative;
+  width: min(100%, 640px);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 125, 32, 0.38) transparent;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(74, 10, 10, 0.22);
+}
+
+.user-profile-modal::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.user-modal::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.user-profile-modal::-webkit-scrollbar-thumb,
+.user-modal::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(79, 125, 32, 0.38);
+}
+
+.user-profile-modal::-webkit-scrollbar-track,
+.user-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.user-profile-modal::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 8px;
+  background: var(--role-color);
+}
+
+.user-profile-modal.admin {
+  --role-color: #6a9a2a;
+  --role-soft: rgba(106, 154, 42, 0.18);
+}
+
+.user-profile-modal.technician {
+  --role-color: #ff6a00;
+  --role-soft: rgba(255, 106, 0, 0.18);
+}
+
+.user-profile-modal.operator {
+  --role-color: #e31e24;
+  --role-soft: rgba(227, 30, 36, 0.14);
+}
+
+.profile-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  background: #f7f9f3;
+}
+
+[dir='rtl'] .profile-close {
+  right: auto;
+  left: 16px;
+}
+
+.user-profile-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: stretch;
+  padding: 34px 24px 18px;
+  background:
+    linear-gradient(180deg, var(--role-soft), rgba(255, 255, 255, 0) 62%),
+    #ffffff;
+  color: #4a0a0a;
+}
+
+.profile-identity-preview {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  padding: 18px;
+  text-align: start;
+}
+
+.profile-photo {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--role-color);
+  border-radius: 50%;
+  background: #ffffff;
+  color: #4a0a0a;
+  font-size: 21px;
+  font-weight: 950;
+  box-shadow: 0 12px 26px rgba(74, 10, 10, 0.1);
+}
+
+.profile-kicker {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--role-soft);
+  padding: 0 10px;
+  color: rgba(74, 10, 10, 0.66);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.profile-identity-preview h2 {
+  margin: 7px 0 4px;
+  color: #4a0a0a;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.profile-identity-preview p {
+  margin: 0;
+  color: rgba(74, 10, 10, 0.66);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.profile-info-list ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #4a0a0a;
+}
+
+.profile-info-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.profile-info-list li span {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--role-soft);
+  color: #4a0a0a;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.profile-info-list li strong {
+  min-width: 0;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.profile-role-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 24px 16px;
+  background: #ffffff;
+}
+
+.profile-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0 24px 24px;
+  background: #ffffff;
+}
+
+.profile-detail-grid div {
+  min-width: 0;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 14px;
+  background: #f7f9f3;
+  padding: 12px 14px;
+}
+
+.profile-detail-grid dt {
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.profile-detail-grid dd {
+  margin: 6px 0 0;
+  color: #4a0a0a;
+  font-size: 14px;
+  font-weight: 900;
+  word-break: break-word;
+}
+
+.user-activity-card,
+.user-permissions-card {
+  margin: 0 24px 24px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.activity-heading {
+  padding: 16px 18px 10px;
+}
+
+.activity-heading h3 {
+  margin: 0;
+  color: #4a0a0a;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.user-activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user-activity-list li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(74, 10, 10, 0.08);
+}
+
+.activity-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.activity-icon.blue {
+  background: rgba(106, 154, 42, 0.14);
+  color: #6a9a2a;
+}
+
+.activity-icon.purple {
+  background: rgba(182, 198, 91, 0.28);
+  color: #6a9a2a;
+}
+
+.activity-icon.slate {
+  background: #f7f9f3;
+  color: #4a0a0a;
+}
+
+.activity-icon.green {
+  background: rgba(182, 198, 91, 0.24);
+  color: #6a9a2a;
+}
+
+.activity-icon.red {
+  background: rgba(227, 30, 36, 0.12);
+  color: #e31e24;
+}
+
+.user-activity-list strong,
+.user-activity-list small {
+  display: block;
+}
+
+.user-activity-list strong {
+  color: #4a0a0a;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.user-activity-list small {
+  margin-top: 2px;
+  color: rgba(74, 10, 10, 0.62);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.activity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #b6c65b;
+}
+
+.activity-dot.blue {
+  background: #6a9a2a;
+}
+
+.activity-dot.purple {
+  background: #b6c65b;
+}
+
+.activity-dot.slate {
+  background: #4a0a0a;
+}
+
+.activity-dot.green {
+  background: #6a9a2a;
+}
+
+.activity-dot.red {
+  background: #e31e24;
+}
+
+.view-activity-button {
+  width: calc(100% - 36px);
+  min-height: 38px;
+  margin: 10px 18px 16px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4a0a0a;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.view-activity-button:hover {
+  border-color: rgba(106, 154, 42, 0.28);
+  background: #f7f9f3;
+}
+
+.permissions-mini-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 18px 16px;
+  list-style: none;
+}
+
+.permissions-mini-list li {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid rgba(74, 10, 10, 0.08);
+  color: #4a0a0a;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.permissions-mini-list strong {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #6a9a2a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.permissions-mini-list strong.denied {
+  background: #e31e24;
+}
+
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.modal-heading h2 {
+  margin: 0;
+  color: #4a0a0a;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.modal-close {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 10px;
+  background: #f7f9f3;
+  color: #4a0a0a;
+  cursor: pointer;
+}
+
+.modal-close span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.modal-close span:first-child {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.modal-close span:last-child {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-permissions-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(74, 10, 10, 0.1);
+  border-radius: 14px;
+  background: #f7f9f3;
+  padding: 14px;
+}
+
+.edit-permissions-panel h3 {
+  margin: 0 0 4px;
+  color: #4a0a0a;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.permission-toggle {
+  min-height: 34px;
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #4a0a0a !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+
+.permission-toggle input {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: #6a9a2a;
+}
+
+:global(:root[data-theme='dark']) .users-layout {
+  background: #10170d;
+  color: #edf6dc;
+}
+
+:global(:root[data-theme='dark']) .users-header h1,
+:global(:root[data-theme='dark']) .stats-grid strong,
+:global(:root[data-theme='dark']) td,
+:global(:root[data-theme='dark']) .modal-heading h2 {
+  color: #f6ffe8;
+}
+
+:global(:root[data-theme='dark']) .users-header p,
+:global(:root[data-theme='dark']) th,
+:global(:root[data-theme='dark']) .stats-grid span,
+:global(:root[data-theme='dark']) .toolbar label,
+:global(:root[data-theme='dark']) .user-modal label,
+:global(:root[data-theme='dark']) .user-cell small {
+  color: #b8c7aa;
+}
+
+:global(:root[data-theme='dark']) .stats-grid article,
+:global(:root[data-theme='dark']) .users-panel,
+:global(:root[data-theme='dark']) .user-modal,
+:global(:root[data-theme='dark']) .user-profile-modal,
+:global(:root[data-theme='dark']) .edit-permissions-panel {
+  border-color: rgba(215, 236, 120, 0.18);
+  background: #172112;
+}
+
+:global(:root[data-theme='dark']) .profile-detail-grid div {
+  border-color: rgba(215, 236, 120, 0.16);
+  background: #111a0d;
+}
+
+:global(:root[data-theme='dark']) .profile-detail-grid,
+:global(:root[data-theme='dark']) .profile-role-line {
+  background: #172112;
+}
+
+:global(:root[data-theme='dark']) .user-profile-card {
+  background:
+    linear-gradient(180deg, rgba(215, 236, 120, 0.08), rgba(23, 33, 18, 0) 62%),
+    #172112;
+}
+
+:global(:root[data-theme='dark']) .profile-identity-preview,
+:global(:root[data-theme='dark']) .profile-info-list li,
+:global(:root[data-theme='dark']) .user-activity-card,
+:global(:root[data-theme='dark']) .user-permissions-card {
+  border-color: rgba(215, 236, 120, 0.16);
+  background: #111a0d;
+}
+
+:global(:root[data-theme='dark']) .profile-identity-preview h2,
+:global(:root[data-theme='dark']) .profile-info-list li strong,
+:global(:root[data-theme='dark']) .activity-heading h3,
+:global(:root[data-theme='dark']) .user-activity-list strong,
+:global(:root[data-theme='dark']) .permissions-mini-list li,
+:global(:root[data-theme='dark']) .edit-permissions-panel h3,
+:global(:root[data-theme='dark']) .permission-toggle {
+  color: #f6ffe8;
+}
+
+:global(:root[data-theme='dark']) .profile-identity-preview p {
+  color: #dce7cf;
+}
+
+:global(:root[data-theme='dark']) .profile-detail-grid dd {
+  color: #f6ffe8;
+}
+
+:global(:root[data-theme='dark']) .profile-detail-grid dt {
+  color: #dce7cf;
+}
+
+:global(:root[data-theme='dark']) .user-activity-list li {
+  border-top-color: rgba(215, 236, 120, 0.14);
+}
+
+:global(:root[data-theme='dark']) .permissions-mini-list li {
+  border-top-color: rgba(215, 236, 120, 0.14);
+}
+
+:global(:root[data-theme='dark']) .user-activity-list small {
+  color: #b8c7aa;
+}
+
+:global(:root[data-theme='dark']) .view-activity-button {
+  border-color: rgba(215, 236, 120, 0.18);
+  background: #172112;
+  color: #eef6dc;
+}
+
+:global(:root[data-theme='dark']) .avatar-slate {
+  background: #263241;
+  color: #dbeafe;
+}
+
+:global(:root[data-theme='dark']) .avatar-indigo {
+  background: #312e81;
+  color: #e0e7ff;
+}
+
+:global(:root[data-theme='dark']) .avatar-teal {
+  background: #134e4a;
+  color: #ccfbf1;
+}
+
+:global(:root[data-theme='dark']) .avatar-stone {
+  background: #292524;
+  color: #e7e5e4;
+}
+
+:global(:root[data-theme='dark']) .stats-grid article {
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+}
+
+:global(:root[data-theme='dark']) th,
+:global(:root[data-theme='dark']) td,
+:global(:root[data-theme='dark']) .toolbar {
+  border-color: rgba(215, 236, 120, 0.18);
+}
+
+@media (max-width: 900px) {
+  .users-page {
+    padding: 88px 16px 32px;
+  }
+
+  [dir='rtl'] .users-page {
+    padding: 88px 16px 32px;
+  }
+
+  .users-header {
+    flex-direction: column;
+  }
+
+  .users-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .stats-grid,
+  .toolbar,
+  .profile-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-profile-card {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    padding: 28px 22px;
+  }
+
+  .profile-info-list li {
+    font-size: 17px;
+  }
+
+  .profile-info-list ul {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-identity-preview {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-role-line,
+  .profile-detail-grid,
+  .user-activity-card,
+  .user-permissions-card {
+    padding-inline: 22px;
+  }
+
+  .user-activity-card,
+  .user-permissions-card {
+    margin-inline: 22px;
+  }
+}
+</style>

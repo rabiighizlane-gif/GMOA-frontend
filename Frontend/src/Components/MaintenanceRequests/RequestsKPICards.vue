@@ -1,0 +1,121 @@
+<template>
+  <section class="kpi-grid">
+    <article v-for="card in cards" :key="card.label" class="kpi-card">
+      <div class="kpi-icon" :class="`kpi-icon--${card.color}`">{{ card.icon }}</div>
+      <div>
+        <p>{{ card.label }}</p>
+        <strong>{{ card.value }}</strong>
+        <small :class="`text-${card.color}`">{{ card.description }}</small>
+      </div>
+    </article>
+  </section>
+</template>
+
+<script setup>
+defineProps({
+  cards: {
+    type: Array,
+    default: () => []
+  }
+})
+</script>
+
+<style scoped>
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 112px;
+  padding: 18px;
+  background: white;
+  border: 1px solid #edf0e8;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(74, 10, 10, 0.05);
+  transition: 0.22s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(74, 10, 10, 0.08);
+}
+
+.kpi-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.kpi-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.kpi-card strong {
+  display: block;
+  margin: 5px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.kpi-card small {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.kpi-icon--green {
+  background: #edf5de;
+  color: #6a9a2a;
+}
+
+.kpi-icon--yellow {
+  background: #fff4cf;
+  color: #ad7a00;
+}
+
+.kpi-icon--orange {
+  background: #fff0df;
+  color: #ff6a00;
+}
+
+.kpi-icon--red {
+  background: #ffe2e2;
+  color: #e31e24;
+}
+
+.kpi-icon--gray {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.text-green { color: #6a9a2a; }
+.text-yellow { color: #ad7a00; }
+.text-orange { color: #ff6a00; }
+.text-red { color: #e31e24; }
+.text-gray { color: #64748b; }
+
+@media (max-width: 1500px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 800px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+</style>

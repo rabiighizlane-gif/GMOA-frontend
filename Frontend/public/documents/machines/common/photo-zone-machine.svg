@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Photo zone machine</title>
+  <desc id="desc">Illustration statique d'une zone machine SmartCalyx.</desc>
+  <rect width="1200" height="760" fill="#F7F9F3"/>
+  <rect x="80" y="90" width="1040" height="580" rx="28" fill="#fff" stroke="#4A0A0A" stroke-opacity=".12"/>
+  <rect x="140" y="190" width="360" height="280" rx="22" fill="#B6C65B"/>
+  <rect x="185" y="240" width="270" height="92" rx="12" fill="#F7F9F3"/>
+  <rect x="190" y="370" width="260" height="36" rx="18" fill="#6A9A2A"/>
+  <circle cx="270" cy="535" r="48" fill="#4A0A0A"/>
+  <circle cx="410" cy="535" r="48" fill="#4A0A0A"/>
+  <path d="M620 250h330v220H620z" fill="#E8B300"/>
+  <path d="M660 300h250v48H660z" fill="#F7F9F3"/>
+  <path d="M660 380h170v34H660z" fill="#FF6A00"/>
+  <path d="M120 610h960" stroke="#4A0A0A" stroke-opacity=".18" stroke-width="18" stroke-linecap="round"/>
+  <text x="140" y="145" fill="#4A0A0A" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800">Zone machine - SmartCalyx</text>
+  <text x="620" y="535" fill="#4A0A0A" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Document image ouvert depuis la fiche machine</text>
+</svg>
