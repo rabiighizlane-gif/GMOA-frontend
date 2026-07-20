@@ -1,43 +1,75 @@
 <template>
   <section class="filters-bar">
     <div class="search-wrapper">
-      <span>⌕</span>
-      <input :value="filters.search" type="search" placeholder="Rechercher par ID ou nom..." @input="updateFilter('search', $event.target.value)" />
+      <span>&#8981;</span>
+      <input :value="filters.search" type="search" :placeholder="content.search" @input="updateFilter('search', $event.target.value)" />
     </div>
     <select :value="filters.line" @change="updateFilter('line', $event.target.value)">
-      <option value="">Toutes les lignes</option>
-      <option v-for="line in lines" :key="line">{{ line }}</option>
+      <option value="">{{ content.allLines }}</option>
+      <option v-for="line in lines" :key="line" :value="line">{{ displayLine(line) }}</option>
     </select>
     <select :value="filters.status" @change="updateFilter('status', $event.target.value)">
-      <option value="">Tous les états</option>
-      <option>En service</option>
-      <option>En maintenance</option>
-      <option>En panne</option>
-      <option>Hors service</option>
+      <option value="">{{ content.allStatuses }}</option>
+      <option value="En service">{{ content.statuses.service }}</option>
+      <option value="En maintenance">{{ content.statuses.maintenance }}</option>
+      <option value="En panne">{{ content.statuses.breakdown }}</option>
+      <option value="Hors service">{{ content.statuses.offline }}</option>
     </select>
     <select :value="filters.category" @change="updateFilter('category', $event.target.value)">
-      <option value="">Toutes les catégories</option>
-      <option v-for="category in categories" :key="category">{{ category }}</option>
+      <option value="">{{ content.allCategories }}</option>
+      <option v-for="category in categories" :key="category" :value="category">{{ displayCategory(category) }}</option>
     </select>
     <select :value="filters.criticality" @change="updateFilter('criticality', $event.target.value)">
-      <option value="">Toutes les criticités</option>
-      <option>Critique</option>
-      <option>Haute</option>
-      <option>Moyenne</option>
-      <option>Faible</option>
+      <option value="">{{ content.allCriticalities }}</option>
+      <option value="Critique">{{ content.criticalities.critical }}</option>
+      <option value="Haute">{{ content.criticalities.high }}</option>
+      <option value="Moyenne">{{ content.criticalities.medium }}</option>
+      <option value="Faible">{{ content.criticalities.low }}</option>
     </select>
-    <button type="button" class="reset-button" @click="$emit('reset')">Réinitialiser</button>
+    <button type="button" class="reset-button" @click="$emit('reset')">{{ content.reset }}</button>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+
 defineProps({
   filters: { type: Object, required: true },
   lines: { type: Array, default: () => [] },
-  categories: { type: Array, default: () => [] }
+  categories: { type: Array, default: () => [] },
+  content: { type: Object, required: true },
 })
+
 const emit = defineEmits(['update-filter', 'reset'])
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+
+const translatedValues = {
+  EN: {
+    categories: { Mecanique: 'Mechanical', Hydraulique: 'Hydraulic', Conditionnement: 'Packaging', Pneumatique: 'Pneumatic', Electrique: 'Electrical' },
+    lines: { 'Ligne Production 1': 'Production Line 1', 'Ligne Production 2': 'Production Line 2', 'Ligne Conditionnement': 'Packaging Line', 'Ligne Utilites': 'Utilities Line' },
+  },
+  AR: {
+    categories: {
+      Mecanique: '\u0645\u064a\u0643\u0627\u0646\u064a\u0643\u064a\u0629',
+      Hydraulique: '\u0647\u064a\u062f\u0631\u0648\u0644\u064a\u0643\u064a\u0629',
+      Conditionnement: '\u0627\u0644\u062a\u0639\u0628\u0626\u0629',
+      Pneumatique: '\u0647\u0648\u0627\u0626\u064a\u0629',
+      Electrique: '\u0643\u0647\u0631\u0628\u0627\u0626\u064a\u0629',
+    },
+    lines: {
+      'Ligne Production 1': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 1',
+      'Ligne Production 2': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 2',
+      'Ligne Conditionnement': '\u062e\u0637 \u0627\u0644\u062a\u0639\u0628\u0626\u0629',
+      'Ligne Utilites': '\u062e\u0637 \u0627\u0644\u0645\u0631\u0627\u0641\u0642',
+    },
+  },
+}
+
 const updateFilter = (key, value) => emit('update-filter', { key, value })
+const displayCategory = (category) => translatedValues[language.value]?.categories?.[category] || category
+const displayLine = (line) => translatedValues[language.value]?.lines?.[line] || line
 </script>
 
 <style scoped>

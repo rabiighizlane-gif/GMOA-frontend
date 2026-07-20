@@ -1,8 +1,8 @@
 <template>
   <div class="stock-progress">
     <div class="stock-meta">
-      <strong>{{ currentStock }} / {{ maximumStock }}</strong>
-      <span>Seuil {{ minimumStock }}</span>
+      <strong class="stock-ratio" dir="ltr">{{ currentStock }} / {{ maximumStock }}</strong>
+      <span>{{ thresholdLabel }} <bdi dir="ltr">{{ minimumStock }}</bdi></span>
     </div>
 
     <div class="track">
@@ -17,6 +17,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   currentStock: {
@@ -32,6 +33,13 @@ const props = defineProps({
     required: true
   }
 })
+
+const languageStore = useLanguageStore()
+const thresholdLabel = computed(() => ({
+  FR: 'Seuil',
+  EN: 'Threshold',
+  AR: 'الحد الادنى',
+})[languageStore.language] || 'Seuil')
 
 const progress = computed(() => {
   if (!props.maximumStock) {
@@ -70,6 +78,11 @@ const statusClass = computed(() => {
 
 .stock-meta strong {
   color: #4a0a0a;
+}
+
+.stock-ratio,
+.stock-meta bdi {
+  unicode-bidi: isolate;
 }
 
 .stock-meta span {

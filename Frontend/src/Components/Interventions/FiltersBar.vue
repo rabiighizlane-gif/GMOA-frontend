@@ -5,48 +5,50 @@
       <input
         :value="modelValue.search"
         type="search"
-        placeholder="Rechercher une intervention..."
+        :placeholder="content.search"
         @input="update('search', $event.target.value)"
       />
     </label>
 
     <label class="field">
-      <span>Date</span>
+      <span>{{ content.date }}</span>
       <input :value="modelValue.date" type="date" @input="update('date', $event.target.value)" />
     </label>
 
     <label class="field">
-      <span>Technicien</span>
+      <span>{{ content.technician }}</span>
       <select :value="modelValue.technician" @change="update('technician', $event.target.value)">
-        <option value="">Tous</option>
-        <option v-for="technician in technicians" :key="technician" :value="technician">{{ technician }}</option>
+        <option value="">{{ content.all }}</option>
+        <option v-for="technician in technicians" :key="technician" :value="technician">{{ displayTechnician(technician) }}</option>
       </select>
     </label>
 
     <label class="field">
-      <span>Statut</span>
+      <span>{{ content.status }}</span>
       <select :value="modelValue.status" @change="update('status', $event.target.value)">
-        <option value="">Tous</option>
-        <option value="Terminée">Terminée</option>
-        <option value="En cours">En cours</option>
-        <option value="En attente">En attente</option>
+        <option value="">{{ content.all }}</option>
+        <option value="Terminee">{{ content.done }}</option>
+        <option value="En cours">{{ content.inProgress }}</option>
+        <option value="En attente">{{ content.pending }}</option>
       </select>
     </label>
 
     <button class="ghost-button" type="button">
       <InterventionIcon name="download" />
-      Export
+      {{ content.export }}
     </button>
 
     <button v-if="canCreate" class="primary-button" type="button">
       <InterventionIcon name="plus" />
-      Nouvelle intervention
+      {{ content.create }}
     </button>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import InterventionIcon from './InterventionIcon.vue'
+import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   modelValue: {
@@ -61,12 +63,32 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  content: {
+    type: Object,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+
+const technicianNames = {
+  AR: {
+    'Nabil Amrani': '\u0646\u0628\u064a\u0644 \u0627\u0644\u0639\u0645\u0631\u0627\u0646\u064a',
+    'Ahmed El Mansouri': '\u0623\u062d\u0645\u062f \u0627\u0644\u0645\u0646\u0635\u0648\u0631\u064a',
+    'Youssef Berrada': '\u064a\u0648\u0633\u0641 \u0628\u0631\u0627\u062f\u0629',
+    'Sara El Idrissi': '\u0633\u0627\u0631\u0629 \u0627\u0644\u0625\u062f\u0631\u064a\u0633\u064a',
+    'Karim El Fassi': '\u0643\u0631\u064a\u0645 \u0627\u0644\u0641\u0627\u0633\u064a',
+  },
+}
 
 function update(key, value) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
+}
+
+function displayTechnician(name) {
+  return technicianNames[language.value]?.[name] || name
 }
 </script>
 

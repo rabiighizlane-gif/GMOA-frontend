@@ -16,9 +16,9 @@
     </button>
 
     <div v-if="isOpen" class="language-menu">
-      <button type="button" @click="selectLanguage('FR')">Français</button>
+      <button type="button" @click="selectLanguage('FR')">{{ frenchLabel }}</button>
       <button type="button" @click="selectLanguage('EN')">English</button>
-      <button type="button" @click="selectLanguage('AR')">العربية</button>
+      <button type="button" @click="selectLanguage('AR')">{{ arabicLabel }}</button>
     </div>
   </div>
 </template>
@@ -38,11 +38,13 @@ const languageStore = useLanguageStore()
 const isOpen = ref(false)
 const switcherRef = ref(null)
 const language = computed(() => languageStore.language)
+const frenchLabel = 'Fran\u00e7ais'
+const arabicLabel = '\u0627\u0644\u0639\u0631\u0628\u064a\u0629'
 
 const languageLabels = {
-  FR: 'Français',
+  FR: frenchLabel,
   EN: 'English',
-  AR: 'العربية',
+  AR: arabicLabel,
 }
 
 const currentLanguageLabel = computed(() => languageLabels[language.value] || language.value)
@@ -51,7 +53,7 @@ const content = computed(() => {
   const labels = {
     FR: { label: 'Changer la langue' },
     EN: { label: 'Change language' },
-    AR: { label: 'تغيير اللغة' },
+    AR: { label: '\u062a\u063a\u064a\u064a\u0631 \u0627\u0644\u0644\u063a\u0629' },
   }
 
   return labels[language.value] || labels.FR

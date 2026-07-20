@@ -160,7 +160,7 @@ const typeLabels = {
     AR: 'إصلاحي',
   },
   improvement: {
-    FR: 'Amelioration',
+    FR: 'Amélioration',
     EN: 'Improvement',
     AR: 'تحسين',
   },

@@ -1,6 +1,13 @@
 <template>
-  <main class="reports-page">
-    <button type="button" class="sidebar-toggle" aria-label="Afficher le menu" @click="openSidebar">
+  <main class="reports-page" :dir="language === 'AR' ? 'rtl' : 'ltr'">
+    <button
+      type="button"
+      class="sidebar-toggle"
+      :class="{ 'is-hidden': isSidebarOpen }"
+      :aria-label="content.sidebarToggle"
+      :aria-expanded="isSidebarOpen"
+      @click="openSidebar"
+    >
       <span></span>
       <span></span>
       <span></span>
@@ -11,32 +18,32 @@
 
     <section class="page-header">
       <div>
-        <p class="breadcrumb">Accueil / Rapports</p>
-        <h1>Rapports</h1>
-        <p>Analyse, suivi et export des données de maintenance</p>
+        <p class="breadcrumb">{{ content.breadcrumb }}</p>
+        <h1>{{ content.title }}</h1>
+        <p>{{ content.subtitle }}</p>
       </div>
 
       <ExportActions
         v-model:period="selectedPeriod"
         v-model:report-type="selectedReportType"
-        :report-types="reportTypes"
+        :report-types="displayReportTypes"
         @export-pdf="exportReport('PDF')"
         @export-excel="exportReport('Excel')"
         @generate="generateReport"
       />
     </section>
 
-    <div class="view-switcher" aria-label="Mode d'affichage">
+    <div class="view-switcher" :aria-label="content.viewMode">
       <button :class="{ active: activeView === 'analytics' }" type="button" @click="activeView = 'analytics'">
-        Vue analytique
+        {{ content.analyticsView }}
       </button>
       <button :class="{ active: activeView === 'generated' }" type="button" @click="activeView = 'generated'">
-        Rapports générés
+        {{ content.generatedView }}
       </button>
     </div>
 
     <template v-if="activeView === 'analytics'">
-      <ReportsKPICards :cards="kpiCards" />
+      <ReportsKPICards :cards="displayKpiCards" />
 
       <ReportsFiltersBar
         :filters="filters"
@@ -45,7 +52,7 @@
         @reset="resetFilters"
       />
 
-      <ReportsTypeSelector v-model="selectedReportType" :types="reportTypes" />
+      <ReportsTypeSelector v-model="selectedReportType" :types="displayReportTypes" />
 
       <ReportsChartsSection :report-type="selectedReportType" />
 
@@ -55,19 +62,19 @@
     <section v-else class="history-card">
       <div class="history-header">
         <div>
-          <h2>Historique des rapports</h2>
-          <p>{{ generatedReports.length }} rapport(s) généré(s)</p>
+          <h2>{{ content.historyTitle }}</h2>
+          <p>{{ content.generatedCount(generatedReports.length) }}</p>
         </div>
-        <button type="button" @click="generateReport">Générer un rapport</button>
+        <button type="button" @click="generateReport">{{ content.generate }}</button>
       </div>
 
       <div class="history-list">
         <article v-for="report in generatedReports" :key="report.id" class="history-row">
           <div>
-            <strong>{{ report.title }}</strong>
-            <span>{{ report.format }} · Généré le {{ report.generatedAt }} · Par {{ report.generatedBy }}</span>
+            <strong>{{ content.reportTitle(report.title) }}</strong>
+            <span>{{ content.historyMeta(report) }}</span>
           </div>
-          <button type="button" @click="downloadReport(report.format, report)">Télécharger</button>
+          <button type="button" @click="downloadReport(report.format, report)">{{ content.download }}</button>
         </article>
       </div>
     </section>
@@ -87,6 +94,7 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import Sidebar from '@/Components/sidebar.vue'
 import ExportActions from '@/Components/Reports/ExportActions.vue'
 import ReportPreviewDrawer from '@/Components/Reports/ReportPreviewDrawer.vue'
@@ -96,6 +104,8 @@ import ReportsKPICards from '@/Components/Reports/ReportsKPICards.vue'
 import ReportsTable from '@/Components/Reports/ReportsTable.vue'
 import ReportsTypeSelector from '@/Components/Reports/ReportsTypeSelector.vue'
 
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 const isSidebarOpen = ref(false)
 const activeView = ref('analytics')
 const selectedPeriod = ref('Juillet 2026')
@@ -103,6 +113,77 @@ const selectedReportType = ref('interventions')
 const previewOpen = ref(false)
 const currentPreviewReport = ref(null)
 const toastMessage = ref('')
+
+const reportContent = {
+  FR: {
+    sidebarToggle: 'Afficher le menu',
+    breadcrumb: 'Accueil / Rapports',
+    title: 'Rapports',
+    subtitle: 'Analyse, suivi et export des donnees de maintenance',
+    viewMode: "Mode d'affichage",
+    analyticsView: 'Vue analytique',
+    generatedView: 'Rapports generes',
+    historyTitle: 'Historique des rapports',
+    generatedCount: (count) => `${count} rapport(s) genere(s)`,
+    generate: 'Generer un rapport',
+    download: 'Telecharger',
+    historyMeta: (report) => `${report.format} - Genere le ${report.generatedAt} - Par ${report.generatedBy}`,
+    reportTitle: (title) => title,
+    maintenanceReport: 'Rapport maintenance',
+    filtersApplied: 'Filtres appliques.',
+    filtersReset: 'Filtres reinitialises.',
+    excelDownloaded: 'Fichier Excel telecharge.',
+    pdfDownloaded: 'Fichier PDF telecharge.',
+  },
+  EN: {
+    sidebarToggle: 'Show menu',
+    breadcrumb: 'Home / Reports',
+    title: 'Reports',
+    subtitle: 'Analysis, tracking, and export of maintenance data',
+    viewMode: 'Display mode',
+    analyticsView: 'Analytics view',
+    generatedView: 'Generated reports',
+    historyTitle: 'Report history',
+    generatedCount: (count) => `${count} generated report(s)`,
+    generate: 'Generate report',
+    download: 'Download',
+    historyMeta: (report) => `${report.format} - Generated on ${report.generatedAt} - By ${report.generatedBy}`,
+    reportTitle: (title) => ({
+      'Rapport mensuel - Juillet 2026': 'Monthly report - July 2026',
+      'Rapport interventions - T2 2026': 'Interventions report - Q2 2026',
+    }[title] || title),
+    maintenanceReport: 'Maintenance report',
+    filtersApplied: 'Filters applied.',
+    filtersReset: 'Filters reset.',
+    excelDownloaded: 'Excel file downloaded.',
+    pdfDownloaded: 'PDF file downloaded.',
+  },
+  AR: {
+    sidebarToggle: 'إظهار القائمة',
+    breadcrumb: 'الرئيسية / التقارير',
+    title: 'التقارير',
+    subtitle: 'تحليل وتتبع وتصدير بيانات الصيانة',
+    viewMode: 'طريقة العرض',
+    analyticsView: 'عرض تحليلي',
+    generatedView: 'التقارير المنجزة',
+    historyTitle: 'سجل التقارير',
+    generatedCount: (count) => `${count} تقرير منجز`,
+    generate: 'إنشاء تقرير',
+    download: 'تحميل',
+    historyMeta: (report) => `${report.format} - أنجز في ${report.generatedAt} - بواسطة ${report.generatedBy}`,
+    reportTitle: (title) => ({
+      'Rapport mensuel - Juillet 2026': 'التقرير الشهري - يوليوز 2026',
+      'Rapport interventions - T2 2026': 'تقرير التدخلات - الربع الثاني 2026',
+    }[title] || title),
+    maintenanceReport: 'تقرير الصيانة',
+    filtersApplied: 'تم تطبيق الفلاتر.',
+    filtersReset: 'تمت إعادة ضبط الفلاتر.',
+    excelDownloaded: 'تم تحميل ملف Excel.',
+    pdfDownloaded: 'تم تحميل ملف PDF.',
+  },
+}
+
+const content = computed(() => reportContent[language.value] || reportContent.FR)
 
 const filters = reactive({
   period: '',
@@ -133,6 +214,81 @@ const kpiCards = [
   { icon: 'DH', label: 'Coût maintenance', value: '48 600 DH', description: 'Coût consolidé', color: 'yellow' },
 ]
 
+const reportTypeText = computed(() => ({
+  FR: [
+    ['Rapport des interventions', 'Duree, technicien, type, statut, couts, machine'],
+    ['Rapport des pannes', 'Causes, criticite, duree arret, machines'],
+    ['Rapport des machines', 'Disponibilite, pannes, MTBF, MTTR, etat'],
+    ['Maintenance preventive', 'Planning, echeances, retards, realisation'],
+    ['Pieces de rechange', 'Stock, consommation, ruptures, valeur'],
+    ['Performance techniciens', 'Interventions, temps moyen, clotures, charge'],
+    ['Couts de maintenance', 'Couts par machine, ligne, piece ou periode'],
+  ],
+  EN: [
+    ['Interventions report', 'Duration, technician, type, status, costs, machine'],
+    ['Breakdowns report', 'Causes, criticality, downtime, machines'],
+    ['Machines report', 'Availability, breakdowns, MTBF, MTTR, status'],
+    ['Preventive maintenance', 'Planning, due dates, delays, completion'],
+    ['Spare parts', 'Stock, consumption, shortages, value'],
+    ['Technician performance', 'Interventions, average time, closures, workload'],
+    ['Maintenance costs', 'Costs by machine, line, part, or period'],
+  ],
+  AR: [
+    ['تقرير التدخلات', 'المدة، التقني، النوع، الحالة، الكلفة، الآلة'],
+    ['تقرير الأعطال', 'الأسباب، الخطورة، مدة التوقف، الآلات'],
+    ['تقرير الآلات', 'التوفر، الأعطال، MTBF، MTTR، الحالة'],
+    ['الصيانة الوقائية', 'التخطيط، المواعيد، التأخيرات، الإنجاز'],
+    ['قطع الغيار', 'المخزون، الاستهلاك، النفاد، القيمة'],
+    ['أداء التقنيين', 'التدخلات، الوقت المتوسط، الإغلاق، العبء'],
+    ['تكاليف الصيانة', 'التكاليف حسب الآلة أو الخط أو القطعة أو الفترة'],
+  ],
+}))
+
+const displayReportTypes = computed(() => {
+  const labels = reportTypeText.value[language.value] || reportTypeText.value.FR
+  return reportTypes.map((type, index) => ({
+    ...type,
+    label: labels[index][0],
+    description: labels[index][1],
+  }))
+})
+
+const kpiText = computed(() => ({
+  FR: [
+    ['Interventions', 'Total periode'],
+    ['Disponibilite', 'Moyenne machines'],
+    ['MTBF', 'Temps moyen entre pannes'],
+    ['MTTR', 'Temps moyen de reparation'],
+    ['Pannes critiques', 'A prioriser'],
+    ['Cout maintenance', 'Cout consolide'],
+  ],
+  EN: [
+    ['Interventions', 'Period total'],
+    ['Availability', 'Machine average'],
+    ['MTBF', 'Mean time between failures'],
+    ['MTTR', 'Mean repair time'],
+    ['Critical breakdowns', 'To prioritize'],
+    ['Maintenance cost', 'Consolidated cost'],
+  ],
+  AR: [
+    ['التدخلات', 'مجموع الفترة'],
+    ['التوفر', 'متوسط الآلات'],
+    ['MTBF', 'متوسط الوقت بين الأعطال'],
+    ['MTTR', 'متوسط وقت الإصلاح'],
+    ['الأعطال الحرجة', 'ذات أولوية'],
+    ['تكلفة الصيانة', 'تكلفة مجمعة'],
+  ],
+}))
+
+const displayKpiCards = computed(() => {
+  const labels = kpiText.value[language.value] || kpiText.value.FR
+  return kpiCards.map((card, index) => ({
+    ...card,
+    label: labels[index][0],
+    description: labels[index][1],
+  }))
+})
+
 const generatedReports = ref([
   {
     id: 'RPT-2026-07',
@@ -151,7 +307,7 @@ const generatedReports = ref([
 ])
 
 const activeReportLabel = computed(
-  () => reportTypes.find((type) => type.id === selectedReportType.value)?.label || 'Rapport maintenance',
+  () => displayReportTypes.value.find((type) => type.id === selectedReportType.value)?.label || content.value.maintenanceReport,
 )
 
 const tableConfig = computed(() => {
@@ -349,14 +505,14 @@ function updateFilter({ key, value }) {
 }
 
 function applyFilters() {
-  showToast('Filtres appliqués.')
+  showToast(content.value.filtersApplied)
 }
 
 function resetFilters() {
   Object.keys(filters).forEach((key) => {
     filters[key] = ''
   })
-  showToast('Filtres réinitialisés.')
+  showToast(content.value.filtersReset)
 }
 
 function generateReport() {
@@ -365,7 +521,7 @@ function generateReport() {
     period: selectedPeriod.value,
     generatedAt: '18/07/2026 20:15',
     generatedBy: 'Super Admin',
-    kpis: kpiCards.map(({ label, value }) => ({ label, value })),
+    kpis: displayKpiCards.value.map(({ label, value }) => ({ label, value })),
     rowsCount: tableConfig.value.rows.length,
   }
 
@@ -390,12 +546,12 @@ function downloadReport(format, report = null) {
 
   if (normalizedFormat === 'EXCEL') {
     downloadBlob(createCsvContent(payload), `${slugify(payload.title)}.csv`, 'text/csv;charset=utf-8')
-    showToast('Fichier Excel téléchargé.')
+    showToast(content.value.excelDownloaded)
     return
   }
 
   downloadBlob(createPdfContent(payload), `${slugify(payload.title)}.pdf`, 'application/pdf')
-  showToast('Fichier PDF téléchargé.')
+  showToast(content.value.pdfDownloaded)
 }
 
 function showToast(message) {
@@ -411,7 +567,7 @@ function buildReportPayload(report = null) {
     period: selectedPeriod.value,
     generatedAt: report?.generatedAt || '18/07/2026',
     generatedBy: report?.generatedBy || 'Super Admin',
-    kpis: kpiCards.map(({ label, value }) => ({ label, value })),
+    kpis: displayKpiCards.value.map(({ label, value }) => ({ label, value })),
     columns: tableConfig.value.columns,
     rows: tableConfig.value.rows,
   }
@@ -543,11 +699,15 @@ function slugify(value) {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.reports-page[dir='rtl'] {
+  padding: 46px 116px 56px 38px;
+}
+
 .sidebar-toggle {
   position: fixed;
-  top: 130px;
-  left: 34px;
-  z-index: 80;
+  top: 24px;
+  left: 24px;
+  z-index: 1000;
   width: 58px;
   height: 58px;
   display: inline-flex;
@@ -562,6 +722,17 @@ function slugify(value) {
   cursor: pointer;
 }
 
+[dir='rtl'] .sidebar-toggle {
+  right: 24px;
+  left: auto;
+}
+
+.sidebar-toggle.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .sidebar-toggle span {
   width: 24px;
   height: 3px;
@@ -572,7 +743,7 @@ function slugify(value) {
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 80;
   background: rgba(15, 23, 42, 0.18);
 }
 

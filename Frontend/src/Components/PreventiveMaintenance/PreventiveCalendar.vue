@@ -2,8 +2,8 @@
   <section class="calendar-card">
     <header class="calendar-header">
       <div>
-        <h2>Calendrier préventif</h2>
-        <p>Planning des opérations de maintenance</p>
+        <h2>{{ content.title }}</h2>
+        <p>{{ content.subtitle }}</p>
       </div>
 
       <div class="calendar-navigation">
@@ -48,7 +48,7 @@
           <span>{{ calendarDay.day }}</span>
 
           <small v-if="calendarDay.isToday">
-            Aujourd’hui
+            {{ content.today }}
           </small>
         </div>
 
@@ -81,22 +81,22 @@
     <footer class="calendar-legend">
       <div>
         <span class="legend-dot planned"></span>
-        Planifiée
+        {{ content.statuses.Planifiee }}
       </div>
 
       <div>
         <span class="legend-dot upcoming"></span>
-        À venir
+        {{ content.statuses['A venir'] }}
       </div>
 
       <div>
         <span class="legend-dot late"></span>
-        En retard
+        {{ content.statuses['En retard'] }}
       </div>
 
       <div>
         <span class="legend-dot completed"></span>
-        Réalisée
+        {{ content.statuses.Realisee }}
       </div>
     </footer>
   </section>
@@ -104,6 +104,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   maintenances: {
@@ -114,6 +115,8 @@ const props = defineProps({
 
 defineEmits(['select'])
 
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 const today = new Date()
 const displayedDate = ref(
   new Date(today.getFullYear(), today.getMonth(), 1)
@@ -144,8 +147,34 @@ const monthNames = [
   'Décembre'
 ]
 
+const translations = {
+  FR: {
+    title: 'Calendrier preventif',
+    subtitle: 'Planning des operations de maintenance',
+    today: 'Aujourd hui',
+    monthNames: ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'],
+    statuses: { Planifiee: 'Planifiee', 'A venir': 'A venir', 'En retard': 'En retard', Realisee: 'Realisee' },
+  },
+  EN: {
+    title: 'Preventive calendar',
+    subtitle: 'Maintenance operations schedule',
+    today: 'Today',
+    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    statuses: { Planifiee: 'Planned', 'A venir': 'Upcoming', 'En retard': 'Overdue', Realisee: 'Completed' },
+  },
+  AR: {
+    title: 'تقويم الصيانة الوقائية',
+    subtitle: 'جدولة عمليات الصيانة',
+    today: 'اليوم',
+    monthNames: ['يناير', 'فبراير', 'مارس', 'أبريل', 'ماي', 'يونيو', 'يوليوز', 'غشت', 'شتنبر', 'أكتوبر', 'نونبر', 'دجنبر'],
+    statuses: { Planifiee: 'مبرمجة', 'A venir': 'قادمة', 'En retard': 'متأخرة', Realisee: 'منجزة' },
+  },
+}
+
+const content = computed(() => translations[language.value] || translations.FR)
+
 const currentMonthLabel = computed(() => {
-  return `${monthNames[displayedDate.value.getMonth()]} ${displayedDate.value.getFullYear()}`
+  return `${content.value.monthNames[displayedDate.value.getMonth()] || monthNames[displayedDate.value.getMonth()]} ${displayedDate.value.getFullYear()}`
 })
 
 const parseFrenchDate = (dateString) => {
@@ -249,9 +278,12 @@ const nextMonth = () => {
 const getEventClass = (status) => {
   const classes = {
     Planifiée: 'event-planned',
+    Planifiee: 'event-planned',
     'À venir': 'event-upcoming',
+    'A venir': 'event-upcoming',
     'En retard': 'event-late',
-    Réalisée: 'event-completed'
+    Réalisée: 'event-completed',
+    Realisee: 'event-completed'
   }
 
   return classes[status] || 'event-default'

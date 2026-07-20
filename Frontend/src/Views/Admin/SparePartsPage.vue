@@ -1,10 +1,10 @@
 <template>
-  <main class="spare-parts-page">
+  <main class="spare-parts-page" :dir="language === 'AR' ? 'rtl' : 'ltr'">
     <button
       type="button"
       class="sidebar-toggle"
       :class="{ 'is-hidden': isSidebarOpen }"
-      aria-label="Afficher le menu"
+      :aria-label="content.menu"
       :aria-expanded="isSidebarOpen"
       @click="toggleSidebar"
     >
@@ -18,17 +18,17 @@
 
     <header class="page-header">
       <div>
-        <p class="breadcrumb">Accueil / Pièces de rechange</p>
-        <h1>Pièces de rechange</h1>
-        <p>Gestion et suivi du stock des pièces nécessaires aux opérations de maintenance</p>
+        <p class="breadcrumb">{{ content.breadcrumb }}</p>
+        <h1>{{ content.title }}</h1>
+        <p>{{ content.subtitle }}</p>
       </div>
 
       <div class="header-actions">
         <button type="button" class="secondary-button" @click="exportParts">
-          Exporter
+          {{ content.export }}
         </button>
         <button type="button" class="primary-button" @click="openCreateModal">
-          Ajouter une pièce
+          {{ content.addPart }}
         </button>
       </div>
     </header>
@@ -76,44 +76,44 @@
         <form class="adjust-card" @submit.prevent="applyStockAdjustment">
           <header>
             <div>
-              <span>Ajustement du stock</span>
+              <span>{{ content.adjustStock }}</span>
               <h2>{{ partToAdjust?.name }}</h2>
             </div>
-            <button type="button" @click="closeAdjustModal">×</button>
+            <button type="button" @click="closeAdjustModal">x</button>
           </header>
 
           <div class="adjust-body">
             <div class="form-group">
-              <label>Type de mouvement</label>
+              <label>{{ content.movementType }}</label>
               <select v-model="stockMovement.type">
-                <option>Entrée</option>
-                <option>Sortie</option>
-                <option>Correction</option>
+                <option value="Entrée">{{ content.in }}</option>
+                <option value="Sortie">{{ content.out }}</option>
+                <option value="Correction">{{ content.correction }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Quantité</label>
+              <label>{{ content.quantity }}</label>
               <input v-model.number="stockMovement.quantity" min="1" type="number" required />
             </div>
 
             <div class="form-group">
-              <label>Motif</label>
+              <label>{{ content.reason }}</label>
               <input v-model.trim="stockMovement.reason" required />
             </div>
 
             <div class="form-group">
-              <label>Intervention liée</label>
+              <label>{{ content.relatedIntervention }}</label>
               <input v-model.trim="stockMovement.intervention" placeholder="INT-887" />
             </div>
 
             <div class="form-group">
-              <label>Date</label>
+              <label>{{ content.date }}</label>
               <input v-model="stockMovement.date" type="date" required />
             </div>
 
             <div class="form-group full">
-              <label>Commentaire</label>
+              <label>{{ content.comment }}</label>
               <textarea v-model.trim="stockMovement.comment" rows="3"></textarea>
             </div>
 
@@ -121,8 +121,8 @@
           </div>
 
           <footer>
-            <button type="button" class="secondary-button" @click="closeAdjustModal">Annuler</button>
-            <button type="submit" class="primary-button">Valider</button>
+            <button type="button" class="secondary-button" @click="closeAdjustModal">{{ content.cancel }}</button>
+            <button type="submit" class="primary-button">{{ content.validate }}</button>
           </footer>
         </form>
       </div>
@@ -132,6 +132,7 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import Sidebar from '@/Components/sidebar.vue'
 import SparePartDrawer from '@/Components/SpareParts/SparePartDrawer.vue'
 import SparePartFormModal from '@/Components/SpareParts/SparePartFormModal.vue'
@@ -139,6 +140,81 @@ import SparePartsChartsSection from '@/Components/SpareParts/SparePartsChartsSec
 import SparePartsFiltersBar from '@/Components/SpareParts/SparePartsFiltersBar.vue'
 import SparePartsKPICards from '@/Components/SpareParts/SparePartsKPICards.vue'
 import SparePartsTable from '@/Components/SpareParts/SparePartsTable.vue'
+
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+const pageContent = {
+  FR: {
+    menu: 'Afficher le menu',
+    breadcrumb: 'Accueil / Pieces de rechange',
+    title: 'Pieces de rechange',
+    subtitle: 'Gestion et suivi du stock des pieces necessaires aux operations de maintenance',
+    export: 'Exporter',
+    addPart: 'Ajouter une piece',
+    adjustStock: 'Ajustement du stock',
+    movementType: 'Type de mouvement',
+    in: 'Entree',
+    out: 'Sortie',
+    correction: 'Correction',
+    quantity: 'Quantite',
+    reason: 'Motif',
+    relatedIntervention: 'Intervention liee',
+    date: 'Date',
+    comment: 'Commentaire',
+    cancel: 'Annuler',
+    validate: 'Valider',
+    stockExitError: 'La quantite de sortie ne peut pas depasser le stock disponible.',
+    deleteConfirm: (reference) => `Supprimer la piece ${reference} ?`,
+    exportReady: 'Export pret pour les pieces filtrees.',
+  },
+  EN: {
+    menu: 'Show menu',
+    breadcrumb: 'Home / Spare parts',
+    title: 'Spare parts',
+    subtitle: 'Stock tracking for parts required by maintenance operations',
+    export: 'Export',
+    addPart: 'Add part',
+    adjustStock: 'Stock adjustment',
+    movementType: 'Movement type',
+    in: 'Entry',
+    out: 'Exit',
+    correction: 'Correction',
+    quantity: 'Quantity',
+    reason: 'Reason',
+    relatedIntervention: 'Related intervention',
+    date: 'Date',
+    comment: 'Comment',
+    cancel: 'Cancel',
+    validate: 'Validate',
+    stockExitError: 'Exit quantity cannot exceed available stock.',
+    deleteConfirm: (reference) => `Delete part ${reference}?`,
+    exportReady: 'Export ready for filtered parts.',
+  },
+  AR: {
+    menu: 'إظهار القائمة',
+    breadcrumb: 'الرئيسية / قطع الغيار',
+    title: 'قطع الغيار',
+    subtitle: 'تدبير وتتبع مخزون القطع اللازمة لعمليات الصيانة',
+    export: 'تصدير',
+    addPart: 'إضافة قطعة',
+    adjustStock: 'تعديل المخزون',
+    movementType: 'نوع الحركة',
+    in: 'دخول',
+    out: 'خروج',
+    correction: 'تصحيح',
+    quantity: 'الكمية',
+    reason: 'السبب',
+    relatedIntervention: 'التدخل المرتبط',
+    date: 'التاريخ',
+    comment: 'تعليق',
+    cancel: 'إلغاء',
+    validate: 'تأكيد',
+    stockExitError: 'كمية الخروج لا يمكن أن تتجاوز المخزون المتوفر.',
+    deleteConfirm: (reference) => `حذف القطعة ${reference}؟`,
+    exportReady: 'التصدير جاهز للقطع المفلترة.',
+  },
+}
+const content = computed(() => pageContent[language.value] || pageContent.FR)
 
 const categories = ['Mécanique', 'Électrique', 'Pneumatique', 'Hydraulique', 'Lubrification', 'Filtration', 'Transmission']
 
@@ -362,7 +438,7 @@ function savePart(part) {
 }
 
 function deletePart(part) {
-  if (!window.confirm(`Supprimer la pièce ${part.reference} ?`)) {
+  if (!window.confirm(content.value.deleteConfirm(part.reference))) {
     return
   }
 
@@ -400,7 +476,7 @@ function applyStockAdjustment() {
   }
 
   if (stockMovement.type === 'Sortie' && stockMovement.quantity > part.currentStock) {
-    stockError.value = 'La quantité de sortie ne peut pas dépasser le stock disponible.'
+    stockError.value = content.value.stockExitError
     return
   }
 
@@ -428,7 +504,7 @@ function formatFrenchDate(date) {
 }
 
 function exportParts() {
-  window.alert('Export mock prêt pour les pièces filtrées.')
+  window.alert(content.value.exportReady)
 }
 
 function toggleSidebar() {
@@ -454,11 +530,15 @@ function closeSidebar() {
   box-sizing: border-box;
 }
 
+.spare-parts-page[dir='rtl'] {
+  padding: 32px 88px 44px 28px;
+}
+
 .sidebar-toggle {
   position: fixed;
   top: 24px;
   left: 24px;
-  z-index: 50;
+  z-index: 1000;
   display: inline-flex;
   width: 48px;
   height: 48px;
@@ -472,6 +552,11 @@ function closeSidebar() {
   color: #4a0a0a;
   box-shadow: 0 10px 30px rgba(74, 10, 10, 0.08);
   cursor: pointer;
+}
+
+[dir='rtl'] .sidebar-toggle {
+  right: 24px;
+  left: auto;
 }
 
 .sidebar-toggle.is-hidden {
@@ -490,7 +575,7 @@ function closeSidebar() {
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 35;
+  z-index: 80;
   background: rgba(74, 10, 10, 0.28);
 }
 
@@ -662,6 +747,10 @@ function closeSidebar() {
 
 @media (max-width: 760px) {
   .spare-parts-page {
+    padding: 88px 16px 32px;
+  }
+
+  .spare-parts-page[dir='rtl'] {
     padding: 88px 16px 32px;
   }
 

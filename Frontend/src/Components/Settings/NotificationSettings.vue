@@ -1,18 +1,21 @@
 <template>
   <section class="settings-panel">
-    <div class="panel-heading">
-      <h2>Notifications</h2>
-      <p>Canaux et événements déclencheurs des alertes SmartCalyx.</p>
-    </div>
-
+    <div class="panel-heading"><h2>{{ t.title }}</h2><p>{{ t.subtitle }}</p></div>
     <div class="toggle-grid">
-      <label v-for="item in items" :key="item"><span>{{ item }}</span><input checked type="checkbox" /></label>
+      <label v-for="item in t.items" :key="item"><span>{{ item }}</span><input checked type="checkbox" /></label>
     </div>
   </section>
 </template>
 
 <script setup>
-const items = ['Email', 'Application', 'Maintenance prévue', 'Nouvelle panne', 'Demande maintenance', 'Stock faible', 'Intervention terminée']
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+const languageStore = useLanguageStore()
+const t = computed(() => ({
+  FR: { title: 'Notifications', subtitle: 'Canaux et evenements declencheurs des alertes SmartCalyx.', items: ['Email', 'Application', 'Maintenance prevue', 'Nouvelle panne', 'Demande maintenance', 'Stock faible', 'Intervention terminee'] },
+  EN: { title: 'Notifications', subtitle: 'Channels and events that trigger SmartCalyx alerts.', items: ['Email', 'Application', 'Scheduled maintenance', 'New breakdown', 'Maintenance request', 'Low stock', 'Completed intervention'] },
+  AR: { title: 'الإشعارات', subtitle: 'القنوات والأحداث التي تطلق تنبيهات SmartCalyx.', items: ['البريد الإلكتروني', 'التطبيق', 'صيانة مبرمجة', 'عطل جديد', 'طلب صيانة', 'مخزون منخفض', 'تدخل منتهي'] },
+})[languageStore.language] || {})
 </script>
 
 <style scoped>

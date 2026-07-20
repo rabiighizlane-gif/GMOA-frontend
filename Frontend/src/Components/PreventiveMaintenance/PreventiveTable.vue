@@ -2,17 +2,13 @@
   <section class="table-card">
     <div class="table-header">
       <div>
-        <h2>Plans de maintenance préventive</h2>
-        <p>{{ maintenances.length }} plan(s) affiché(s)</p>
+        <h2>{{ content.title }}</h2>
+        <p>{{ content.shown(maintenances.length) }}</p>
       </div>
 
-      <button
-        class="export-button"
-        type="button"
-        @click="$emit('export')"
-      >
+      <button class="export-button" type="button" @click="$emit('export')">
         <PreventiveIcon name="download" />
-        Exporter
+        {{ content.export }}
       </button>
     </div>
 
@@ -21,117 +17,72 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Plan</th>
-            <th>Machine</th>
-            <th>Fréquence</th>
-            <th>Dernière réalisation</th>
-            <th>Prochaine échéance</th>
-            <th>Responsable</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th>{{ content.columns.plan }}</th>
+            <th>{{ content.columns.machine }}</th>
+            <th>{{ content.columns.frequency }}</th>
+            <th>{{ content.columns.lastExecution }}</th>
+            <th>{{ content.columns.nextDueDate }}</th>
+            <th>{{ content.columns.responsible }}</th>
+            <th>{{ content.columns.status }}</th>
+            <th>{{ content.columns.actions }}</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr
-            v-for="maintenance in paginatedMaintenances"
-            :key="maintenance.id"
-          >
-            <td class="id-cell">
-              {{ maintenance.id }}
-            </td>
+          <tr v-for="maintenance in paginatedMaintenances" :key="maintenance.id">
+            <td class="id-cell">{{ maintenance.id }}</td>
 
             <td>
               <div class="plan-cell">
-                <span class="plan-icon">
-                  <PreventiveIcon name="tool" />
-                </span>
-
+                <span class="plan-icon"><PreventiveIcon name="tool" /></span>
                 <div>
-                  <strong>{{ maintenance.plan }}</strong>
-                  <small>{{ maintenance.line }}</small>
+                  <strong>{{ planLabel(maintenance.plan) }}</strong>
+                  <small>{{ lineLabel(maintenance.line) }}</small>
                 </div>
               </div>
             </td>
 
-            <td>
-              <strong class="machine-name">
-                {{ maintenance.machine }}
-              </strong>
-            </td>
-
-            <td>
-              <span class="frequency-badge">
-                {{ maintenance.frequency }}
-              </span>
-            </td>
-
-            <td>
-              {{ maintenance.lastExecution }}
-            </td>
+            <td><strong class="machine-name">{{ machineLabel(maintenance.machine) }}</strong></td>
+            <td><span class="frequency-badge">{{ frequencyLabel(maintenance.frequency) }}</span></td>
+            <td>{{ maintenance.lastExecution }}</td>
 
             <td>
               <div class="deadline-cell">
                 <strong>{{ maintenance.nextDueDate }}</strong>
-
-                <small :class="`deadline-${maintenance.deadlineColor}`">
-                  {{ maintenance.deadlineLabel }}
-                </small>
+                <small :class="`deadline-${maintenance.deadlineColor}`">{{ deadlineLabel(maintenance) }}</small>
               </div>
             </td>
 
             <td>
               <div class="technician-cell">
-                <span class="avatar">
-                  {{ maintenance.initials }}
-                </span>
-
-                <span>{{ maintenance.technician }}</span>
+                <span class="avatar">{{ initialsLabel(maintenance) }}</span>
+                <span>{{ technicianLabel(maintenance.technician) }}</span>
               </div>
             </td>
 
             <td>
-              <span
-                class="status-badge"
-                :class="getStatusClass(maintenance.status)"
-              >
-                {{ maintenance.status }}
+              <span class="status-badge" :class="getStatusClass(maintenance.status)">
+                {{ statusLabel(maintenance.status) }}
               </span>
             </td>
 
             <td>
               <div class="actions">
-                <button
-                  type="button"
-                  title="Voir les détails"
-                  @click="$emit('view', maintenance)"
-                >
+                <button type="button" :title="content.actions.view" @click="$emit('view', maintenance)">
                   <PreventiveIcon name="eye" />
                 </button>
-
-                <button
-                  type="button"
-                  title="Modifier"
-                  @click="$emit('edit', maintenance)"
-                >
+                <button type="button" :title="content.actions.edit" @click="$emit('edit', maintenance)">
                   <PreventiveIcon name="edit" />
                 </button>
-
                 <button
-                  v-if="maintenance.status !== 'Réalisée'"
+                  v-if="!['Realisee', 'Réalisée'].includes(maintenance.status)"
                   type="button"
-                  title="Marquer comme réalisée"
+                  :title="content.actions.complete"
                   @click="$emit('complete', maintenance)"
                 >
                   <PreventiveIcon name="check" />
                 </button>
-
-                <button
-                  type="button"
-                  title="Supprimer"
-                  class="delete-button"
-                  @click="$emit('delete', maintenance)"
-                >
+                <button type="button" :title="content.actions.delete" class="delete-button" @click="$emit('delete', maintenance)">
                   <PreventiveIcon name="trash" />
                 </button>
               </div>
@@ -139,16 +90,11 @@
           </tr>
 
           <tr v-if="paginatedMaintenances.length === 0">
-            <td
-              colspan="9"
-              class="empty-state"
-            >
+            <td colspan="9" class="empty-state">
               <div class="empty-content">
                 <span><PreventiveIcon name="search" /></span>
-                <strong>Aucun plan trouvé</strong>
-                <p>
-                  Aucun plan de maintenance ne correspond aux filtres sélectionnés.
-                </p>
+                <strong>{{ content.emptyTitle }}</strong>
+                <p>{{ content.emptyText }}</p>
               </div>
             </td>
           </tr>
@@ -156,16 +102,9 @@
       </table>
     </div>
 
-    <footer
-      v-if="maintenances.length > 0"
-      class="pagination"
-    >
-      <button
-        type="button"
-        :disabled="currentPage === 1"
-        @click="previousPage"
-      >
-        ← Précédent
+    <footer v-if="maintenances.length > 0" class="pagination">
+      <button type="button" :disabled="currentPage === 1" @click="previousPage">
+        {{ content.previous }}
       </button>
 
       <div class="page-numbers">
@@ -180,16 +119,10 @@
         </button>
       </div>
 
-      <span>
-        {{ startItem }}-{{ endItem }} sur {{ maintenances.length }}
-      </span>
+      <span>{{ content.range(startItem, endItem, maintenances.length) }}</span>
 
-      <button
-        type="button"
-        :disabled="currentPage === totalPages"
-        @click="nextPage"
-      >
-        Suivant →
+      <button type="button" :disabled="currentPage === totalPages" @click="nextPage">
+        {{ content.next }}
       </button>
     </footer>
   </section>
@@ -197,54 +130,202 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import PreventiveIcon from '@/Components/PreventiveMaintenance/PreventiveIcon.vue'
 
 const props = defineProps({
   maintenances: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
-defineEmits([
-  'view',
-  'edit',
-  'complete',
-  'delete',
-  'export'
-])
+defineEmits(['view', 'edit', 'complete', 'delete', 'export'])
 
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 const currentPage = ref(1)
 const itemsPerPage = 3
 
-const totalPages = computed(() => {
-  return Math.max(
-    1,
-    Math.ceil(props.maintenances.length / itemsPerPage)
-  )
-})
+const translations = {
+  FR: {
+    title: 'Plans de maintenance preventive',
+    export: 'Exporter',
+    shown: (count) => `${count} plan(s) affiche(s)`,
+    columns: {
+      plan: 'Plan',
+      machine: 'Machine',
+      frequency: 'Frequence',
+      lastExecution: 'Derniere realisation',
+      nextDueDate: 'Prochaine echeance',
+      responsible: 'Responsable',
+      status: 'Statut',
+      actions: 'Actions',
+    },
+    actions: {
+      view: 'Voir les details',
+      edit: 'Modifier',
+      complete: 'Marquer comme realisee',
+      delete: 'Supprimer',
+    },
+    emptyTitle: 'Aucun plan trouve',
+    emptyText: 'Aucun plan de maintenance ne correspond aux filtres selectionnes.',
+    previous: '<- Precedent',
+    next: 'Suivant ->',
+    range: (start, end, total) => `${start}-${end} sur ${total}`,
+    statuses: { Planifiee: 'Planifiee', 'A venir': 'A venir', 'En retard': 'En retard', Realisee: 'Realisee' },
+    frequencies: { Quotidienne: 'Quotidienne', Hebdomadaire: 'Hebdomadaire', Mensuelle: 'Mensuelle', Trimestrielle: 'Trimestrielle', Annuelle: 'Annuelle' },
+  },
+  EN: {
+    title: 'Preventive maintenance plans',
+    export: 'Export',
+    shown: (count) => `${count} plan(s) shown`,
+    columns: {
+      plan: 'Plan',
+      machine: 'Machine',
+      frequency: 'Frequency',
+      lastExecution: 'Last completion',
+      nextDueDate: 'Next due date',
+      responsible: 'Responsible',
+      status: 'Status',
+      actions: 'Actions',
+    },
+    actions: {
+      view: 'View details',
+      edit: 'Edit',
+      complete: 'Mark as completed',
+      delete: 'Delete',
+    },
+    emptyTitle: 'No plan found',
+    emptyText: 'No maintenance plan matches the selected filters.',
+    previous: '<- Previous',
+    next: 'Next ->',
+    range: (start, end, total) => `${start}-${end} of ${total}`,
+    statuses: { Planifiee: 'Planned', 'A venir': 'Upcoming', 'En retard': 'Overdue', Realisee: 'Completed' },
+    frequencies: { Quotidienne: 'Daily', Hebdomadaire: 'Weekly', Mensuelle: 'Monthly', Trimestrielle: 'Quarterly', Annuelle: 'Yearly' },
+  },
+  AR: {
+    title: 'خطط الصيانة الوقائية',
+    export: 'تصدير',
+    shown: (count) => `${count} خطة معروضة`,
+    columns: {
+      plan: 'الخطة',
+      machine: 'الآلة',
+      frequency: 'التواتر',
+      lastExecution: 'آخر إنجاز',
+      nextDueDate: 'الموعد القادم',
+      responsible: 'المسؤول',
+      status: 'الحالة',
+      actions: 'الإجراءات',
+    },
+    actions: {
+      view: 'عرض التفاصيل',
+      edit: 'تعديل',
+      complete: 'تعليم كمنجزة',
+      delete: 'حذف',
+    },
+    emptyTitle: 'لا توجد خطة',
+    emptyText: 'لا توجد خطة صيانة توافق الفلاتر المختارة.',
+    previous: 'السابق <-',
+    next: 'التالي ->',
+    range: (start, end, total) => `${start}-${end} من ${total}`,
+    statuses: { Planifiee: 'مبرمجة', 'A venir': 'قادمة', 'En retard': 'متأخرة', Realisee: 'منجزة' },
+    frequencies: { Quotidienne: 'يومية', Hebdomadaire: 'أسبوعية', Mensuelle: 'شهرية', Trimestrielle: 'ربع سنوية', Annuelle: 'سنوية' },
+  },
+}
 
-const paginatedMaintenances = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-
-  return props.maintenances.slice(start, end)
-})
-
-const startItem = computed(() => {
-  if (props.maintenances.length === 0) {
-    return 0
-  }
-
-  return (currentPage.value - 1) * itemsPerPage + 1
-})
-
-const endItem = computed(() => {
-  return Math.min(
-    currentPage.value * itemsPerPage,
-    props.maintenances.length
-  )
-})
+const content = computed(() => translations[language.value] || translations.FR)
+const displayMaps = {
+  FR: {
+    plans: {
+      'Graissage du moteur': 'Graissage du moteur',
+      'Controle de temperature': 'Controle de temperature',
+      'Contrôle de température': 'Controle de temperature',
+      'Nettoyage des filtres': 'Nettoyage des filtres',
+      'Inspection des buses': 'Inspection des buses',
+    },
+    machines: {
+      'Convoyeur M-309': 'Convoyeur M-309',
+      'Pasteurisateur P-204': 'Pasteurisateur P-204',
+      'Compresseur M-412': 'Compresseur M-412',
+      'Remplisseuse R-118': 'Remplisseuse R-118',
+    },
+    lines: {
+      'Ligne Conditionnement': 'Ligne Conditionnement',
+      'Ligne Production 1': 'Ligne Production 1',
+      'Ligne Utilites': 'Ligne Utilites',
+      'Ligne Utilités': 'Ligne Utilites',
+    },
+    technicians: {
+      'Sara El Idrissi': 'Sara El Idrissi',
+      'Nabil Amrani': 'Nabil Amrani',
+      'Youssef Berrada': 'Youssef Berrada',
+      'Ahmed El Mansouri': 'Ahmed El Mansouri',
+    },
+    initials: { 'Sara El Idrissi': 'SE', 'Nabil Amrani': 'NA', 'Youssef Berrada': 'YB', 'Ahmed El Mansouri': 'AE' },
+  },
+  EN: {
+    plans: {
+      'Graissage du moteur': 'Motor greasing',
+      'Controle de temperature': 'Temperature check',
+      'Contrôle de température': 'Temperature check',
+      'Nettoyage des filtres': 'Filter cleaning',
+      'Inspection des buses': 'Nozzle inspection',
+    },
+    machines: {
+      'Convoyeur M-309': 'Conveyor M-309',
+      'Pasteurisateur P-204': 'Pasteurizer P-204',
+      'Compresseur M-412': 'Compressor M-412',
+      'Remplisseuse R-118': 'Filling machine R-118',
+    },
+    lines: {
+      'Ligne Conditionnement': 'Packaging line',
+      'Ligne Production 1': 'Production line 1',
+      'Ligne Utilites': 'Utilities line',
+      'Ligne Utilités': 'Utilities line',
+    },
+    technicians: {
+      'Sara El Idrissi': 'Sara El Idrissi',
+      'Nabil Amrani': 'Nabil Amrani',
+      'Youssef Berrada': 'Youssef Berrada',
+      'Ahmed El Mansouri': 'Ahmed El Mansouri',
+    },
+    initials: { 'Sara El Idrissi': 'SE', 'Nabil Amrani': 'NA', 'Youssef Berrada': 'YB', 'Ahmed El Mansouri': 'AE' },
+  },
+  AR: {
+    plans: {
+      'Graissage du moteur': 'تشحيم المحرك',
+      'Controle de temperature': 'مراقبة درجة الحرارة',
+      'Contrôle de température': 'مراقبة درجة الحرارة',
+      'Nettoyage des filtres': 'تنظيف المرشحات',
+      'Inspection des buses': 'فحص الفوهات',
+    },
+    machines: {
+      'Convoyeur M-309': 'ناقل M-309',
+      'Pasteurisateur P-204': 'مبستر P-204',
+      'Compresseur M-412': 'ضاغط M-412',
+      'Remplisseuse R-118': 'آلة تعبئة R-118',
+    },
+    lines: {
+      'Ligne Conditionnement': 'خط التكييف',
+      'Ligne Production 1': 'خط الإنتاج 1',
+      'Ligne Utilites': 'خط المرافق',
+      'Ligne Utilités': 'خط المرافق',
+    },
+    technicians: {
+      'Sara El Idrissi': 'سارة الإدريسي',
+      'Nabil Amrani': 'نبيل العمراني',
+      'Youssef Berrada': 'يوسف برادة',
+      'Ahmed El Mansouri': 'أحمد المنصوري',
+    },
+    initials: { 'Sara El Idrissi': 'سإ', 'Nabil Amrani': 'نع', 'Youssef Berrada': 'يب', 'Ahmed El Mansouri': 'أم' },
+  },
+}
+const displayMap = computed(() => displayMaps[language.value] || displayMaps.FR)
+const totalPages = computed(() => Math.max(1, Math.ceil(props.maintenances.length / itemsPerPage)))
+const paginatedMaintenances = computed(() => props.maintenances.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
+const startItem = computed(() => (props.maintenances.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage + 1))
+const endItem = computed(() => Math.min(currentPage.value * itemsPerPage, props.maintenances.length))
 
 watch(
   () => props.maintenances.map((maintenance) => maintenance.id).join('|'),
@@ -254,24 +335,56 @@ watch(
 )
 
 const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value -= 1
-  }
+  if (currentPage.value > 1) currentPage.value -= 1
 }
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value += 1
+  if (currentPage.value < totalPages.value) currentPage.value += 1
+}
+
+const statusLabel = (status) => content.value.statuses[status] || status
+const frequencyLabel = (frequency) => content.value.frequencies[frequency] || frequency
+const planLabel = (plan) => displayMap.value.plans[plan] || plan
+const machineLabel = (machine) => displayMap.value.machines[machine] || machine
+const lineLabel = (line) => displayMap.value.lines[line] || line
+const technicianLabel = (technician) => displayMap.value.technicians[technician] || technician
+const initialsLabel = (maintenance) => displayMap.value.initials[maintenance.technician] || maintenance.initials
+const deadlineLabel = (maintenance) => {
+  if (language.value === 'FR') return maintenance.deadlineLabel
+
+  const label = String(maintenance.deadlineLabel || '')
+  const daysMatch = label.match(/^Dans\s+(\d+)\s+jours?$/i)
+  const lateMatch = label.match(/^En retard de\s+(\d+)\s+jours?$/i)
+  const completedMatch = label.match(/^R[eé]alis[eé]e le\s+(.+)$/i)
+
+  if (language.value === 'EN') {
+    if (daysMatch) return `In ${daysMatch[1]} day${Number(daysMatch[1]) > 1 ? 's' : ''}`
+    if (lateMatch) return `${lateMatch[1]} day${Number(lateMatch[1]) > 1 ? 's' : ''} overdue`
+    if (completedMatch) return `Completed on ${completedMatch[1]}`
   }
+
+  if (language.value === 'AR') {
+    if (daysMatch) return `بعد ${daysMatch[1]} يوم`
+    if (lateMatch) return Number(lateMatch[1]) === 1 ? 'متأخرة بيوم واحد' : `متأخرة بـ ${lateMatch[1]} أيام`
+    if (completedMatch) return `منجزة في ${completedMatch[1]}`
+  }
+
+  if (maintenance.status === 'En retard') return content.value.statuses['En retard']
+  if (maintenance.status === 'Realisee') return content.value.statuses.Realisee
+  if (maintenance.status === 'A venir') return content.value.statuses['A venir']
+  return maintenance.deadlineLabel
 }
 
 const getStatusClass = (status) => {
   const statusClasses = {
+    Planifiee: 'status-planned',
     Planifiée: 'status-planned',
+    'A venir': 'status-upcoming',
     'À venir': 'status-upcoming',
     'En retard': 'status-late',
+    Realisee: 'status-completed',
     Réalisée: 'status-completed',
-    'En cours': 'status-progress'
+    'En cours': 'status-progress',
   }
 
   return statusClasses[status] || 'status-default'
@@ -342,7 +455,6 @@ th {
   font-weight: 800;
   text-align: left;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 
 td {
@@ -351,10 +463,6 @@ td {
   border-top: 1px solid #edf0e8;
   font-size: 12px;
   vertical-align: middle;
-}
-
-tbody tr {
-  transition: 0.2s ease;
 }
 
 tbody tr:hover {
@@ -366,9 +474,15 @@ tbody tr:hover {
   font-weight: 900;
 }
 
-.plan-cell {
+.plan-cell,
+.technician-cell,
+.actions {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.plan-cell {
   gap: 10px;
 }
 
@@ -381,7 +495,6 @@ tbody tr:hover {
   background: #f0f5e5;
   border-radius: 10px;
   color: #6a9a2a;
-  font-size: 17px;
 }
 
 .plan-cell strong,
@@ -391,7 +504,8 @@ tbody tr:hover {
   display: block;
 }
 
-.plan-cell strong {
+.plan-cell strong,
+.machine-name {
   color: #111827;
   font-size: 12px;
 }
@@ -402,19 +516,20 @@ tbody tr:hover {
   font-size: 9px;
 }
 
-.machine-name {
-  color: #4a0a0a;
-  font-size: 12px;
+.frequency-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .frequency-badge {
-  display: inline-flex;
   padding: 6px 9px;
   background: #f0f5e5;
-  border-radius: 999px;
   color: #6a9a2a;
-  font-size: 10px;
-  font-weight: 800;
 }
 
 .deadline-cell small {
@@ -423,28 +538,10 @@ tbody tr:hover {
   font-weight: 700;
 }
 
-.deadline-green {
-  color: #6a9a2a;
-}
-
-.deadline-yellow {
-  color: #b88700;
-}
-
-.deadline-orange {
-  color: #ff6a00;
-}
-
-.deadline-red {
-  color: #e31e24;
-}
-
-.technician-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-}
+.deadline-green { color: #6a9a2a; }
+.deadline-yellow { color: #b88700; }
+.deadline-orange { color: #ff6a00; }
+.deadline-red { color: #e31e24; }
 
 .avatar {
   display: grid;
@@ -460,47 +557,17 @@ tbody tr:hover {
 }
 
 .status-badge {
-  display: inline-flex;
-  align-items: center;
   padding: 7px 10px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 800;
-  white-space: nowrap;
 }
 
-.status-planned {
-  background: #e9f3db;
-  color: #5f8c23;
-}
-
-.status-upcoming {
-  background: #fff4cf;
-  color: #ad7a00;
-}
-
-.status-late {
-  background: #ffe2e2;
-  color: #d51c22;
-}
-
-.status-completed {
-  background: #e3f4df;
-  color: #43852c;
-}
-
-.status-progress {
-  background: #fff0df;
-  color: #ff6a00;
-}
-
-.status-default {
-  background: #f1f5f9;
-  color: #64748b;
-}
+.status-planned { background: #e9f3db; color: #5f8c23; }
+.status-upcoming { background: #fff4cf; color: #ad7a00; }
+.status-late { background: #ffe2e2; color: #d51c22; }
+.status-completed { background: #e3f4df; color: #43852c; }
+.status-progress { background: #fff0df; color: #ff6a00; }
+.status-default { background: #f1f5f9; color: #64748b; }
 
 .actions {
-  display: flex;
   gap: 6px;
 }
 
@@ -513,7 +580,6 @@ tbody tr:hover {
   border: 1px solid #e4e9dc;
   border-radius: 9px;
   cursor: pointer;
-  transition: 0.2s ease;
 }
 
 .actions button svg,
@@ -551,7 +617,6 @@ tbody tr:hover {
   background: #f0f5e5;
   border-radius: 14px;
   color: #6a9a2a;
-  font-size: 22px;
 }
 
 .empty-content strong {

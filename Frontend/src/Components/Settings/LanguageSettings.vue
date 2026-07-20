@@ -1,23 +1,30 @@
 <template>
   <section class="settings-panel">
-    <div class="panel-heading">
-      <h2>Langues & région</h2>
-      <p>Langue d'interface, formats régionaux et présentation des données.</p>
-    </div>
-
+    <div class="panel-heading"><h2>{{ t.title }}</h2><p>{{ t.subtitle }}</p></div>
     <div class="choice-row">
-      <button class="active" type="button">Français</button>
-      <button type="button">English</button>
-      <button type="button">العربية</button>
+      <button :class="{ active: language === 'FR' }" type="button">Français</button>
+      <button :class="{ active: language === 'EN' }" type="button">English</button>
+      <button :class="{ active: language === 'AR' }" type="button">العربية</button>
     </div>
-
     <div class="form-grid">
-      <label>Format date<select><option>18/07/2026</option><option>2026-07-18</option></select></label>
-      <label>Format heure<select><option>24h - 20:55</option><option>12h - 08:55 PM</option></select></label>
-      <label>Format devise<select><option>48 600 DH</option><option>MAD 48,600</option></select></label>
+      <label>{{ t.dateFormat }}<select><option>18/07/2026</option><option>2026-07-18</option></select></label>
+      <label>{{ t.timeFormat }}<select><option>24h - 20:55</option><option>12h - 08:55 PM</option></select></label>
+      <label>{{ t.currencyFormat }}<select><option>{{ t.dhFormat }}</option><option>MAD 48,600</option></select></label>
     </div>
   </section>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+const t = computed(() => ({
+  FR: { title: 'Langues & region', subtitle: "Langue d'interface, formats regionaux et presentation des donnees.", dateFormat: 'Format date', timeFormat: 'Format heure', currencyFormat: 'Format devise', dhFormat: '48 600 DH' },
+  EN: { title: 'Language & region', subtitle: 'Interface language, regional formats, and data display.', dateFormat: 'Date format', timeFormat: 'Time format', currencyFormat: 'Currency format', dhFormat: '48,600 DH' },
+  AR: { title: 'اللغات والمنطقة', subtitle: 'لغة الواجهة، الصيغ الجهوية وطريقة عرض البيانات.', dateFormat: 'صيغة التاريخ', timeFormat: 'صيغة الوقت', currencyFormat: 'صيغة العملة', dhFormat: '48 600 درهم' },
+})[language.value] || {})
+</script>
 
 <style scoped>
 @import './settings.css';

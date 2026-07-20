@@ -2,7 +2,7 @@
   <div class="availability">
     <div class="meta">
       <strong>{{ value }}%</strong>
-      <span>Disponibilité</span>
+      <span>{{ label }}</span>
     </div>
     <div class="track">
       <span class="fill" :class="tone" :style="{ width: `${value}%` }"></span>
@@ -12,15 +12,29 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
-  value: { type: Number, required: true }
+  value: { type: Number, required: true },
+})
+
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+
+const label = computed(() => {
+  const labels = {
+    FR: 'Disponibilite',
+    EN: 'Availability',
+    AR: '\u0627\u0644\u062a\u0648\u0641\u0631',
+  }
+
+  return labels[language.value] || labels.FR
 })
 
 const tone = computed(() => ({
   healthy: props.value >= 90,
   warning: props.value < 90 && props.value >= 75,
-  danger: props.value < 75
+  danger: props.value < 75,
 }))
 </script>
 

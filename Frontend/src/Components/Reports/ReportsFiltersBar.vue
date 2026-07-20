@@ -1,34 +1,84 @@
 <template>
   <section class="filters-bar">
-    <select :value="filters.period" @change="updateFilter('period', $event.target.value)">
-      <option value="">Toutes les périodes</option><option>Juillet 2026</option><option>T2 2026</option><option>Année 2026</option>
+    <select
+      v-for="filter in filterGroups"
+      :key="filter.key"
+      :value="filters[filter.key]"
+      @change="updateFilter(filter.key, $event.target.value)"
+    >
+      <option v-for="option in filter.options" :key="option.value" :value="option.value">
+        {{ option.label }}
+      </option>
     </select>
-    <select :value="filters.line" @change="updateFilter('line', $event.target.value)">
-      <option value="">Toutes les lignes</option><option>Ligne Production 1</option><option>Ligne Production 2</option><option>Ligne Conditionnement</option><option>Ligne Utilités</option>
-    </select>
-    <select :value="filters.machine" @change="updateFilter('machine', $event.target.value)">
-      <option value="">Toutes les machines</option><option>M-102</option><option>M-215</option><option>M-309</option><option>M-412</option>
-    </select>
-    <select :value="filters.technician" @change="updateFilter('technician', $event.target.value)">
-      <option value="">Tous les techniciens</option><option>Nabil</option><option>Ahmed</option><option>Sara</option><option>Youssef</option>
-    </select>
-    <select :value="filters.maintenanceType" @change="updateFilter('maintenanceType', $event.target.value)">
-      <option value="">Tous les types</option><option>Corrective</option><option>Préventive</option><option>Amélioration</option>
-    </select>
-    <select :value="filters.status" @change="updateFilter('status', $event.target.value)">
-      <option value="">Tous les statuts</option><option>Terminée</option><option>En cours</option><option>En attente</option>
-    </select>
-    <select :value="filters.priority" @change="updateFilter('priority', $event.target.value)">
-      <option value="">Toutes les priorités</option><option>Critique</option><option>Haute</option><option>Moyenne</option><option>Faible</option>
-    </select>
-    <button type="button" class="primary-button" @click="$emit('apply')">Appliquer</button>
-    <button type="button" class="reset-button" @click="$emit('reset')">Réinitialiser</button>
+    <button type="button" class="primary-button" @click="$emit('apply')">{{ content.apply }}</button>
+    <button type="button" class="reset-button" @click="$emit('reset')">{{ content.reset }}</button>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+
 defineProps({ filters: { type: Object, required: true } })
 const emit = defineEmits(['update-filter', 'apply', 'reset'])
+
+const languageStore = useLanguageStore()
+const content = computed(() => ({
+  FR: { apply: 'Appliquer', reset: 'Reinitialiser' },
+  EN: { apply: 'Apply', reset: 'Reset' },
+  AR: { apply: 'تطبيق', reset: 'إعادة ضبط' },
+})[languageStore.language] || {})
+
+const labels = computed(() => ({
+  FR: {
+    period: ['Toutes les periodes', 'Juillet 2026', 'T2 2026', 'Annee 2026'],
+    line: ['Toutes les lignes', 'Ligne Production 1', 'Ligne Production 2', 'Ligne Conditionnement', 'Ligne Utilites'],
+    machine: ['Toutes les machines', 'M-102', 'M-215', 'M-309', 'M-412'],
+    technician: ['Tous les techniciens', 'Nabil', 'Ahmed', 'Sara', 'Youssef'],
+    maintenanceType: ['Tous les types', 'Corrective', 'Preventive', 'Amelioration'],
+    status: ['Tous les statuts', 'Terminee', 'En cours', 'En attente'],
+    priority: ['Toutes les priorites', 'Critique', 'Haute', 'Moyenne', 'Faible'],
+  },
+  EN: {
+    period: ['All periods', 'July 2026', 'Q2 2026', 'Year 2026'],
+    line: ['All lines', 'Production line 1', 'Production line 2', 'Conditioning line', 'Utilities line'],
+    machine: ['All machines', 'M-102', 'M-215', 'M-309', 'M-412'],
+    technician: ['All technicians', 'Nabil', 'Ahmed', 'Sara', 'Youssef'],
+    maintenanceType: ['All types', 'Corrective', 'Preventive', 'Improvement'],
+    status: ['All statuses', 'Completed', 'In progress', 'Pending'],
+    priority: ['All priorities', 'Critical', 'High', 'Medium', 'Low'],
+  },
+  AR: {
+    period: ['كل الفترات', 'يوليوز 2026', 'الربع الثاني 2026', 'سنة 2026'],
+    line: ['كل الخطوط', 'خط الإنتاج 1', 'خط الإنتاج 2', 'خط التكييف', 'خط المرافق'],
+    machine: ['كل الآلات', 'M-102', 'M-215', 'M-309', 'M-412'],
+    technician: ['كل التقنيين', 'نبيل', 'أحمد', 'سارة', 'يوسف'],
+    maintenanceType: ['كل الأنواع', 'تصحيحية', 'وقائية', 'تحسين'],
+    status: ['كل الحالات', 'منتهية', 'قيد الإنجاز', 'في الانتظار'],
+    priority: ['كل الأولويات', 'حرجة', 'عالية', 'متوسطة', 'منخفضة'],
+  },
+})[languageStore.language] || {})
+
+const rawOptions = {
+  period: ['', 'Juillet 2026', 'T2 2026', 'Année 2026'],
+  line: ['', 'Ligne Production 1', 'Ligne Production 2', 'Ligne Conditionnement', 'Ligne Utilités'],
+  machine: ['', 'M-102', 'M-215', 'M-309', 'M-412'],
+  technician: ['', 'Nabil', 'Ahmed', 'Sara', 'Youssef'],
+  maintenanceType: ['', 'Corrective', 'Préventive', 'Amélioration'],
+  status: ['', 'Terminée', 'En cours', 'En attente'],
+  priority: ['', 'Critique', 'Haute', 'Moyenne', 'Faible'],
+}
+
+const filterGroups = computed(() =>
+  Object.entries(rawOptions).map(([key, values]) => ({
+    key,
+    options: values.map((value, index) => ({
+      value,
+      label: labels.value[key]?.[index] || value,
+    })),
+  })),
+)
+
 const updateFilter = (key, value) => emit('update-filter', { key, value })
 </script>
 

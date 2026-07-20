@@ -1,6 +1,6 @@
 <template>
   <section class="kpi-grid">
-    <article v-for="card in cards" :key="card.label" class="kpi-card">
+    <article v-for="card in translatedCards" :key="card.label" class="kpi-card">
       <div class="kpi-icon" :class="`kpi-icon--${card.color}`">{{ card.icon }}</div>
       <div>
         <p>{{ card.label }}</p>
@@ -12,11 +12,51 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+
+const props = defineProps({
   cards: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
+})
+
+const languageStore = useLanguageStore()
+
+const labels = {
+  FR: {
+    total: ['Total des demandes', 'Toutes les demandes enregistrees', '#'],
+    new: ['Nouvelles', "Creees aujourd'hui", '+'],
+    pending: ['En attente', 'En attente de validation', '...'],
+    accepted: ['Acceptees', 'Validees par le responsable', 'OK'],
+    rejected: ['Refusees', 'Demandes non retenues', 'X'],
+    created: ['Interventions creees', 'Transformees en interventions', '>'],
+  },
+  EN: {
+    total: ['Total requests', 'All registered requests', '#'],
+    new: ['New', 'Created today', '+'],
+    pending: ['Pending', 'Waiting for validation', '...'],
+    accepted: ['Accepted', 'Validated by the manager', 'OK'],
+    rejected: ['Rejected', 'Requests not retained', 'X'],
+    created: ['Created interventions', 'Converted into interventions', '>'],
+  },
+  AR: {
+    total: ['إجمالي الطلبات', 'كل الطلبات المسجلة', '#'],
+    new: ['جديدة', 'تم إنشاؤها اليوم', '+'],
+    pending: ['في الانتظار', 'في انتظار المصادقة', '...'],
+    accepted: ['مقبولة', 'صادق عليها المسؤول', 'تم'],
+    rejected: ['مرفوضة', 'طلبات غير مقبولة', 'X'],
+    created: ['تدخلات منشأة', 'تحولت إلى تدخلات', '>'],
+  },
+}
+
+const translatedCards = computed(() => {
+  const dictionary = labels[languageStore.language] || labels.FR
+  return props.cards.map((card) => {
+    const [label, description, icon] = dictionary[card.labelKey] || [card.label, card.description, card.icon]
+    return { ...card, label, description, icon }
+  })
 })
 </script>
 
@@ -52,7 +92,7 @@ defineProps({
   flex-shrink: 0;
   place-items: center;
   border-radius: 14px;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 900;
 }
 
@@ -76,31 +116,11 @@ defineProps({
   font-weight: 800;
 }
 
-.kpi-icon--green {
-  background: #edf5de;
-  color: #6a9a2a;
-}
-
-.kpi-icon--yellow {
-  background: #fff4cf;
-  color: #ad7a00;
-}
-
-.kpi-icon--orange {
-  background: #fff0df;
-  color: #ff6a00;
-}
-
-.kpi-icon--red {
-  background: #ffe2e2;
-  color: #e31e24;
-}
-
-.kpi-icon--gray {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
+.kpi-icon--green { background: #edf5de; color: #6a9a2a; }
+.kpi-icon--yellow { background: #fff4cf; color: #ad7a00; }
+.kpi-icon--orange { background: #fff0df; color: #ff6a00; }
+.kpi-icon--red { background: #ffe2e2; color: #e31e24; }
+.kpi-icon--gray { background: #f1f5f9; color: #64748b; }
 .text-green { color: #6a9a2a; }
 .text-yellow { color: #ad7a00; }
 .text-orange { color: #ff6a00; }

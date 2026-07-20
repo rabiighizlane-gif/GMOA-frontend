@@ -1,5 +1,5 @@
 <template>
-  <section v-if="reportType === 'interventions'" class="charts-grid" aria-label="Graphiques interventions">
+  <section v-if="reportType === 'interventions'" class="charts-grid" :aria-label="content.interventionsCharts">
     <InterventionsByMonth />
     <InterventionTypesChart />
     <TopTechniciansChart />
@@ -14,14 +14,14 @@
 
   <SparePartsChartsSection v-else-if="reportType === 'spareParts'" />
 
-  <section v-else-if="reportType === 'technicians'" class="charts-grid" aria-label="Graphiques techniciens">
+  <section v-else-if="reportType === 'technicians'" class="charts-grid" :aria-label="content.techniciansCharts">
     <TopTechniciansChart />
     <AverageTimeChart />
     <SlaGauge />
     <PriorityChart />
   </section>
 
-  <section v-else class="charts-grid" aria-label="Graphiques rapports">
+  <section v-else class="charts-grid" :aria-label="content.reportsCharts">
     <article v-for="chart in customCharts" :key="chart.title" class="chart-card">
       <header>
         <div>
@@ -38,6 +38,7 @@
 <script setup>
 import { computed } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
+import { useLanguageStore } from '@/stores/language'
 import AverageTimeChart from '@/Components/charts/AverageTimeChart.vue'
 import InterventionTypesChart from '@/Components/charts/InterventionTypesChart.vue'
 import InterventionsByMonth from '@/Components/charts/InterventionsByMonth.vue'
@@ -49,6 +50,8 @@ import SparePartsChartsSection from '@/Components/SpareParts/SparePartsChartsSec
 import TopTechniciansChart from '@/Components/charts/TopTechniciansChart.vue'
 
 const apexchart = VueApexCharts
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 
 const props = defineProps({
   reportType: {
@@ -57,6 +60,24 @@ const props = defineProps({
   },
 })
 
+const content = computed(() => ({
+  FR: {
+    interventionsCharts: 'Graphiques interventions',
+    techniciansCharts: 'Graphiques techniciens',
+    reportsCharts: 'Graphiques rapports',
+  },
+  EN: {
+    interventionsCharts: 'Intervention charts',
+    techniciansCharts: 'Technician charts',
+    reportsCharts: 'Report charts',
+  },
+  AR: {
+    interventionsCharts: 'رسوم بيانية للتدخلات',
+    techniciansCharts: 'رسوم بيانية للتقنيين',
+    reportsCharts: 'رسوم بيانية للتقارير',
+  },
+})[language.value] || {})
+
 const chartBase = {
   fontFamily: 'inherit',
   toolbar: { show: false },
@@ -64,58 +85,91 @@ const chartBase = {
 }
 
 const machinesData = [
-  {
-    id: 'M-102',
-    line: 'Ligne Production 1',
-    status: 'En service',
-    availability: 96,
-    breakdownCount: 2,
-  },
-  {
-    id: 'M-215',
-    line: 'Ligne Production 2',
-    status: 'En maintenance',
-    availability: 88,
-    breakdownCount: 5,
-  },
-  {
-    id: 'M-309',
-    line: 'Ligne Conditionnement',
-    status: 'En panne',
-    availability: 72,
-    breakdownCount: 7,
-  },
-  {
-    id: 'M-412',
-    line: 'Ligne Utilités',
-    status: 'En service',
-    availability: 94,
-    breakdownCount: 4,
-  },
-  {
-    id: 'M-518',
-    line: 'Ligne Conditionnement',
-    status: 'Hors service',
-    availability: 66,
-    breakdownCount: 3,
-  },
+  { id: 'M-102', line: 'Ligne Production 1', status: 'En service', availability: 96, breakdownCount: 2 },
+  { id: 'M-215', line: 'Ligne Production 2', status: 'En maintenance', availability: 88, breakdownCount: 5 },
+  { id: 'M-309', line: 'Ligne Conditionnement', status: 'En panne', availability: 72, breakdownCount: 7 },
+  { id: 'M-412', line: 'Ligne Utilites', status: 'En service', availability: 94, breakdownCount: 4 },
+  { id: 'M-518', line: 'Ligne Conditionnement', status: 'Hors service', availability: 66, breakdownCount: 3 },
 ]
+
+const months = computed(() => ({
+  FR: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+  EN: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+  AR: ['ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون', 'يول'],
+})[language.value] || [])
 
 const customCharts = computed(() => {
   if (props.reportType === 'breakdowns') {
+    const text = {
+      FR: [
+        ['Pannes par mois', 'Meme lecture que le suivi des pannes', 'Pannes'],
+        ['Gravite des pannes', 'Critique, haute et moyenne', 'Priorite'],
+        ['Machines impactees', 'Top machines en panne', 'Top 5'],
+        ["Duree d'arret", 'Heures perdues par mois', 'Heures'],
+      ],
+      EN: [
+        ['Breakdowns by month', 'Same view as breakdown tracking', 'Breakdowns'],
+        ['Breakdown severity', 'Critical, high, and medium', 'Priority'],
+        ['Impacted machines', 'Top failed machines', 'Top 5'],
+        ['Downtime duration', 'Lost hours by month', 'Hours'],
+      ],
+      AR: [
+        ['الأعطال حسب الشهر', 'نفس قراءة تتبع الأعطال', 'الأعطال'],
+        ['خطورة الأعطال', 'حرجة، عالية ومتوسطة', 'الأولوية'],
+        ['الآلات المتأثرة', 'أكثر الآلات تعطلا', 'Top 5'],
+        ['مدة التوقف', 'الساعات المفقودة حسب الشهر', 'ساعات'],
+      ],
+    }[language.value]
+    const priorities = {
+      FR: ['Critique', 'Haute', 'Moyenne'],
+      EN: ['Critical', 'High', 'Medium'],
+      AR: ['حرجة', 'عالية', 'متوسطة'],
+    }[language.value]
+
     return [
-      barChart('Pannes par mois', 'Même lecture que le suivi des pannes', 'Pannes', ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'], [4, 7, 5, 8, 6, 9, 12], '#E31E24'),
-      donutChart('Gravité des pannes', 'Critique, warning et attention', 'Priorité', ['Critical', 'Warning', 'Attention'], [12, 22, 18], ['#E31E24', '#FF6A00', '#E8B300']),
-      horizontalChart('Machines impactées', 'Top machines en panne', 'Top 5', ['M-309', 'M-215', 'P-204', 'M-412', 'M-102'], [7, 5, 4, 3, 2], '#E31E24'),
-      areaChart('Durée d’arrêt', 'Heures perdues par mois', 'Heures', ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'], [8, 14, 11, 18, 13, 20, 24], '#FF6A00'),
+      barChart(text[0][0], text[0][1], text[0][2], months.value, [4, 7, 5, 8, 6, 9, 12], '#E31E24'),
+      donutChart(text[1][0], text[1][1], text[1][2], priorities, [12, 22, 18], ['#E31E24', '#FF6A00', '#E8B300']),
+      horizontalChart(text[2][0], text[2][1], text[2][2], ['M-309', 'M-215', 'P-204', 'M-412', 'M-102'], [7, 5, 4, 3, 2], '#E31E24'),
+      areaChart(text[3][0], text[3][1], text[3][2], months.value, [8, 14, 11, 18, 13, 20, 24], '#FF6A00'),
     ]
   }
 
+  const text = {
+    FR: [
+      ['Cout par ligne', 'Maintenance par secteur', 'DH'],
+      ['Evolution des couts', 'Budget mensuel en DH', '2026'],
+      ['Repartition des couts', "Pieces, main-d'oeuvre et arrets", 'Mix'],
+      ['Machines les plus couteuses', 'Top couts maintenance', 'Top 5'],
+    ],
+    EN: [
+      ['Cost by line', 'Maintenance by sector', 'DH'],
+      ['Cost trend', 'Monthly budget in DH', '2026'],
+      ['Cost distribution', 'Parts, labor, and stoppages', 'Mix'],
+      ['Most expensive machines', 'Top maintenance costs', 'Top 5'],
+    ],
+    AR: [
+      ['الكلفة حسب الخط', 'الصيانة حسب القطاع', 'درهم'],
+      ['تطور التكاليف', 'الميزانية الشهرية بالدرهم', '2026'],
+      ['توزيع التكاليف', 'القطع، اليد العاملة والتوقفات', 'Mix'],
+      ['أعلى الآلات تكلفة', 'أعلى تكاليف الصيانة', 'Top 5'],
+    ],
+  }[language.value]
+  const lines = {
+    FR: ['Production 1', 'Production 2', 'Conditionnement', 'Utilites'],
+    EN: ['Production 1', 'Production 2', 'Conditioning', 'Utilities'],
+    AR: ['الإنتاج 1', 'الإنتاج 2', 'التكييف', 'المرافق'],
+  }[language.value]
+  const costLabels = {
+    FR: ['Pieces', "Main-d'oeuvre", 'Arret machine'],
+    EN: ['Parts', 'Labor', 'Machine stoppage'],
+    AR: ['القطع', 'اليد العاملة', 'توقف الآلة'],
+  }[language.value]
+
   return [
-    barChart('Coût par ligne', 'Maintenance par secteur', 'DH', ['Production 1', 'Production 2', 'Conditionnement', 'Utilités'], [12400, 18600, 9600, 8000], '#4A0A0A'),
-    areaChart('Évolution des coûts', 'Budget mensuel en DH', '2026', ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'], [32, 36, 34, 41, 39, 45, 48], '#FF6A00'),
-    donutChart('Répartition des coûts', 'Pièces, main-d’œuvre et arrêts', 'Mix', ['Pièces', 'Main-d’œuvre', 'Arrêt machine'], [45, 25, 30], ['#6A9A2A', '#E8B300', '#E31E24']),
-    horizontalChart('Machines les plus coûteuses', 'Top coûts maintenance', 'Top 5', ['P-204', 'M-215', 'M-309', 'M-412', 'M-102'], [9600, 8200, 7600, 5400, 4200], '#E31E24'),
+    barChart(text[0][0], text[0][1], text[0][2], lines, [12400, 18600, 9600, 8000], '#4A0A0A'),
+    areaChart(text[1][0], text[1][1], text[1][2], months.value, [32, 36, 34, 41, 39, 45, 48], '#FF6A00'),
+    donutChart(text[2][0], text[2][1], text[2][2], costLabels, [45, 25, 30], ['#6A9A2A', '#E8B300', '#E31E24']),
+    horizontalChart(text[3][0], text[3][1], text[3][2], ['P-204', 'M-215', 'M-309', 'M-412', 'M-102'], [9600, 8200, 7600, 5400, 4200], '#E31E24'),
   ]
 })
 

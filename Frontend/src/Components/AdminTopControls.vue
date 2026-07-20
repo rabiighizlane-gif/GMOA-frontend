@@ -7,7 +7,7 @@
         :placeholder="content.searchPlaceholder"
         @input="$emit('update:modelValue', $event.target.value)"
       />
-      <span aria-hidden="true">🔍</span>
+      <span aria-hidden="true">&#128269;</span>
     </label>
 
     <AdminLanguageSwitcher />
@@ -21,25 +21,26 @@
         aria-haspopup="true"
         @click.stop="toggleNotifications"
       >
-        <span aria-hidden="true">🔔</span>
-        <strong>{{ notifications.length }}</strong>
+        <span aria-hidden="true">&#128276;</span>
+        <strong v-if="unreadCount">{{ unreadCount }}</strong>
       </button>
 
       <section v-if="isNotificationsOpen" class="notifications-menu">
         <header>
           <h3>{{ content.notifications }}</h3>
-          <span>{{ notifications.length }}</span>
+          <span>{{ unreadCount }}</span>
         </header>
 
-        <ul>
-          <li v-for="notification in notifications" :key="notification.title">
+        <ul v-if="unreadNotifications.length">
+          <li v-for="notification in unreadNotifications" :key="notification.id">
             <span class="notification-dot" :class="notification.tone" aria-hidden="true"></span>
             <div>
               <strong>{{ notification.title }}</strong>
-              <small>{{ notification.time }}</small>
+              <small>{{ notification.date }} - {{ notification.module }}</small>
             </div>
           </li>
         </ul>
+        <p v-else class="notifications-empty">{{ content.empty }}</p>
 
         <button type="button" class="notifications-action" @click="openNotificationsPage">
           {{ content.viewAll }}
@@ -48,7 +49,7 @@
     </div>
 
     <div class="date-control">
-      <span aria-hidden="true">🗓️</span>
+      <span aria-hidden="true">&#128467;&#65039;</span>
       <strong>{{ formattedDate }}</strong>
     </div>
 
@@ -63,6 +64,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AdminLanguageSwitcher from '@/Components/AdminLanguageSwitcher.vue'
 import { useLanguageStore } from '@/stores/language'
+import { useNotificationsStore } from '@/stores/notifications'
 
 defineProps({
   modelValue: {
@@ -74,6 +76,7 @@ defineProps({
 defineEmits(['update:modelValue'])
 
 const languageStore = useLanguageStore()
+const notificationsStore = useNotificationsStore()
 const router = useRouter()
 const now = ref(new Date())
 const isNotificationsOpen = ref(false)
@@ -81,6 +84,8 @@ const notificationsRef = ref(null)
 let clockInterval
 
 const language = computed(() => languageStore.language)
+const unreadNotifications = computed(() => notificationsStore.unreadNotifications)
+const unreadCount = computed(() => notificationsStore.unreadCount)
 
 const content = computed(() => {
   const labels = {
@@ -89,6 +94,7 @@ const content = computed(() => {
       searchPlaceholder: 'Rechercher...',
       notifications: 'Notifications',
       viewAll: 'Voir toutes les notifications',
+      empty: 'Aucune notification non lue',
       live: 'En direct',
     },
     EN: {
@@ -96,14 +102,16 @@ const content = computed(() => {
       searchPlaceholder: 'Search...',
       notifications: 'Notifications',
       viewAll: 'View all notifications',
+      empty: 'No unread notifications',
       live: 'Live',
     },
     AR: {
       locale: 'ar-MA',
-      searchPlaceholder: 'بحث...',
-      notifications: 'الإشعارات',
-      viewAll: 'عرض كل الإشعارات',
-      live: 'مباشر',
+      searchPlaceholder: '\u0628\u062d\u062b...',
+      notifications: '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a',
+      viewAll: '\u0639\u0631\u0636 \u0643\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a',
+      empty: 'Aucune notification non lue',
+      live: '\u0645\u0628\u0627\u0634\u0631',
     },
   }
 
@@ -125,54 +133,6 @@ const formattedTime = computed(() =>
     hour12: false,
   }).format(now.value),
 )
-
-const notifications = computed(() => [
-  {
-    tone: 'critical',
-    title:
-      language.value === 'AR'
-        ? 'عطل حرج في آلة'
-        : language.value === 'EN'
-          ? 'Critical machine breakdown'
-          : 'Panne critique sur une machine',
-    time:
-      language.value === 'AR'
-        ? 'منذ 5 دقائق'
-        : language.value === 'EN'
-          ? '5 min ago'
-          : 'Il y a 5 min',
-  },
-  {
-    tone: 'warning',
-    title:
-      language.value === 'AR'
-        ? 'صيانة وقائية متأخرة'
-        : language.value === 'EN'
-          ? 'Preventive maintenance overdue'
-          : 'Maintenance preventive en retard',
-    time:
-      language.value === 'AR'
-        ? 'منذ 28 دقيقة'
-        : language.value === 'EN'
-          ? '28 min ago'
-          : 'Il y a 28 min',
-  },
-  {
-    tone: 'info',
-    title:
-      language.value === 'AR'
-        ? 'تمت إضافة تقرير جديد'
-        : language.value === 'EN'
-          ? 'New report added'
-          : 'Nouveau rapport ajoute',
-    time:
-      language.value === 'AR'
-        ? 'اليوم على 09:20'
-        : language.value === 'EN'
-          ? 'Today at 09:20'
-          : "Aujourd'hui a 09:20",
-  },
-])
 
 function toggleNotifications() {
   isNotificationsOpen.value = !isNotificationsOpen.value
@@ -360,6 +320,15 @@ onBeforeUnmount(() => {
   list-style: none;
 }
 
+.notifications-empty {
+  margin: 0;
+  padding: 14px 18px;
+  border-top: 1px solid var(--sc-border);
+  color: var(--sc-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .notifications-menu li {
   display: grid;
   grid-template-columns: 10px minmax(0, 1fr);
@@ -462,6 +431,10 @@ onBeforeUnmount(() => {
 }
 
 :global(:root[data-theme='dark']) .notifications-menu li {
+  border-top-color: rgba(215, 236, 120, 0.14);
+}
+
+:global(:root[data-theme='dark']) .notifications-empty {
   border-top-color: rgba(215, 236, 120, 0.14);
 }
 

@@ -48,7 +48,7 @@
             </span>
           </button>
 
-          <div class="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm">
+          <div class="calendar-chip flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm">
             <span class="text-base">📅</span>
             <span>{{ formattedDate }}</span>
           </div>

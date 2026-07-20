@@ -21,6 +21,7 @@
 
       <template v-if="machine">
         <header class="machine-hero">
+          <img class="machine-hero-photo" :src="editableMachine.imageUrl || fallbackImage" :alt="machineNameLabel(editableMachine.name)" />
           <div>
             <p>{{ content.pageEyebrow }}</p>
             <h1>{{ editableMachine.id }} - {{ machineNameLabel(editableMachine.name) }}</h1>
@@ -181,6 +182,7 @@ const isFullPlanningOpen = ref(false)
 const language = computed(() => languageStore.language)
 const editableMachine = reactive({})
 const draftMachine = reactive({})
+const fallbackImage = '/documents/machines/common/photo-zone-machine.svg'
 
 const machine = computed(() => findMachineById(route.params.id))
 
@@ -605,6 +607,7 @@ const editFields = computed(() => [
     ],
   },
   { key: 'description', label: content.value.editFields.description, type: 'textarea' },
+  { key: 'imageUrl', label: content.value.editFields.photo || 'Photo' },
   { key: 'availability', label: content.value.editFields.availability },
   { key: 'mtbf', label: content.value.editFields.mtbf },
   { key: 'mttr', label: content.value.editFields.mttr },
@@ -984,6 +987,16 @@ function getCriticalityTone(criticality) {
   border-radius: 18px;
   background: var(--sc-surface);
   box-shadow: var(--sc-shadow);
+}
+
+.machine-hero-photo {
+  width: 180px;
+  height: 128px;
+  flex: 0 0 180px;
+  object-fit: cover;
+  border: 1px solid var(--sc-border);
+  border-radius: 14px;
+  background: var(--sc-bg);
 }
 
 .machine-hero p {
@@ -1615,6 +1628,12 @@ function getCriticalityTone(criticality) {
 
   .machine-hero {
     flex-direction: column;
+  }
+
+  .machine-hero-photo {
+    width: 100%;
+    height: 190px;
+    flex-basis: auto;
   }
 
   .machine-hero h1 {

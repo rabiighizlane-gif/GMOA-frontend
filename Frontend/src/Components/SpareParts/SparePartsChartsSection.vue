@@ -1,246 +1,170 @@
 <template>
   <section class="charts-section">
-    <article class="chart-card">
-      <header>
-        <div>
-          <h3>Stock par catégorie</h3>
-          <p>Répartition des références</p>
-        </div>
-        <span>Mix</span>
-      </header>
-
-      <apexchart type="donut" height="250" :options="categoryOptions" :series="categorySeries" />
+    <article class="chart-card" :dir="pageDirection">
+      <header><div><h3>{{ content.categoryTitle }}</h3><p>{{ content.categorySubtitle }}</p></div><span>{{ content.mix }}</span></header>
+      <div class="chart-canvas" dir="ltr">
+        <apexchart type="donut" height="250" :options="categoryOptions" :series="categorySeries" />
+      </div>
     </article>
 
-    <article class="chart-card">
-      <header>
-        <div>
-          <h3>Consommation mensuelle</h3>
-          <p>Évolution sur 7 mois</p>
-        </div>
-        <span>2026</span>
-      </header>
-
-      <apexchart type="area" height="250" :options="consumptionOptions" :series="consumptionSeries" />
+    <article class="chart-card" :dir="pageDirection">
+      <header><div><h3>{{ content.consumptionTitle }}</h3><p>{{ content.consumptionSubtitle }}</p></div><span>2026</span></header>
+      <div class="chart-canvas" dir="ltr">
+        <apexchart type="area" height="250" :options="consumptionOptions" :series="consumptionSeries" />
+      </div>
     </article>
 
-    <article class="chart-card">
-      <header>
-        <div>
-          <h3>Top pièces consommées</h3>
-          <p>Top 5 des sorties stock</p>
-        </div>
-        <span>Top 5</span>
-      </header>
-
-      <apexchart type="bar" height="250" :options="topOptions" :series="topSeries" />
+    <article class="chart-card" :dir="pageDirection">
+      <header><div><h3>{{ content.topTitle }}</h3><p>{{ content.topSubtitle }}</p></div><span>Top 5</span></header>
+      <div class="chart-canvas" dir="ltr">
+        <apexchart type="bar" height="250" :options="topOptions" :series="topSeries" />
+      </div>
     </article>
 
-    <article class="chart-card">
-      <header>
-        <div>
-          <h3>Niveau global du stock</h3>
-          <p>Disponibilité globale</p>
-        </div>
-        <span>SLA</span>
-      </header>
-
-      <apexchart type="radialBar" height="250" :options="stockLevelOptions" :series="stockLevelSeries" />
+    <article class="chart-card" :dir="pageDirection">
+      <header><div><h3>{{ content.stockTitle }}</h3><p>{{ content.stockSubtitle }}</p></div><span>SLA</span></header>
+      <div class="chart-canvas" dir="ltr">
+        <apexchart type="radialBar" height="250" :options="stockLevelOptions" :series="stockLevelSeries" />
+      </div>
     </article>
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import VueApexCharts from 'vue3-apexcharts'
 
 const apexchart = VueApexCharts
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+const pageDirection = computed(() => (language.value === 'AR' ? 'rtl' : 'ltr'))
 
-const chartBase = {
-  fontFamily: 'inherit',
-  toolbar: {
-    show: false
+const translations = {
+  FR: {
+    mix: 'Mix',
+    categoryTitle: 'Stock par categorie',
+    categorySubtitle: 'Repartition des references',
+    consumptionTitle: 'Consommation mensuelle',
+    consumptionSubtitle: 'Evolution sur 7 mois',
+    topTitle: 'Top pieces consommees',
+    topSubtitle: 'Top 5 des sorties stock',
+    stockTitle: 'Niveau global du stock',
+    stockSubtitle: 'Disponibilite globale',
+    categories: ['Mecanique', 'Electrique', 'Filtration', 'Transmission', 'Lubrification', 'Pneumatique'],
+    months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+    usedParts: 'Pieces utilisees',
+    exits: 'Sorties',
+    topParts: ['Filtre a huile', 'Roulement 6205', 'Courroie', 'Fusible', 'Huile mecanique'],
+    available: 'Disponible',
+    unit: 'pieces',
   },
-  animations: {
-    enabled: true,
-    speed: 800
-  }
+  EN: {
+    mix: 'Mix',
+    categoryTitle: 'Stock by category',
+    categorySubtitle: 'Reference breakdown',
+    consumptionTitle: 'Monthly consumption',
+    consumptionSubtitle: '7-month trend',
+    topTitle: 'Top consumed parts',
+    topSubtitle: 'Top 5 stock exits',
+    stockTitle: 'Overall stock level',
+    stockSubtitle: 'Global availability',
+    categories: ['Mechanical', 'Electrical', 'Filtration', 'Transmission', 'Lubrication', 'Pneumatic'],
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    usedParts: 'Used parts',
+    exits: 'Exits',
+    topParts: ['Oil filter', 'Bearing 6205', 'Belt', 'Fuse', 'Mechanical oil'],
+    available: 'Available',
+    unit: 'parts',
+  },
+  AR: {
+    mix: 'مزيج',
+    categoryTitle: 'المخزون حسب الفئة',
+    categorySubtitle: 'توزيع المراجع',
+    consumptionTitle: 'الاستهلاك الشهري',
+    consumptionSubtitle: 'التطور خلال 7 أشهر',
+    topTitle: 'أكثر القطع استهلاكا',
+    topSubtitle: 'أعلى 5 خروجات من المخزون',
+    stockTitle: 'المستوى العام للمخزون',
+    stockSubtitle: 'التوفر الإجمالي',
+    categories: ['ميكانيكية', 'كهربائية', 'ترشيح', 'نقل الحركة', 'تشحيم', 'هوائية'],
+    months: ['يناير', 'فبراير', 'مارس', 'أبريل', 'ماي', 'يونيو', 'يوليو'],
+    usedParts: 'القطع المستعملة',
+    exits: 'الخروجات',
+    topParts: ['مرشح الزيت', 'محمل 6205', 'حزام', 'مصهر', 'زيت ميكانيكي'],
+    available: 'متوفر',
+    unit: 'قطع',
+  },
 }
 
-const categorySeries = ref([145, 88, 72, 64, 49, 32])
-const categoryOptions = ref({
-  chart: {
-    type: 'donut',
-    ...chartBase
-  },
-  labels: ['Mécanique', 'Électrique', 'Filtration', 'Transmission', 'Lubrification', 'Pneumatique'],
+const content = computed(() => translations[language.value] || translations.FR)
+const chartBase = computed(() => ({ fontFamily: 'inherit', toolbar: { show: false }, animations: { enabled: true, speed: 800 } }))
+
+const categorySeries = computed(() => [145, 88, 72, 64, 49, 32])
+const categoryOptions = computed(() => ({
+  chart: { type: 'donut', ...chartBase.value },
+  labels: content.value.categories,
   colors: ['#6A9A2A', '#4A0A0A', '#B6C65B', '#E8B300', '#FF6A00', '#8AAE4A'],
-  stroke: {
-    width: 4,
-    colors: ['#FFFFFF']
-  },
-  dataLabels: {
-    enabled: false
-  },
-  legend: {
-    position: 'bottom',
-    fontSize: '10px'
-  },
-  tooltip: {
-    y: {
-      formatter: (value) => `${value} pièces`
-    }
-  }
-})
+  stroke: { width: 4, colors: ['#FFFFFF'] },
+  dataLabels: { enabled: false },
+  legend: { position: 'bottom', fontSize: '10px' },
+  tooltip: { y: { formatter: (value) => `${value} ${content.value.unit}` } },
+}))
 
-const consumptionSeries = ref([
-  {
-    name: 'Pièces utilisées',
-    data: [62, 74, 69, 88, 91, 83, 94]
-  }
-])
-
-const consumptionOptions = ref({
-  chart: {
-    type: 'area',
-    ...chartBase
-  },
+const consumptionSeries = computed(() => [{ name: content.value.usedParts, data: [62, 74, 69, 88, 91, 83, 94] }])
+const consumptionOptions = computed(() => ({
+  chart: { type: 'area', ...chartBase.value },
   colors: ['#6A9A2A'],
-  dataLabels: {
-    enabled: false
-  },
-  stroke: {
-    curve: 'smooth',
-    width: 3
-  },
-  fill: {
-    type: 'gradient',
-    gradient: {
-      opacityFrom: 0.28,
-      opacityTo: 0.02
-    }
-  },
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 3 },
+  fill: { type: 'gradient', gradient: { opacityFrom: 0.28, opacityTo: 0.02 } },
   xaxis: {
-    categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-    labels: {
-      style: {
-        colors: '#64748B',
-        fontSize: '10px'
-      }
-    }
+    categories: content.value.months,
+    labels: { rotate: 0, trim: false, hideOverlappingLabels: false, style: { colors: '#64748B', fontSize: '11px', fontFamily: 'inherit' } },
   },
-  yaxis: {
-    labels: {
-      style: {
-        colors: '#64748B'
-      }
-    }
-  },
-  grid: {
-    borderColor: '#EEF1E9',
-    strokeDashArray: 4
-  }
-})
+  yaxis: { labels: { style: { colors: '#64748B', fontFamily: 'inherit' } } },
+  grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+}))
 
-const topSeries = ref([
-  {
-    name: 'Sorties',
-    data: [26, 19, 16, 14, 11]
-  }
-])
-
-const topOptions = ref({
-  chart: {
-    type: 'bar',
-    ...chartBase
-  },
+const topSeries = computed(() => [{ name: content.value.exits, data: [26, 19, 16, 14, 11] }])
+const topOptions = computed(() => ({
+  chart: { type: 'bar', ...chartBase.value },
   colors: ['#6A9A2A'],
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      borderRadius: 6,
-      barHeight: '42%'
-    }
-  },
-  dataLabels: {
-    enabled: true,
-    offsetX: 7,
-    style: {
-      colors: ['#4A0A0A'],
-      fontSize: '10px'
-    }
-  },
-  xaxis: {
-    categories: ['Filtre à huile', 'Roulement 6205', 'Courroie', 'Fusible', 'Huile mécanique'],
-    labels: {
-      show: false
-    },
-    axisBorder: {
-      show: false
-    },
-    axisTicks: {
-      show: false
-    }
-  },
-  yaxis: {
-    labels: {
-      style: {
-        colors: '#4A0A0A',
-        fontSize: '10px',
-        fontWeight: 700
-      }
-    }
-  },
-  grid: {
-    show: false
-  }
-})
+  plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
+  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#4A0A0A'], fontSize: '10px' } },
+  xaxis: { categories: content.value.topParts, labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+  yaxis: { labels: { maxWidth: 120, style: { colors: '#4A0A0A', fontSize: '11px', fontWeight: 700, fontFamily: 'inherit' } } },
+  grid: { show: false },
+}))
 
-const stockLevelSeries = ref([84])
-const stockLevelOptions = ref({
-  chart: {
-    type: 'radialBar',
-    ...chartBase
-  },
+const stockLevelSeries = computed(() => [84])
+const stockLevelOptions = computed(() => ({
+  chart: { type: 'radialBar', ...chartBase.value },
   colors: ['#6A9A2A'],
   plotOptions: {
     radialBar: {
-      hollow: {
-        size: '64%'
-      },
-      track: {
-        background: '#EEF1E9'
-      },
+      hollow: { size: '64%' },
+      track: { background: '#EEF1E9' },
       dataLabels: {
-        name: {
-          color: '#64748B',
-          fontSize: '11px'
-        },
-        value: {
-          color: '#111827',
-          fontSize: '30px',
-          fontWeight: 900,
-          formatter: (value) => `${Math.round(value)}%`
-        }
-      }
-    }
+        name: { color: '#64748B', fontSize: '11px' },
+        value: { color: '#111827', fontSize: '30px', fontWeight: 900, formatter: (value) => `${Math.round(value)}%` },
+      },
+    },
   },
-  stroke: {
-    lineCap: 'round'
-  },
-  labels: ['Disponible']
-})
+  stroke: { lineCap: 'round' },
+  labels: [content.value.available],
+}))
 </script>
 
 <style scoped>
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
   gap: 18px;
   width: 100%;
   overflow: hidden;
+  direction: ltr;
 }
-
 .chart-card {
   min-width: 0;
   overflow: hidden;
@@ -249,34 +173,30 @@ const stockLevelOptions = ref({
   border: 1px solid #edf0e8;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
-  transition: 0.2s ease;
 }
-
-.chart-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.08);
-}
-
 .chart-card header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
 }
-
+.chart-card[dir='rtl'] header {
+  flex-direction: row-reverse;
+  text-align: right;
+}
 .chart-card h3 {
   margin: 0;
   color: #111827;
   font-size: 15px;
   font-weight: 900;
+  letter-spacing: 0;
 }
-
 .chart-card p {
   margin: 5px 0 0;
   color: #94a3b8;
   font-size: 11px;
 }
-
 .chart-card header > span {
   padding: 6px 9px;
   background: #eff5df;
@@ -284,23 +204,19 @@ const stockLevelOptions = ref({
   color: #6a9a2a;
   font-size: 10px;
   font-weight: 900;
+  white-space: nowrap;
 }
-
+.chart-canvas { direction: ltr; }
 .chart-card :deep(.vue-apexcharts),
-.chart-card :deep(.apexcharts-canvas) {
+.chart-card :deep(.apexcharts-canvas),
+.chart-card :deep(svg) {
   width: 100% !important;
   max-width: 100%;
 }
-
-@media (max-width: 1400px) {
-  .charts-section {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.chart-card :deep(.apexcharts-legend-text) {
+  font-family: inherit !important;
 }
-
 @media (max-width: 750px) {
-  .charts-section {
-    grid-template-columns: 1fr;
-  }
+  .charts-section { grid-template-columns: minmax(0, 1fr); }
 }
 </style>

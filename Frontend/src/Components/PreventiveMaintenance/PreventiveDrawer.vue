@@ -43,41 +43,41 @@
             class="drawer-body"
           >
             <section v-if="activeTab === 'information'">
-              <h3>Informations générales</h3>
+              <h3>{{ content.informationTitle }}</h3>
 
               <div class="details-grid">
                 <div>
-                  <span>Machine</span>
+                  <span>{{ content.machine }}</span>
                   <strong>{{ maintenance.machine }}</strong>
                 </div>
 
                 <div>
-                  <span>Ligne</span>
+                  <span>{{ content.line }}</span>
                   <strong>{{ maintenance.line }}</strong>
                 </div>
 
                 <div>
-                  <span>Fréquence</span>
+                  <span>{{ content.frequency }}</span>
                   <strong>{{ maintenance.frequency }}</strong>
                 </div>
 
                 <div>
-                  <span>Responsable</span>
+                  <span>{{ content.responsible }}</span>
                   <strong>{{ maintenance.technician }}</strong>
                 </div>
 
                 <div>
-                  <span>Dernière réalisation</span>
+                  <span>{{ content.lastExecution }}</span>
                   <strong>{{ maintenance.lastExecution }}</strong>
                 </div>
 
                 <div>
-                  <span>Prochaine échéance</span>
+                  <span>{{ content.nextDueDate }}</span>
                   <strong>{{ maintenance.nextDueDate }}</strong>
                 </div>
               </div>
 
-              <h3>Description</h3>
+              <h3>{{ content.description }}</h3>
 
               <p class="description">
                 {{ maintenance.description }}
@@ -85,7 +85,7 @@
             </section>
 
             <section v-if="activeTab === 'tasks'">
-              <h3>Checklist des tâches</h3>
+              <h3>{{ content.tasksTitle }}</h3>
 
               <label
                 v-for="task in tasks"
@@ -104,7 +104,7 @@
             </section>
 
             <section v-if="activeTab === 'parts'">
-              <h3>Pièces prévues</h3>
+              <h3>{{ content.partsTitle }}</h3>
 
               <div
                 v-for="part in parts"
@@ -119,14 +119,14 @@
                 <div>
                   <strong>x{{ part.quantity }}</strong>
                   <span :class="part.available ? 'available' : 'unavailable'">
-                    {{ part.available ? 'Disponible' : 'Stock insuffisant' }}
+                    {{ part.available ? content.available : content.unavailable }}
                   </span>
                 </div>
               </div>
             </section>
 
             <section v-if="activeTab === 'history'">
-              <h3>Historique du plan</h3>
+              <h3>{{ content.historyTitle }}</h3>
 
               <div class="timeline">
                 <article
@@ -148,7 +148,7 @@
 
           <footer class="drawer-footer">
             <button class="secondary-button" type="button">
-              Imprimer
+              {{ content.print }}
             </button>
 
             <button
@@ -156,7 +156,7 @@
               type="button"
               @click="$emit('edit', maintenance)"
             >
-              Modifier le plan
+              {{ content.edit }}
             </button>
           </footer>
         </aside>
@@ -166,7 +166,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import PreventiveIcon from '@/Components/PreventiveMaintenance/PreventiveIcon.vue'
 
 defineProps({
@@ -180,13 +181,74 @@ defineProps({
 defineEmits(['close', 'edit'])
 
 const activeTab = ref('information')
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 
-const tabs = [
-  { id: 'information', label: 'Informations', icon: 'info' },
-  { id: 'tasks', label: 'Tâches', icon: 'check' },
-  { id: 'parts', label: 'Pièces', icon: 'tool' },
-  { id: 'history', label: 'Historique', icon: 'clock' }
-]
+const translations = {
+  FR: {
+    tabs: ['Informations', 'Taches', 'Pieces', 'Historique'],
+    informationTitle: 'Informations generales',
+    machine: 'Machine',
+    line: 'Ligne',
+    frequency: 'Frequence',
+    responsible: 'Responsable',
+    lastExecution: 'Derniere realisation',
+    nextDueDate: 'Prochaine echeance',
+    description: 'Description',
+    tasksTitle: 'Checklist des taches',
+    partsTitle: 'Pieces prevues',
+    historyTitle: 'Historique du plan',
+    available: 'Disponible',
+    unavailable: 'Stock insuffisant',
+    print: 'Imprimer',
+    edit: 'Modifier le plan',
+  },
+  EN: {
+    tabs: ['Information', 'Tasks', 'Parts', 'History'],
+    informationTitle: 'General information',
+    machine: 'Machine',
+    line: 'Line',
+    frequency: 'Frequency',
+    responsible: 'Responsible',
+    lastExecution: 'Last completion',
+    nextDueDate: 'Next due date',
+    description: 'Description',
+    tasksTitle: 'Task checklist',
+    partsTitle: 'Planned parts',
+    historyTitle: 'Plan history',
+    available: 'Available',
+    unavailable: 'Insufficient stock',
+    print: 'Print',
+    edit: 'Edit plan',
+  },
+  AR: {
+    tabs: ['معلومات', 'مهام', 'قطع', 'السجل'],
+    informationTitle: 'معلومات عامة',
+    machine: 'الآلة',
+    line: 'الخط',
+    frequency: 'التواتر',
+    responsible: 'المسؤول',
+    lastExecution: 'آخر إنجاز',
+    nextDueDate: 'الموعد القادم',
+    description: 'الوصف',
+    tasksTitle: 'لائحة المهام',
+    partsTitle: 'القطع المبرمجة',
+    historyTitle: 'سجل الخطة',
+    available: 'متوفر',
+    unavailable: 'المخزون غير كاف',
+    print: 'طباعة',
+    edit: 'تعديل الخطة',
+  },
+}
+
+const content = computed(() => translations[language.value] || translations.FR)
+
+const tabs = computed(() => [
+  { id: 'information', label: content.value.tabs[0], icon: 'info' },
+  { id: 'tasks', label: content.value.tabs[1], icon: 'check' },
+  { id: 'parts', label: content.value.tabs[2], icon: 'tool' },
+  { id: 'history', label: content.value.tabs[3], icon: 'clock' },
+])
 
 const tasks = ref([
   { id: 1, label: "Couper et sécuriser l'alimentation", completed: true },

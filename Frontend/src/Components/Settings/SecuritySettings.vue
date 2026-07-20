@@ -1,20 +1,26 @@
 <template>
   <section class="settings-panel">
-    <div class="panel-heading">
-      <h2>Sécurité</h2>
-      <p>Sessions, authentification et politique de mots de passe.</p>
-    </div>
-
+    <div class="panel-heading"><h2>{{ t.title }}</h2><p>{{ t.subtitle }}</p></div>
     <div class="form-grid">
-      <label>Durée session<select><option>8 heures</option><option>4 heures</option><option>24 heures</option></select></label>
-      <label>Mot de passe minimum<input type="number" value="8" /></label>
-      <label>Verrouillage après X tentatives<input type="number" value="5" /></label>
-      <label>Politique mot de passe<select><option>Forte</option><option>Moyenne</option></select></label>
+      <label>{{ t.session }}<select><option>{{ t.hours8 }}</option><option>{{ t.hours4 }}</option><option>{{ t.hours24 }}</option></select></label>
+      <label>{{ t.passwordMin }}<input type="number" value="8" /></label>
+      <label>{{ t.lockAfter }}<input type="number" value="5" /></label>
+      <label>{{ t.passwordPolicy }}<select><option>{{ t.strong }}</option><option>{{ t.medium }}</option></select></label>
     </div>
-
-    <label class="single-toggle"><span>Double authentification</span><input type="checkbox" /></label>
+    <label class="single-toggle"><span>{{ t.twoFactor }}</span><input type="checkbox" /></label>
   </section>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
+const languageStore = useLanguageStore()
+const t = computed(() => ({
+  FR: { title: 'Securite', subtitle: 'Sessions, authentification et politique de mots de passe.', session: 'Duree session', hours8: '8 heures', hours4: '4 heures', hours24: '24 heures', passwordMin: 'Mot de passe minimum', lockAfter: 'Verrouillage apres X tentatives', passwordPolicy: 'Politique mot de passe', strong: 'Forte', medium: 'Moyenne', twoFactor: 'Double authentification' },
+  EN: { title: 'Security', subtitle: 'Sessions, authentication, and password policy.', session: 'Session duration', hours8: '8 hours', hours4: '4 hours', hours24: '24 hours', passwordMin: 'Minimum password length', lockAfter: 'Lock after X attempts', passwordPolicy: 'Password policy', strong: 'Strong', medium: 'Medium', twoFactor: 'Two-factor authentication' },
+  AR: { title: 'الأمان', subtitle: 'الجلسات، المصادقة وسياسة كلمات المرور.', session: 'مدة الجلسة', hours8: '8 ساعات', hours4: '4 ساعات', hours24: '24 ساعة', passwordMin: 'الحد الأدنى لكلمة المرور', lockAfter: 'القفل بعد عدد محاولات', passwordPolicy: 'سياسة كلمة المرور', strong: 'قوية', medium: 'متوسطة', twoFactor: 'المصادقة الثنائية' },
+})[languageStore.language] || {})
+</script>
 
 <style scoped>
 @import './settings.css';

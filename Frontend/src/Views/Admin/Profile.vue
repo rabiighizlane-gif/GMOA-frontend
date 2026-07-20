@@ -679,6 +679,12 @@ const profile = computed(() => {
 })
 
 function formatName(name) {
+  const genericName = String(name || '').trim().toLowerCase()
+
+  if (genericName === 'utilisateur' || genericName === 'user') {
+    return pickText({ FR: 'Utilisateur', EN: 'User', AR: 'مستخدم' })
+  }
+
   if (language.value !== 'AR') return name
 
   const knownNames = {
@@ -1810,7 +1816,7 @@ function toggleAllActivity() {
   position: fixed;
   top: 24px;
   left: 24px;
-  z-index: 50;
+  z-index: 1000;
   width: 48px;
   height: 48px;
   display: inline-flex;
@@ -1827,6 +1833,7 @@ function toggleAllActivity() {
     opacity 0.18s ease,
     transform 0.18s ease,
     visibility 0.18s ease;
+  cursor: pointer;
 }
 
 .sidebar-toggle:hover {
@@ -1851,7 +1858,7 @@ function toggleAllActivity() {
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 35;
+  z-index: 80;
   background: rgba(15, 23, 42, 0.28);
 }
 

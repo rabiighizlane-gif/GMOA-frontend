@@ -1,50 +1,47 @@
 <template>
   <section class="settings-panel">
-    <div class="panel-heading">
-      <h2>Utilisateurs & rôles</h2>
-      <p>Configuration des rôles, permissions et actions d'administration.</p>
-    </div>
+    <div class="panel-heading"><h2>{{ t.title }}</h2><p>{{ t.subtitle }}</p></div>
 
     <form v-if="isEditorOpen" class="role-editor" @submit.prevent="saveRole">
-      <label>Nom du rôle<input v-model="roleForm.name" required /></label>
-      <label>Description<input v-model="roleForm.description" required /></label>
+      <label>{{ t.roleName }}<input v-model="roleForm.name" required /></label>
+      <label>{{ t.description }}<input v-model="roleForm.description" required /></label>
       <div>
-        <button type="submit" class="primary-action">{{ editingRoleIndex === null ? 'Créer le rôle' : 'Enregistrer' }}</button>
-        <button type="button" @click="closeEditor">Annuler</button>
+        <button type="submit" class="primary-action">{{ editingRoleIndex === null ? t.createRole : t.save }}</button>
+        <button type="button" @click="closeEditor">{{ t.cancel }}</button>
       </div>
     </form>
 
     <div class="role-list">
-      <article v-for="(role, index) in roles" :key="role.name">
+      <article v-for="(role, index) in roles" :key="role.key">
         <div class="role-main">
-          <strong>{{ role.name }}</strong>
-          <span>{{ role.description }}</span>
-          <div v-if="expandedRole === role.name" class="permissions-list">
+          <strong>{{ roleLabel(role) }}</strong>
+          <span>{{ roleDescription(role) }}</span>
+          <div v-if="expandedRole === role.key" class="permissions-list">
             <div class="permissions-header">
-              <strong>Permissions actives</strong>
-              <button type="button" @click="expandedRole = ''">Fermer</button>
+              <strong>{{ t.activePermissions }}</strong>
+              <button type="button" @click="expandedRole = ''">{{ t.close }}</button>
             </div>
             <div class="permission-tags">
               <label v-for="permission in role.permissions" :key="permission">
                 <input checked type="checkbox" />
-                <span>{{ permission }}</span>
+                <span>{{ permissionLabel(permission) }}</span>
               </label>
             </div>
           </div>
         </div>
 
         <div class="actions">
-          <button type="button" @click="openCreateEditor">Créer</button>
-          <button type="button" @click="openEditEditor(role, index)">Modifier</button>
-          <button type="button" @click="deleteRole(index)">Supprimer</button>
-          <button type="button" @click="togglePermissions(role.name)">
-            {{ expandedRole === role.name ? 'Masquer' : 'Permissions' }}
+          <button type="button" @click="openCreateEditor">{{ t.create }}</button>
+          <button type="button" @click="openEditEditor(role, index)">{{ t.edit }}</button>
+          <button type="button" @click="deleteRole(index)">{{ t.delete }}</button>
+          <button type="button" @click="togglePermissions(role.key)">
+            {{ expandedRole === role.key ? t.hide : t.permissions }}
           </button>
         </div>
       </article>
     </div>
 
-    <button type="button" class="danger-light" @click="resetPassword">Réinitialiser mot de passe</button>
+    <button type="button" class="danger-light" @click="resetPassword">{{ t.resetPassword }}</button>
 
     <Transition name="toast">
       <div v-if="toastMessage" class="mini-toast">{{ toastMessage }}</div>
@@ -53,36 +50,70 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 
-const roles = ref([
-  {
-    name: 'Super Admin',
-    description: 'Accès total, lecture globale, gestion utilisateurs et rôles.',
-    permissions: ['Voir toutes les statistiques', 'Gérer les utilisateurs', 'Gérer les rôles', 'Voir toutes les pannes'],
-  },
-  {
-    name: 'Responsable',
-    description: 'Validation, planification et suivi des opérations.',
-    permissions: ['Valider les demandes', 'Planifier la maintenance', 'Consulter les rapports'],
-  },
-  {
-    name: 'Technicien',
-    description: 'Interventions, diagnostics, pièces et clôtures.',
-    permissions: ['Traiter les interventions', 'Utiliser les pièces', 'Clôturer les interventions'],
-  },
-  {
-    name: 'Opérateur',
-    description: 'Déclaration pannes et demandes de maintenance.',
-    permissions: ['Déclarer une panne', 'Créer une demande', 'Consulter ses demandes'],
-  },
-])
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 
+const t = computed(() => ({
+  FR: { title: 'Utilisateurs & roles', subtitle: "Configuration des roles, permissions et actions d'administration.", roleName: 'Nom du role', description: 'Description', createRole: 'Creer le role', save: 'Enregistrer', cancel: 'Annuler', activePermissions: 'Permissions actives', close: 'Fermer', create: 'Creer', edit: 'Modifier', delete: 'Supprimer', hide: 'Masquer', permissions: 'Permissions', resetPassword: 'Reinitialiser mot de passe', created: 'Role cree.', updated: 'Role modifie.', deleted: 'Role supprime.', protected: 'Le role Super Admin ne peut pas etre supprime.', resetReady: 'Lien de reinitialisation prepare.' },
+  EN: { title: 'Users & roles', subtitle: 'Role, permission, and administration action configuration.', roleName: 'Role name', description: 'Description', createRole: 'Create role', save: 'Save', cancel: 'Cancel', activePermissions: 'Active permissions', close: 'Close', create: 'Create', edit: 'Edit', delete: 'Delete', hide: 'Hide', permissions: 'Permissions', resetPassword: 'Reset password', created: 'Role created.', updated: 'Role updated.', deleted: 'Role deleted.', protected: 'The Super Admin role cannot be deleted.', resetReady: 'Reset link prepared.' },
+  AR: { title: 'المستخدمون والأدوار', subtitle: 'إعداد الأدوار والصلاحيات وإجراءات الإدارة.', roleName: 'اسم الدور', description: 'الوصف', createRole: 'إنشاء الدور', save: 'حفظ', cancel: 'إلغاء', activePermissions: 'الصلاحيات النشطة', close: 'إغلاق', create: 'إنشاء', edit: 'تعديل', delete: 'حذف', hide: 'إخفاء', permissions: 'الصلاحيات', resetPassword: 'إعادة تعيين كلمة المرور', created: 'تم إنشاء الدور.', updated: 'تم تعديل الدور.', deleted: 'تم حذف الدور.', protected: 'لا يمكن حذف دور Super Admin.', resetReady: 'تم تجهيز رابط إعادة التعيين.' },
+})[language.value] || {})
+
+const roleTexts = {
+  superadmin: {
+    name: { FR: 'Super Admin', EN: 'Super Admin', AR: 'المدير العام' },
+    description: { FR: 'Acces total, lecture globale, gestion utilisateurs et roles.', EN: 'Full access, global view, user and role management.', AR: 'ولوج كامل، عرض شامل، وتدبير المستخدمين والأدوار.' },
+    permissions: ['stats', 'users', 'roles', 'breakdowns'],
+  },
+  manager: {
+    name: { FR: 'Responsable', EN: 'Manager', AR: 'مسؤول' },
+    description: { FR: 'Validation, planification et suivi des operations.', EN: 'Approval, planning, and operation tracking.', AR: 'المصادقة، التخطيط وتتبع العمليات.' },
+    permissions: ['requests', 'planning', 'reports'],
+  },
+  technician: {
+    name: { FR: 'Technicien', EN: 'Technician', AR: 'تقني' },
+    description: { FR: 'Interventions, diagnostics, pieces et clotures.', EN: 'Interventions, diagnostics, parts, and closures.', AR: 'التدخلات، التشخيص، القطع والإغلاق.' },
+    permissions: ['interventions', 'parts', 'closeInterventions'],
+  },
+  operator: {
+    name: { FR: 'Operateur', EN: 'Operator', AR: 'مشغل' },
+    description: { FR: 'Declaration pannes et demandes de maintenance.', EN: 'Breakdown reporting and maintenance requests.', AR: 'التبليغ عن الأعطال وطلبات الصيانة.' },
+    permissions: ['declareBreakdown', 'createRequest', 'ownRequests'],
+  },
+}
+
+const permissionTexts = {
+  stats: { FR: 'Voir toutes les statistiques', EN: 'View all statistics', AR: 'عرض جميع الإحصائيات' },
+  users: { FR: 'Gerer les utilisateurs', EN: 'Manage users', AR: 'تدبير المستخدمين' },
+  roles: { FR: 'Gerer les roles', EN: 'Manage roles', AR: 'تدبير الأدوار' },
+  breakdowns: { FR: 'Voir toutes les pannes', EN: 'View all breakdowns', AR: 'عرض جميع الأعطال' },
+  requests: { FR: 'Valider les demandes', EN: 'Approve requests', AR: 'المصادقة على الطلبات' },
+  planning: { FR: 'Planifier la maintenance', EN: 'Plan maintenance', AR: 'تخطيط الصيانة' },
+  reports: { FR: 'Consulter les rapports', EN: 'View reports', AR: 'الاطلاع على التقارير' },
+  interventions: { FR: 'Traiter les interventions', EN: 'Handle interventions', AR: 'معالجة التدخلات' },
+  parts: { FR: 'Utiliser les pieces', EN: 'Use parts', AR: 'استعمال القطع' },
+  closeInterventions: { FR: 'Cloturer les interventions', EN: 'Close interventions', AR: 'إغلاق التدخلات' },
+  declareBreakdown: { FR: 'Declarer une panne', EN: 'Report a breakdown', AR: 'التبليغ عن عطل' },
+  createRequest: { FR: 'Creer une demande', EN: 'Create a request', AR: 'إنشاء طلب' },
+  ownRequests: { FR: 'Consulter ses demandes', EN: 'View own requests', AR: 'عرض طلباته' },
+  consult: { FR: 'Consulter', EN: 'View', AR: 'الاطلاع' },
+  create: { FR: 'Creer', EN: 'Create', AR: 'إنشاء' },
+  update: { FR: 'Modifier', EN: 'Edit', AR: 'تعديل' },
+}
+
+const roles = ref(Object.entries(roleTexts).map(([key, role]) => ({ key, ...role })))
 const roleForm = reactive({ name: '', description: '' })
 const isEditorOpen = ref(false)
 const editingRoleIndex = ref(null)
 const expandedRole = ref('')
 const toastMessage = ref('')
+
+const roleLabel = (role) => role.name?.[language.value] || role.name?.FR || role.name
+const roleDescription = (role) => role.description?.[language.value] || role.description?.FR || role.description
+const permissionLabel = (permission) => permissionTexts[permission]?.[language.value] || permission
 
 function openCreateEditor() {
   editingRoleIndex.value = null
@@ -93,8 +124,8 @@ function openCreateEditor() {
 
 function openEditEditor(role, index) {
   editingRoleIndex.value = index
-  roleForm.name = role.name
-  roleForm.description = role.description
+  roleForm.name = roleLabel(role)
+  roleForm.description = roleDescription(role)
   isEditorOpen.value = true
 }
 
@@ -104,42 +135,39 @@ function closeEditor() {
 
 function saveRole() {
   const role = {
-    name: roleForm.name.trim(),
-    description: roleForm.description.trim(),
-    permissions: ['Consulter', 'Créer', 'Modifier'],
+    key: `custom-${Date.now()}`,
+    name: { [language.value]: roleForm.name.trim(), FR: roleForm.name.trim() },
+    description: { [language.value]: roleForm.description.trim(), FR: roleForm.description.trim() },
+    permissions: ['consult', 'create', 'update'],
   }
 
   if (editingRoleIndex.value === null) {
     roles.value.push(role)
-    showToast('Rôle créé.')
+    showToast(t.value.created)
   } else {
-    roles.value[editingRoleIndex.value] = {
-      ...roles.value[editingRoleIndex.value],
-      ...role,
-    }
-    showToast('Rôle modifié.')
+    roles.value[editingRoleIndex.value] = { ...roles.value[editingRoleIndex.value], ...role, key: roles.value[editingRoleIndex.value].key }
+    showToast(t.value.updated)
   }
 
   closeEditor()
 }
 
 function deleteRole(index) {
-  const protectedRoles = ['Super Admin']
-  if (protectedRoles.includes(roles.value[index].name)) {
-    showToast('Le rôle Super Admin ne peut pas être supprimé.')
+  if (roles.value[index].key === 'superadmin') {
+    showToast(t.value.protected)
     return
   }
 
   roles.value.splice(index, 1)
-  showToast('Rôle supprimé.')
+  showToast(t.value.deleted)
 }
 
-function togglePermissions(roleName) {
-  expandedRole.value = expandedRole.value === roleName ? '' : roleName
+function togglePermissions(roleKey) {
+  expandedRole.value = expandedRole.value === roleKey ? '' : roleKey
 }
 
 function resetPassword() {
-  showToast('Lien de réinitialisation préparé.')
+  showToast(t.value.resetReady)
 }
 
 function showToast(message) {
@@ -172,9 +200,11 @@ function showToast(message) {
 .permission-tags label { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 10px; border-radius: 999px; background: #fbfcf8; border: 1px solid #dfe5d6; color: #4a0a0a; font-size: 11px; font-weight: 900; }
 .permissions-list input { accent-color: #6a9a2a; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+[dir='rtl'] .actions { justify-content: flex-start; }
 .actions button, .danger-light { min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid #dfe5d6; background: white; color: #4a0a0a; font-weight: 900; cursor: pointer; }
 .danger-light { margin-top: 14px; border-color: #ffd6d6; color: #e31e24; }
 .mini-toast { position: fixed; right: 24px; bottom: 24px; z-index: 11000; padding: 13px 16px; border-radius: 14px; background: #4a0a0a; color: white; font-weight: 900; box-shadow: 0 18px 44px rgba(74,10,10,.22); }
+[dir='rtl'] .mini-toast { right: auto; left: 24px; }
 .toast-enter-active, .toast-leave-active { transition: .22s ease; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(8px); }
 @media (max-width: 1100px) { .role-editor { grid-template-columns: 1fr; } }

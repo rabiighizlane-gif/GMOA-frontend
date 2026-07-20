@@ -1,27 +1,28 @@
 <template>
   <section class="settings-panel about-panel">
-    <div class="brand-mark">
-      <img :src="logo" alt="SmartCalyx" />
-    </div>
+    <div class="brand-mark"><img :src="logo" alt="SmartCalyx" /></div>
     <h2>SmartCalyx</h2>
-    <p>Application GMAO dédiée à AGRO-FOOD INDUSTRIE Marrakech</p>
-
+    <p>{{ t.subtitle }}</p>
     <dl>
-      <div><dt>Version</dt><dd>SmartCalyx 1.0</dd></div>
-      <div><dt>Domaine</dt><dd>Producteur agroalimentaire</dd></div>
-      <div><dt>Entreprise</dt><dd>AGRO-FOOD INDUSTRIE Marrakech</dd></div>
-      <div><dt>Adresse</dt><dd>102 Rte de Safi, Marrakech 40110</dd></div>
-      <div><dt>Modules</dt><dd>Pannes, interventions, stock, rapports</dd></div>
-      <div><dt>Site web</dt><dd>agrofoodindustrie.com</dd></div>
-      <div><dt>Téléphone</dt><dd>05 24 33 80 80</dd></div>
-      <div><dt>Environnement</dt><dd>GMAO agroalimentaire</dd></div>
-      <div><dt>Année</dt><dd>2026</dd></div>
+      <div v-for="item in items" :key="item.label"><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
     </dl>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 const logo = '/Profiles/agoo-logo.png'
+const languageStore = useLanguageStore()
+const t = computed(() => ({
+  FR: { subtitle: 'Application GMAO dediee a AGRO-FOOD INDUSTRIE Marrakech', labels: ['Version', 'Domaine', 'Entreprise', 'Adresse', 'Modules', 'Site web', 'Telephone', 'Environnement', 'Annee'], domain: 'Producteur agroalimentaire', modules: 'Pannes, interventions, stock, rapports', environment: 'GMAO agroalimentaire' },
+  EN: { subtitle: 'CMMS application dedicated to AGRO-FOOD INDUSTRIE Marrakech', labels: ['Version', 'Domain', 'Company', 'Address', 'Modules', 'Website', 'Phone', 'Environment', 'Year'], domain: 'Agri-food producer', modules: 'Breakdowns, interventions, stock, reports', environment: 'Agri-food CMMS' },
+  AR: { subtitle: 'تطبيق إدارة صيانة خاص بـ AGRO-FOOD INDUSTRIE Marrakech', labels: ['الإصدار', 'المجال', 'الشركة', 'العنوان', 'الوحدات', 'الموقع', 'الهاتف', 'البيئة', 'السنة'], domain: 'منتج غذائي صناعي', modules: 'الأعطال، التدخلات، المخزون، التقارير', environment: 'إدارة صيانة للصناعة الغذائية' },
+})[languageStore.language] || {})
+const items = computed(() => {
+  const values = ['SmartCalyx 1.0', t.value.domain, 'AGRO-FOOD INDUSTRIE Marrakech', '102 Rte de Safi, Marrakech 40110', t.value.modules, 'agrofoodindustrie.com', '05 24 33 80 80', t.value.environment, '2026']
+  return t.value.labels.map((label, index) => ({ label, value: values[index] }))
+})
 </script>
 
 <style scoped>
@@ -32,8 +33,10 @@ const logo = '/Profiles/agoo-logo.png'
 .about-panel h2 { margin: 0; color: #111827; font-size: 30px; font-weight: 950; }
 .about-panel p { margin: 8px 0 24px; color: #64748b; font-weight: 850; }
 dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; text-align: left; }
+[dir='rtl'] dl { text-align: right; }
 dl div { padding: 15px; border: 1px solid #edf0e8; border-radius: 14px; background: #fbfcf8; }
 dt { color: #64748b; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+[dir='rtl'] dt { text-transform: none; }
 dd { margin: 6px 0 0; color: #4a0a0a; font-weight: 950; }
 @media (max-width: 620px) { dl { grid-template-columns: 1fr; } }
 </style>

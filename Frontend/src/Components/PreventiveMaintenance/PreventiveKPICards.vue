@@ -24,52 +24,41 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import PreventiveIcon from '@/Components/PreventiveMaintenance/PreventiveIcon.vue'
+import { useLanguageStore } from '@/stores/language'
 
-const cards = [
-  {
-    label: 'Plans préventifs',
-    value: 64,
-    description: '8 plans actifs ajoutés',
-    icon: 'tool',
-    color: 'green'
-  },
-  {
-    label: 'Prévues cette semaine',
-    value: 15,
-    description: '5 prévues aujourd’hui',
-    icon: 'calendar',
-    color: 'yellow'
-  },
-  {
-    label: 'En retard',
-    value: 4,
-    description: 'Action requise',
-    icon: 'alert',
-    color: 'red'
-  },
-  {
-    label: 'Réalisées ce mois',
-    value: 38,
-    description: '+12 % par rapport au mois dernier',
-    icon: 'check',
-    color: 'green'
-  },
-  {
-    label: 'Taux de réalisation',
-    value: '92 %',
-    description: 'Objectif supérieur à 90 %',
-    icon: 'target',
-    color: 'green'
-  },
-  {
-    label: 'Prochaine maintenance',
-    value: '2 jours',
-    description: 'Convoyeur M-309',
-    icon: 'clock',
-    color: 'orange'
-  }
-]
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+
+const cardContent = {
+  FR: [
+    ['Plans preventifs', 64, '8 plans actifs ajoutes', 'tool', 'green'],
+    ['Prevues cette semaine', 15, '5 prevues aujourd hui', 'calendar', 'yellow'],
+    ['En retard', 4, 'Action requise', 'alert', 'red'],
+    ['Realisees ce mois', 38, '+12 % par rapport au mois dernier', 'check', 'green'],
+    ['Taux de realisation', '92 %', 'Objectif superieur a 90 %', 'target', 'green'],
+    ['Prochaine maintenance', '2 jours', 'Convoyeur M-309', 'clock', 'orange'],
+  ],
+  EN: [
+    ['Preventive plans', 64, '8 active plans added', 'tool', 'green'],
+    ['Due this week', 15, '5 due today', 'calendar', 'yellow'],
+    ['Overdue', 4, 'Action required', 'alert', 'red'],
+    ['Completed this month', 38, '+12% compared with last month', 'check', 'green'],
+    ['Completion rate', '92 %', 'Target above 90%', 'target', 'green'],
+    ['Next maintenance', '2 days', 'Conveyor M-309', 'clock', 'orange'],
+  ],
+  AR: [
+    ['\u062e\u0637\u0637 \u0648\u0642\u0627\u0626\u064a\u0629', 64, '8 \u062e\u0637\u0637 \u0646\u0634\u0637\u0629 \u0645\u0636\u0627\u0641\u0629', 'tool', 'green'],
+    ['\u0645\u0628\u0631\u0645\u062c\u0629 \u0647\u0630\u0627 \u0627\u0644\u0623\u0633\u0628\u0648\u0639', 15, '5 \u0645\u0628\u0631\u0645\u062c\u0629 \u0627\u0644\u064a\u0648\u0645', 'calendar', 'yellow'],
+    ['\u0645\u062a\u0623\u062e\u0631\u0629', 4, '\u0625\u062c\u0631\u0627\u0621 \u0645\u0637\u0644\u0648\u0628', 'alert', 'red'],
+    ['\u0623\u0646\u062c\u0632\u062a \u0647\u0630\u0627 \u0627\u0644\u0634\u0647\u0631', 38, '+12 % \u0645\u0642\u0627\u0631\u0646\u0629 \u0628\u0627\u0644\u0634\u0647\u0631 \u0627\u0644\u0645\u0627\u0636\u064a', 'check', 'green'],
+    ['\u0646\u0633\u0628\u0629 \u0627\u0644\u0625\u0646\u062c\u0627\u0632', '92 %', '\u0627\u0644\u0647\u062f\u0641 \u0623\u0643\u062b\u0631 \u0645\u0646 90 %', 'target', 'green'],
+    ['\u0627\u0644\u0635\u064a\u0627\u0646\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629', '\u064a\u0648\u0645\u0627\u0646', '\u0646\u0627\u0642\u0644 M-309', 'clock', 'orange'],
+  ],
+}
+
+const cards = computed(() => (cardContent[language.value] || cardContent.FR).map(([label, value, description, icon, color]) => ({ label, value, description, icon, color })))
 </script>
 
 <style scoped>

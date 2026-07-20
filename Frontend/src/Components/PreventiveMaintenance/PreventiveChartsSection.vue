@@ -3,348 +3,218 @@
     <article class="chart-card">
       <header>
         <div>
-          <h3>Préventives réalisées</h3>
-          <p>Évolution mensuelle</p>
+          <h3>{{ content.monthlyTitle }}</h3>
+          <p>{{ content.monthlySubtitle }}</p>
         </div>
-
         <span>2026</span>
       </header>
-
-      <apexchart
-        type="bar"
-        height="260"
-        :options="monthlyOptions"
-        :series="monthlySeries"
-      />
+      <apexchart type="bar" height="260" :options="monthlyOptions" :series="monthlySeries" />
     </article>
 
     <article class="chart-card">
       <header>
         <div>
-          <h3>Respect du planning</h3>
-          <p>Maintenances réalisées à temps</p>
+          <h3>{{ content.slaTitle }}</h3>
+          <p>{{ content.slaSubtitle }}</p>
         </div>
-
         <span>SLA</span>
       </header>
-
-      <apexchart
-        type="radialBar"
-        height="260"
-        :options="slaOptions"
-        :series="slaSeries"
-      />
+      <apexchart type="radialBar" height="260" :options="slaOptions" :series="slaSeries" />
     </article>
 
     <article class="chart-card">
       <header>
         <div>
-          <h3>Répartition par fréquence</h3>
-          <p>Organisation des plans</p>
+          <h3>{{ content.frequencyTitle }}</h3>
+          <p>{{ content.frequencySubtitle }}</p>
         </div>
-
         <span>Mix</span>
       </header>
-
-      <apexchart
-        type="donut"
-        height="260"
-        :options="frequencyOptions"
-        :series="frequencySeries"
-      />
+      <apexchart type="donut" height="260" :options="frequencyOptions" :series="frequencySeries" />
     </article>
 
     <article class="chart-card">
       <header>
         <div>
-          <h3>Retards par ligne</h3>
-          <p>Plans nécessitant une action</p>
+          <h3>{{ content.lateTitle }}</h3>
+          <p>{{ content.lateSubtitle }}</p>
         </div>
-
-        <span>Alertes</span>
+        <span>{{ content.alerts }}</span>
       </header>
-
-      <apexchart
-        type="bar"
-        height="260"
-        :options="lateOptions"
-        :series="lateSeries"
-      />
+      <apexchart type="bar" height="260" :options="lateOptions" :series="lateSeries" />
     </article>
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 import VueApexCharts from 'vue3-apexcharts'
 
 const apexchart = VueApexCharts
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
 
-const monthlySeries = ref([
+const translations = {
+  FR: {
+    monthlyTitle: 'Preventives realisees',
+    monthlySubtitle: 'Evolution mensuelle',
+    slaTitle: 'Respect du planning',
+    slaSubtitle: 'Maintenances realisees a temps',
+    frequencyTitle: 'Repartition par frequence',
+    frequencySubtitle: 'Organisation des plans',
+    lateTitle: 'Retards par ligne',
+    lateSubtitle: 'Plans necessitant une action',
+    alerts: 'Alertes',
+    completedName: 'Maintenances realisees',
+    maintenanceUnit: 'maintenances',
+    planUnit: 'plans',
+    onTime: 'A temps',
+    totalPlans: 'Plans',
+    overdueName: 'Plans en retard',
+    months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+    frequencies: ['Quotidienne', 'Hebdomadaire', 'Mensuelle', 'Trimestrielle', 'Annuelle'],
+    lines: ['Conditionnement', 'Production 1', 'Utilites', 'Emballage'],
+  },
+  EN: {
+    monthlyTitle: 'Completed preventive tasks',
+    monthlySubtitle: 'Monthly trend',
+    slaTitle: 'Schedule compliance',
+    slaSubtitle: 'Maintenance completed on time',
+    frequencyTitle: 'Breakdown by frequency',
+    frequencySubtitle: 'Plan organization',
+    lateTitle: 'Overdue by line',
+    lateSubtitle: 'Plans requiring action',
+    alerts: 'Alerts',
+    completedName: 'Completed maintenance',
+    maintenanceUnit: 'maintenance tasks',
+    planUnit: 'plans',
+    onTime: 'On time',
+    totalPlans: 'Plans',
+    overdueName: 'Overdue plans',
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    frequencies: ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'],
+    lines: ['Packaging', 'Production 1', 'Utilities', 'Packing'],
+  },
+  AR: {
+    monthlyTitle: 'الصيانات الوقائية المنجزة',
+    monthlySubtitle: 'التطور الشهري',
+    slaTitle: 'احترام التخطيط',
+    slaSubtitle: 'الصيانات المنجزة في وقتها',
+    frequencyTitle: 'التوزيع حسب التواتر',
+    frequencySubtitle: 'تنظيم الخطط',
+    lateTitle: 'التأخيرات حسب الخط',
+    lateSubtitle: 'خطط تحتاج إلى تدخل',
+    alerts: 'تنبيهات',
+    completedName: 'الصيانات المنجزة',
+    maintenanceUnit: 'صيانات',
+    planUnit: 'خطط',
+    onTime: 'في وقتها',
+    totalPlans: 'خطط',
+    overdueName: 'الخطط المتأخرة',
+    months: ['ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون', 'يول'],
+    frequencies: ['يومية', 'أسبوعية', 'شهرية', 'ربع سنوية', 'سنوية'],
+    lines: ['التكييف', 'الإنتاج 1', 'المرافق', 'التعبئة'],
+  },
+}
+
+const content = computed(() => translations[language.value] || translations.FR)
+
+const monthlySeries = computed(() => [
   {
-    name: 'Maintenances réalisées',
-    data: [18, 22, 20, 27, 31, 29, 38]
-  }
+    name: content.value.completedName,
+    data: [18, 22, 20, 27, 31, 29, 38],
+  },
 ])
 
-const monthlyOptions = ref({
-  chart: {
-    toolbar: {
-      show: false
-    },
-    fontFamily: 'inherit',
-    animations: {
-      enabled: true,
-      speed: 800
-    }
-  },
-
+const monthlyOptions = computed(() => ({
+  chart: { toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true, speed: 800 } },
   colors: ['#6A9A2A'],
-
-  plotOptions: {
-    bar: {
-      borderRadius: 7,
-      columnWidth: '46%'
-    }
-  },
-
-  dataLabels: {
-    enabled: false
-  },
-
+  plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } },
+  dataLabels: { enabled: false },
   xaxis: {
-    categories: [
-      'Jan',
-      'Fév',
-      'Mar',
-      'Avr',
-      'Mai',
-      'Juin',
-      'Juil'
-    ],
-    axisBorder: {
-      show: false
-    },
-    axisTicks: {
-      show: false
-    },
-    labels: {
-      style: {
-        colors: '#64748B',
-        fontSize: '10px'
-      }
-    }
+    categories: content.value.months,
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: { style: { colors: '#64748B', fontSize: '10px' } },
   },
+  yaxis: { labels: { style: { colors: '#64748B' } } },
+  grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+  tooltip: { y: { formatter: (value) => `${value} ${content.value.maintenanceUnit}` } },
+}))
 
-  yaxis: {
-    labels: {
-      style: {
-        colors: '#64748B'
-      }
-    }
-  },
+const slaSeries = computed(() => [92])
 
-  grid: {
-    borderColor: '#EEF1E9',
-    strokeDashArray: 4
-  },
-
-  tooltip: {
-    y: {
-      formatter: (value) => `${value} maintenances`
-    }
-  }
-})
-
-const slaSeries = ref([92])
-
-const slaOptions = ref({
-  chart: {
-    type: 'radialBar',
-    fontFamily: 'inherit',
-    animations: {
-      enabled: true,
-      speed: 900
-    }
-  },
-
+const slaOptions = computed(() => ({
+  chart: { type: 'radialBar', fontFamily: 'inherit', animations: { enabled: true, speed: 900 } },
   colors: ['#6A9A2A'],
-
   plotOptions: {
     radialBar: {
       startAngle: -130,
       endAngle: 130,
-
-      hollow: {
-        size: '65%'
-      },
-
-      track: {
-        background: '#EEF1E9'
-      },
-
+      hollow: { size: '65%' },
+      track: { background: '#EEF1E9' },
       dataLabels: {
-        name: {
-          show: true,
-          offsetY: 22,
-          color: '#64748B',
-          fontSize: '11px'
-        },
-
+        name: { show: true, offsetY: 22, color: '#64748B', fontSize: '11px' },
         value: {
           offsetY: -18,
           color: '#111827',
           fontSize: '30px',
           fontWeight: 800,
-          formatter: (value) => `${Math.round(value)}%`
-        }
-      }
-    }
+          formatter: (value) => `${Math.round(value)}%`,
+        },
+      },
+    },
   },
+  stroke: { lineCap: 'round' },
+  labels: [content.value.onTime],
+}))
 
-  stroke: {
-    lineCap: 'round'
-  },
+const frequencySeries = computed(() => [12, 22, 18, 8, 4])
 
-  labels: ['À temps']
-})
-
-const frequencySeries = ref([12, 22, 18, 8, 4])
-
-const frequencyOptions = ref({
-  chart: {
-    type: 'donut',
-    fontFamily: 'inherit'
-  },
-
-  labels: [
-    'Quotidienne',
-    'Hebdomadaire',
-    'Mensuelle',
-    'Trimestrielle',
-    'Annuelle'
-  ],
-
-  colors: [
-    '#4A0A0A',
-    '#6A9A2A',
-    '#B6C65B',
-    '#E8B300',
-    '#FF6A00'
-  ],
-
-  stroke: {
-    width: 4,
-    colors: ['#FFFFFF']
-  },
-
-  dataLabels: {
-    enabled: false
-  },
-
-  legend: {
-    position: 'bottom',
-    fontSize: '10px'
-  },
-
+const frequencyOptions = computed(() => ({
+  chart: { type: 'donut', fontFamily: 'inherit' },
+  labels: content.value.frequencies,
+  colors: ['#4A0A0A', '#6A9A2A', '#B6C65B', '#E8B300', '#FF6A00'],
+  stroke: { width: 4, colors: ['#FFFFFF'] },
+  dataLabels: { enabled: false },
+  legend: { position: 'bottom', fontSize: '10px' },
   plotOptions: {
     pie: {
       donut: {
         size: '66%',
-
         labels: {
           show: true,
-
-          total: {
-            show: true,
-            label: 'Plans',
-            color: '#64748B',
-            formatter: () => '64'
-          }
-        }
-      }
-    }
+          total: { show: true, label: content.value.totalPlans, color: '#64748B', formatter: () => '64' },
+        },
+      },
+    },
   },
+  tooltip: { y: { formatter: (value) => `${value} ${content.value.planUnit}` } },
+}))
 
-  tooltip: {
-    y: {
-      formatter: (value) => `${value} plans`
-    }
-  }
-})
-
-const lateSeries = ref([
+const lateSeries = computed(() => [
   {
-    name: 'Plans en retard',
-    data: [5, 3, 2, 1]
-  }
+    name: content.value.overdueName,
+    data: [5, 3, 2, 1],
+  },
 ])
 
-const lateOptions = ref({
-  chart: {
-    toolbar: {
-      show: false
-    },
-    fontFamily: 'inherit'
-  },
-
+const lateOptions = computed(() => ({
+  chart: { toolbar: { show: false }, fontFamily: 'inherit' },
   colors: ['#E31E24'],
-
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      borderRadius: 6,
-      barHeight: '42%'
-    }
-  },
-
-  dataLabels: {
-    enabled: true,
-    offsetX: 7,
-    style: {
-      colors: ['#4A0A0A'],
-      fontSize: '10px'
-    }
-  },
-
+  plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
+  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#4A0A0A'], fontSize: '10px' } },
   xaxis: {
-    categories: [
-      'Conditionnement',
-      'Production 1',
-      'Utilités',
-      'Emballage'
-    ],
-    labels: {
-      show: false
-    },
-    axisBorder: {
-      show: false
-    },
-    axisTicks: {
-      show: false
-    }
+    categories: content.value.lines,
+    labels: { show: false },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
   },
-
-  yaxis: {
-    labels: {
-      style: {
-        colors: '#4A0A0A',
-        fontSize: '10px',
-        fontWeight: 600
-      }
-    }
-  },
-
-  grid: {
-    show: false
-  },
-
-  tooltip: {
-    y: {
-      formatter: (value) => `${value} plans en retard`
-    }
-  }
-})
+  yaxis: { labels: { style: { colors: '#4A0A0A', fontSize: '10px', fontWeight: 600 } } },
+  grid: { show: false },
+  tooltip: { y: { formatter: (value) => `${value} ${content.value.overdueName}` } },
+}))
 </script>
 
 <style scoped>
@@ -365,12 +235,6 @@ const lateOptions = ref({
   border: 1px solid #edf0e8;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
-  transition: 0.2s ease;
-}
-
-.chart-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.08);
 }
 
 .chart-card header {

@@ -1,89 +1,51 @@
 <template>
   <Teleport to="body">
-    <div
-      v-if="open"
-      class="modal-overlay"
-      @click.self="$emit('close')"
-    >
-      <form
-        class="modal-card"
-        @submit.prevent="submitForm"
-      >
+    <div v-if="open" class="modal-overlay" @click.self="$emit('close')">
+      <form class="modal-card" @submit.prevent="submitForm">
         <header>
           <div>
-            <span>Maintenance préventive</span>
-            <h2>
-              {{ maintenance ? 'Modifier le plan' : 'Nouveau plan préventif' }}
-            </h2>
+            <span>{{ content.kicker }}</span>
+            <h2>{{ maintenance ? content.editTitle : content.createTitle }}</h2>
           </div>
-
-          <button
-            type="button"
-            @click="$emit('close')"
-          >
-            ×
-          </button>
+          <button type="button" @click="$emit('close')">x</button>
         </header>
 
         <div class="form-body">
           <div class="form-group full">
-            <label>Nom du plan *</label>
-            <input
-              v-model.trim="form.plan"
-              required
-              placeholder="Ex. Graissage du moteur"
-            />
+            <label>{{ content.plan }} *</label>
+            <input v-model.trim="form.plan" required :placeholder="content.planPlaceholder" />
           </div>
 
           <div class="form-group">
-            <label>Machine *</label>
-            <select
-              v-model="form.machine"
-              required
-            >
-              <option value="">Sélectionner</option>
-              <option>Convoyeur M-309</option>
-              <option>Pasteurisateur P-204</option>
-              <option>Remplisseuse R-118</option>
-              <option>Compresseur M-412</option>
+            <label>{{ content.machine }} *</label>
+            <select v-model="form.machine" required>
+              <option value="">{{ content.select }}</option>
+              <option v-for="machine in machines" :key="machine" :value="machine">{{ machine }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Ligne *</label>
-            <select
-              v-model="form.line"
-              required
-            >
-              <option value="">Sélectionner</option>
-              <option>Ligne Production 1</option>
-              <option>Ligne Conditionnement</option>
-              <option>Ligne Utilités</option>
+            <label>{{ content.line }} *</label>
+            <select v-model="form.line" required>
+              <option value="">{{ content.select }}</option>
+              <option v-for="line in lines" :key="line" :value="line">{{ line }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Fréquence *</label>
-            <select
-              v-model="form.frequency"
-              required
-            >
-              <option value="">Sélectionner</option>
-              <option>Quotidienne</option>
-              <option>Hebdomadaire</option>
-              <option>Mensuelle</option>
-              <option>Trimestrielle</option>
-              <option>Annuelle</option>
+            <label>{{ content.frequency }} *</label>
+            <select v-model="form.frequency" required>
+              <option value="">{{ content.select }}</option>
+              <option v-for="frequency in frequencies" :key="frequency.value" :value="frequency.value">
+                {{ frequency.label }}
+              </option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Responsable *</label>
-            <select
-              v-model="form.technician"
-              required
-            >
-              <option value="">Sélectionner</option>
+            <label>{{ content.responsible }} *</label>
+            <select v-model="form.technician" required>
+              <option value="">{{ content.select }}</option>
               <option>Nabil Amrani</option>
               <option>Ahmed El Mansouri</option>
               <option>Sara El Idrissi</option>
@@ -92,46 +54,27 @@
           </div>
 
           <div class="form-group">
-            <label>Prochaine échéance *</label>
-            <input
-              v-model="form.nextDueDate"
-              type="date"
-              required
-            />
+            <label>{{ content.nextDueDate }} *</label>
+            <input v-model="form.nextDueDate" type="date" required />
           </div>
 
           <div class="form-group">
-            <label>Durée estimée</label>
-            <input
-              v-model="form.estimatedDuration"
-              placeholder="Ex. 2 heures"
-            />
+            <label>{{ content.duration }}</label>
+            <input v-model="form.estimatedDuration" :placeholder="content.durationPlaceholder" />
           </div>
 
           <div class="form-group full">
-            <label>Description</label>
-            <textarea
-              v-model.trim="form.description"
-              rows="4"
-              placeholder="Décrire les contrôles et opérations à réaliser..."
-            ></textarea>
+            <label>{{ content.description }}</label>
+            <textarea v-model.trim="form.description" rows="4" :placeholder="content.descriptionPlaceholder"></textarea>
           </div>
         </div>
 
         <footer>
-          <button
-            type="button"
-            class="cancel-button"
-            @click="$emit('close')"
-          >
-            Annuler
+          <button type="button" class="cancel-button" @click="$emit('close')">
+            {{ content.cancel }}
           </button>
-
-          <button
-            type="submit"
-            class="save-button"
-          >
-            {{ maintenance ? 'Enregistrer les modifications' : 'Créer le plan' }}
+          <button type="submit" class="save-button">
+            {{ maintenance ? content.saveEdit : content.saveCreate }}
           </button>
         </footer>
       </form>
@@ -140,17 +83,92 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
+import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   open: Boolean,
   maintenance: {
     type: Object,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const emit = defineEmits(['close', 'save'])
+const languageStore = useLanguageStore()
+const language = computed(() => languageStore.language)
+
+const translations = {
+  FR: {
+    kicker: 'Maintenance preventive',
+    editTitle: 'Modifier le plan',
+    createTitle: 'Nouveau plan preventif',
+    plan: 'Nom du plan',
+    planPlaceholder: 'Ex. Graissage du moteur',
+    machine: 'Machine',
+    line: 'Ligne',
+    frequency: 'Frequence',
+    responsible: 'Responsable',
+    nextDueDate: 'Prochaine echeance',
+    duration: 'Duree estimee',
+    durationPlaceholder: 'Ex. 2 heures',
+    description: 'Description',
+    descriptionPlaceholder: 'Decrire les controles et operations a realiser...',
+    select: 'Selectionner',
+    cancel: 'Annuler',
+    saveEdit: 'Enregistrer les modifications',
+    saveCreate: 'Creer le plan',
+    frequencies: ['Quotidienne', 'Hebdomadaire', 'Mensuelle', 'Trimestrielle', 'Annuelle'],
+  },
+  EN: {
+    kicker: 'Preventive maintenance',
+    editTitle: 'Edit plan',
+    createTitle: 'New preventive plan',
+    plan: 'Plan name',
+    planPlaceholder: 'E.g. Motor greasing',
+    machine: 'Machine',
+    line: 'Line',
+    frequency: 'Frequency',
+    responsible: 'Responsible',
+    nextDueDate: 'Next due date',
+    duration: 'Estimated duration',
+    durationPlaceholder: 'E.g. 2 hours',
+    description: 'Description',
+    descriptionPlaceholder: 'Describe the checks and operations to perform...',
+    select: 'Select',
+    cancel: 'Cancel',
+    saveEdit: 'Save changes',
+    saveCreate: 'Create plan',
+    frequencies: ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'],
+  },
+  AR: {
+    kicker: 'الصيانة الوقائية',
+    editTitle: 'تعديل الخطة',
+    createTitle: 'خطة وقائية جديدة',
+    plan: 'اسم الخطة',
+    planPlaceholder: 'مثال: تشحيم المحرك',
+    machine: 'الآلة',
+    line: 'الخط',
+    frequency: 'التواتر',
+    responsible: 'المسؤول',
+    nextDueDate: 'الموعد القادم',
+    duration: 'المدة المقدرة',
+    durationPlaceholder: 'مثال: ساعتان',
+    description: 'الوصف',
+    descriptionPlaceholder: 'صف الفحوصات والعمليات المطلوب إنجازها...',
+    select: 'اختيار',
+    cancel: 'إلغاء',
+    saveEdit: 'حفظ التعديلات',
+    saveCreate: 'إنشاء الخطة',
+    frequencies: ['يومية', 'أسبوعية', 'شهرية', 'ربع سنوية', 'سنوية'],
+  },
+}
+
+const rawFrequencies = ['Quotidienne', 'Hebdomadaire', 'Mensuelle', 'Trimestrielle', 'Annuelle']
+const machines = ['Convoyeur M-309', 'Pasteurisateur P-204', 'Remplisseuse R-118', 'Compresseur M-412']
+const lines = ['Ligne Production 1', 'Ligne Conditionnement', 'Ligne Utilites']
+const content = computed(() => translations[language.value] || translations.FR)
+const frequencies = computed(() => rawFrequencies.map((value, index) => ({ value, label: content.value.frequencies[index] || value })))
 
 const emptyForm = () => ({
   plan: '',
@@ -160,7 +178,7 @@ const emptyForm = () => ({
   technician: '',
   nextDueDate: '',
   estimatedDuration: '',
-  description: ''
+  description: '',
 })
 
 const form = reactive(emptyForm())
@@ -176,7 +194,7 @@ watch(
 const submitForm = () => {
   emit('save', {
     ...props.maintenance,
-    ...form
+    ...form,
   })
 }
 </script>
