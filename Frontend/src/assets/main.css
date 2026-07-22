@@ -460,3 +460,150 @@
   fill: #53667f !important;
   color: #53667f !important;
 }
+
+html[data-theme='light'] body,
+html[data-theme='light'] #app,
+html[data-theme='light'] body #app .dashboard-layout,
+html[data-theme='light'] body #app .profile-layout,
+html[data-theme='light'] body #app .machines-layout,
+html[data-theme='light'] body #app .interventions-layout,
+html[data-theme='light'] body #app .pannes-layout,
+html[data-theme='light'] body #app .notifications-layout,
+html[data-theme='light'] body #app .users-layout,
+html[data-theme='light'] body #app .analytics-layout,
+html[data-theme='light'] body #app .activity-layout,
+html[data-theme='light'] body #app .settings-layout,
+html[data-theme='light'] body #app .dashboard-page,
+html[data-theme='light'] body #app .profile-page,
+html[data-theme='light'] body #app .machines-page,
+html[data-theme='light'] body #app .interventions-page,
+html[data-theme='light'] body #app .pannes-page,
+html[data-theme='light'] body #app .notifications-page,
+html[data-theme='light'] body #app .users-page,
+html[data-theme='light'] body #app .analytics-page,
+html[data-theme='light'] body #app .spare-parts-page,
+html[data-theme='light'] body #app .requests-page,
+html[data-theme='light'] body #app .preventive-page,
+html[data-theme='light'] body #app .reports-page,
+html[data-theme='light'] body #app .activity-page,
+html[data-theme='light'] body #app .settings-page {
+  background: #f7f9f3 !important;
+  background-image: none !important;
+  color: #4a0a0a !important;
+}
+
+html[data-theme='light'] body #app .kpi-card,
+html[data-theme='light'] body #app .kpi-grid article,
+html[data-theme='light'] body #app .filters-card,
+html[data-theme='light'] body #app .filters-bar,
+html[data-theme='light'] body #app .table-card,
+html[data-theme='light'] body #app .chart-card,
+html[data-theme='light'] body #app .settings-panel,
+html[data-theme='light'] body #app .settings-tabs,
+html[data-theme='light'] body #app .settings-shell,
+html[data-theme='light'] body #app .activity-card,
+html[data-theme='light'] body #app .notifications-card,
+html[data-theme='light'] body #app .history-card,
+html[data-theme='light'] body #app .role-editor,
+html[data-theme='light'] body #app .role-list article,
+html[data-theme='light'] body #app .permissions-list,
+html[data-theme='light'] body #app .system-grid article,
+html[data-theme='light'] body #app .about-panel,
+html[data-theme='light'] body #app .health-strip,
+html[data-theme='light'] body #app .info-card,
+html[data-theme='light'] body #app .detail-card {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #edf0e8 !important;
+  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05) !important;
+  color: #4a0a0a !important;
+}
+
+html[data-theme='light'] body #app .page-header h1,
+html[data-theme='light'] body #app .table-header h2,
+html[data-theme='light'] body #app .table-card h2,
+html[data-theme='light'] body #app .chart-header h3,
+html[data-theme='light'] body #app .chart-card h3,
+html[data-theme='light'] body #app .settings-panel h2,
+html[data-theme='light'] body #app .settings-panel h3,
+html[data-theme='light'] body #app .machine-cell strong,
+html[data-theme='light'] body #app .empty-state strong,
+html[data-theme='light'] body #app .kpi-card strong,
+html[data-theme='light'] body #app .kpi-grid article strong {
+  color: #111827 !important;
+}
+
+html[data-theme='light'] body #app .page-header p,
+html[data-theme='light'] body #app .table-header p,
+html[data-theme='light'] body #app .chart-header p,
+html[data-theme='light'] body #app .chart-card p,
+html[data-theme='light'] body #app .settings-panel p,
+html[data-theme='light'] body #app .machine-cell small,
+html[data-theme='light'] body #app .empty-state p,
+html[data-theme='light'] body #app .pagination > span,
+html[data-theme='light'] body #app .kpi-card p,
+html[data-theme='light'] body #app .kpi-card small,
+html[data-theme='light'] body #app .kpi-grid article p,
+html[data-theme='light'] body #app .kpi-grid article small {
+  color: #53667f !important;
+}
+
+html[data-theme='light'] body #app input,
+html[data-theme='light'] body #app select,
+html[data-theme='light'] body #app textarea,
+html[data-theme='light'] body #app .search-wrapper,
+html[data-theme='light'] body #app .search-wrapper input,
+html[data-theme='light'] body #app .filters-card input,
+html[data-theme='light'] body #app .filters-card select,
+html[data-theme='light'] body #app .filters-bar input,
+html[data-theme='light'] body #app .filters-bar select,
+html[data-theme='light'] body #app .file-picker {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #dfe5d6 !important;
+  color: #4a0a0a !important;
+}
+
+html[data-theme='light'] body #app .secondary-button,
+html[data-theme='light'] body #app .reset-button,
+html[data-theme='light'] body #app .cancel-button,
+html[data-theme='light'] body #app .export-button,
+html[data-theme='light'] body #app .draft-button,
+html[data-theme='light'] body #app .actions button,
+html[data-theme='light'] body #app .button-row button,
+html[data-theme='light'] body #app .drawer-tabs button,
+html[data-theme='light'] body #app .choice-row button,
+html[data-theme='light'] body #app .pagination > button,
+html[data-theme='light'] body #app .page-numbers button {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #dfe5d6 !important;
+  color: #4a0a0a !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='light'] body #app .table-card thead,
+html[data-theme='light'] body #app .table-wrapper thead,
+html[data-theme='light'] body #app .table-card th,
+html[data-theme='light'] body #app .table-wrapper th {
+  background: #f4f6f0 !important;
+  background-image: none !important;
+  color: #53667f !important;
+}
+
+html[data-theme='light'] body #app .table-card td,
+html[data-theme='light'] body #app .table-wrapper td {
+  border-color: #edf0e8 !important;
+  color: #4a0a0a !important;
+}
+
+html[data-theme='light'] body #app .table-card tbody tr,
+html[data-theme='light'] body #app .table-wrapper tbody tr {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+html[data-theme='light'] body #app .table-card tbody tr:hover,
+html[data-theme='light'] body #app .table-wrapper tbody tr:hover {
+  background: #fbfcf8 !important;
+}
