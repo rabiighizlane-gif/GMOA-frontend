@@ -78,16 +78,16 @@ const labels = {
 
 const content = computed(() => labels[language.value] || labels.FR)
 const statusSeries = computed(() => statusValues.map((status) => props.machines.filter((m) => m.status === status).length))
-const statusOptions = computed(() => ({ chart: { type: 'donut', ...base, foreColor: '#aeb9c8' }, labels: content.value.statuses, colors: ['#83B95C', '#E4AB44', '#DC3747', '#94A3B8'], stroke: { width: 3, colors: ['#101924'] }, dataLabels: { enabled: false }, legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#aeb9c8' } } }))
+const statusOptions = computed(() => ({ chart: { type: 'donut', ...base, foreColor: 'var(--sc-muted)' }, labels: content.value.statuses, colors: ['#83B95C', '#E4AB44', '#DC3747', '#94A3B8'], stroke: { width: 3, colors: ['var(--sc-surface)'] }, dataLabels: { enabled: false }, legend: { position: 'bottom', fontSize: '10px', labels: { colors: 'var(--sc-muted)' } } }))
 const lineLabels = computed(() => [...new Set(props.machines.map((m) => m.line))])
 const displayLineLabels = computed(() => lineLabels.value.map((line) => content.value.lines[line] || line))
 const lineSeries = computed(() => [{ name: content.value.availability, data: lineLabels.value.map((line) => { const items = props.machines.filter((m) => m.line === line); return Math.round(items.reduce((sum, m) => sum + m.availability, 0) / Math.max(1, items.length)) }) }])
-const lineOptions = computed(() => ({ chart: { type: 'bar', ...base, foreColor: '#aeb9c8' }, colors: ['#83B95C'], plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } }, dataLabels: { enabled: false }, xaxis: { categories: displayLineLabels.value }, yaxis: { max: 100 }, grid: { borderColor: 'rgba(126, 146, 170, 0.16)', strokeDashArray: 4 } }))
+const lineOptions = computed(() => ({ chart: { type: 'bar', ...base, foreColor: 'var(--sc-muted)' }, colors: ['#83B95C'], plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } }, dataLabels: { enabled: false }, xaxis: { categories: displayLineLabels.value }, yaxis: { max: 100 }, grid: { borderColor: 'var(--sc-border)', strokeDashArray: 4 } }))
 const unstable = computed(() => [...props.machines].sort((a, b) => b.breakdownCount - a.breakdownCount).slice(0, 5))
 const unstableSeries = computed(() => [{ name: content.value.breakdowns, data: unstable.value.map((m) => m.breakdownCount) }])
 const machineLabel = (machine) => content.value.names[machine.name] || machine.name || machine.id
 const unstableOptions = computed(() => ({
-  chart: { type: 'bar', ...base, foreColor: '#aeb9c8' },
+  chart: { type: 'bar', ...base, foreColor: 'var(--sc-muted)' },
   colors: ['#DC3747'],
   plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
   dataLabels: { enabled: true },

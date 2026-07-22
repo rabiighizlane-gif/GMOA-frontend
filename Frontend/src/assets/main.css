@@ -782,3 +782,13 @@ html[data-theme='light'] body #app main[class*='-layout'] .notifications-action:
   background: #f7f9f3 !important;
   color: #6a9a2a !important;
 }
+
+html[data-theme='light'] body #app .apexcharts-pie-series path,
+html[data-theme='light'] body #app .apexcharts-donut-series path {
+  stroke: #ffffff !important;
+}
+
+html[data-theme='dark'] body #app .apexcharts-pie-series path,
+html[data-theme='dark'] body #app .apexcharts-donut-series path {
+  stroke: #1e293b !important;
+}
