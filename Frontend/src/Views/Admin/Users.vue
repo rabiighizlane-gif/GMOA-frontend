@@ -829,10 +829,8 @@ function closeSidebar() {
 .users-layout {
   position: relative;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 22% 0%, rgba(77, 126, 172, 0.16), transparent 28%),
-    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
-  color: #f4f7fb;
+  background: #f7f9f3;
+  color: #4a0a0a;
 }
 
 .users-page {
@@ -913,21 +911,22 @@ function closeSidebar() {
 .users-page :deep(.live-control),
 .users-page :deep(.language-button) {
   min-height: 42px;
-  border: 1px solid rgba(126, 146, 170, 0.24);
+  border: 1px solid rgba(74, 10, 10, 0.16);
   border-radius: 14px;
-  background: rgba(19, 29, 42, 0.9);
-  color: #f5f8fc;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 28px rgba(0, 0, 0, 0.2);
+  background: #4a0a0a;
+  color: #f7f9f3;
+  box-shadow: 0 12px 28px rgba(74, 10, 10, 0.16);
 }
 
 .users-page :deep(.search-control input) {
   height: 42px;
-  color: #dbe4ef;
+  background: #ffffff;
+  color: #4a0a0a;
   font-size: 13px;
 }
 
 .users-page :deep(.search-control input::placeholder) {
-  color: #8795a7;
+  color: rgba(74, 10, 10, 0.5);
 }
 
 .users-page :deep(.search-control span) {
@@ -939,30 +938,30 @@ function closeSidebar() {
   align-items: center;
   border-radius: 999px;
   padding: 0 16px;
-  color: #f4d96a;
+  color: #e8b300;
 }
 
 .users-page :deep(.language-button) {
   height: 42px;
   min-width: 86px;
   font-size: 13px;
-  color: #f4f7fb;
+  color: #f7f9f3;
 }
 
 .users-page :deep(.language-menu) {
-  border-color: rgba(126, 146, 170, 0.24);
+  border-color: rgba(247, 249, 243, 0.16);
   border-radius: 12px;
-  background: #121c28;
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  background: #4a0a0a;
+  box-shadow: 0 18px 42px rgba(74, 10, 10, 0.28);
 }
 
 .users-page :deep(.language-menu button) {
-  color: #e7edf5;
+  color: #f7f9f3;
 }
 
 .users-page :deep(.language-menu button:hover) {
-  background: rgba(75, 153, 212, 0.16);
-  color: #cfe9ff;
+  background: rgba(247, 249, 243, 0.12);
+  color: #b6c65b;
 }
 
 .stats-grid {
@@ -975,12 +974,12 @@ function closeSidebar() {
 
 .stats-grid article,
 .users-panel {
-  border: 1px solid rgba(var(--panel-rgb, 105, 155, 79), 0.58);
+  border: 1px solid rgba(var(--panel-rgb, 106, 154, 42), 0.42);
   border-radius: 8px;
   background:
-    linear-gradient(180deg, rgba(var(--panel-rgb, 105, 155, 79), 0.13), rgba(var(--panel-rgb, 105, 155, 79), 0.04)),
-    rgba(18, 28, 39, 0.84);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
+    linear-gradient(180deg, rgba(var(--panel-rgb, 106, 154, 42), 0.12), rgba(var(--panel-rgb, 106, 154, 42), 0.03)),
+    #4a0a0a;
+  box-shadow: 0 18px 40px rgba(74, 10, 10, 0.18);
 }
 
 .stats-grid article {
@@ -1014,31 +1013,31 @@ function closeSidebar() {
 }
 
 .stats-grid article.total {
-  --stat-color: #83b95c;
-  --stat-soft: rgba(131, 185, 92, 0.15);
-  --panel-rgb: 131, 185, 92;
+  --stat-color: #6a9a2a;
+  --stat-soft: rgba(106, 154, 42, 0.18);
+  --panel-rgb: 106, 154, 42;
 }
 
 .stats-grid article.active {
-  --stat-color: #e4ab44;
-  --stat-soft: rgba(228, 171, 68, 0.15);
-  --panel-rgb: 228, 171, 68;
+  --stat-color: #ff6a00;
+  --stat-soft: rgba(255, 106, 0, 0.18);
+  --panel-rgb: 255, 106, 0;
 }
 
 .stats-grid article.pending {
-  --stat-color: #4b99d4;
-  --stat-soft: rgba(75, 153, 212, 0.15);
-  --panel-rgb: 75, 153, 212;
+  --stat-color: #e8b300;
+  --stat-soft: rgba(232, 179, 0, 0.18);
+  --panel-rgb: 232, 179, 0;
 }
 
 .stats-grid article.blocked {
-  --stat-color: #dc3747;
-  --stat-soft: rgba(220, 55, 71, 0.15);
-  --panel-rgb: 220, 55, 71;
+  --stat-color: #e31e24;
+  --stat-soft: rgba(227, 30, 36, 0.18);
+  --panel-rgb: 227, 30, 36;
 }
 
 .stats-grid span {
-  color: #b8c3d2;
+  color: rgba(247, 249, 243, 0.72);
   font-size: 12px;
   font-weight: 850;
 }
@@ -1051,9 +1050,9 @@ function closeSidebar() {
 
 .users-panel {
   overflow: hidden;
-  --panel-rgb: 112, 129, 150;
-  border-color: rgba(116, 135, 158, 0.28);
-  background: rgba(17, 27, 38, 0.9);
+  --panel-rgb: 74, 10, 10;
+  border-color: rgba(74, 10, 10, 0.18);
+  background: #4a0a0a;
 }
 
 .toolbar {
@@ -1061,14 +1060,15 @@ function closeSidebar() {
   grid-template-columns: minmax(220px, 1fr) 180px 180px;
   gap: 12px;
   padding: 18px 20px;
-  border-bottom: 1px solid rgba(116, 135, 158, 0.18);
+  border-bottom: 1px solid rgba(247, 249, 243, 0.14);
+  background: rgba(247, 249, 243, 0.08);
 }
 
 .toolbar label,
 .user-modal label {
   display: grid;
   gap: 7px;
-  color: #a9b6c5;
+  color: rgba(247, 249, 243, 0.78);
   font-size: 12px;
   font-weight: 850;
 }
@@ -1079,18 +1079,18 @@ function closeSidebar() {
 .user-modal select {
   height: 38px;
   width: 100%;
-  border: 1px solid rgba(117, 136, 158, 0.24);
+  border: 1px solid rgba(74, 10, 10, 0.12);
   border-radius: 8px;
-  background: #0d1520;
+  background: #ffffff;
   padding: 0 12px;
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 13px;
   font-weight: 700;
   outline: none;
 }
 
 .toolbar input::placeholder {
-  color: #738197;
+  color: rgba(74, 10, 10, 0.5);
 }
 
 .table-wrap {
@@ -1105,14 +1105,14 @@ table {
 th,
 td {
   padding: 13px 18px;
-  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
+  border-bottom: 1px solid rgba(247, 249, 243, 0.14);
   text-align: start;
   vertical-align: middle;
 }
 
 th {
-  background: rgba(43, 55, 68, 0.72);
-  color: #aeb9c8;
+  background: rgba(247, 249, 243, 0.1);
+  color: rgba(247, 249, 243, 0.72);
   font-size: 11px;
   font-weight: 950;
   line-height: 1.2;
@@ -1125,17 +1125,17 @@ td:last-child {
 }
 
 td {
-  color: #f4f7fb;
+  color: #f7f9f3;
   font-size: 13px;
   font-weight: 750;
 }
 
 tbody tr {
-  background: rgba(17, 27, 38, 0.8);
+  background: rgba(74, 10, 10, 0.94);
 }
 
 tbody tr:hover {
-  background: rgba(35, 49, 64, 0.92);
+  background: rgba(74, 10, 10, 0.86);
 }
 
 .user-cell {
@@ -1157,22 +1157,22 @@ tbody tr:hover {
 }
 
 .avatar-slate {
-  background: rgba(148, 163, 184, 0.2);
-  color: #e6edf6;
+  background: rgba(106, 154, 42, 0.2);
+  color: #f7f9f3;
 }
 
 .avatar-indigo {
-  background: rgba(131, 185, 92, 0.18);
-  color: #e5f5d8;
+  background: rgba(106, 154, 42, 0.22);
+  color: #f7f9f3;
 }
 
 .avatar-teal {
-  background: rgba(75, 153, 212, 0.18);
-  color: #dcefff;
+  background: rgba(232, 179, 0, 0.2);
+  color: #f7f9f3;
 }
 
 .avatar-stone {
-  background: rgba(228, 171, 68, 0.18);
+  background: rgba(255, 106, 0, 0.2);
   color: #fff0cf;
 }
 
@@ -1183,7 +1183,7 @@ tbody tr:hover {
 
 .user-cell small {
   margin-top: 3px;
-  color: #8d9aab;
+  color: rgba(247, 249, 243, 0.62);
   font-size: 11px;
 }
 
@@ -1214,35 +1214,35 @@ tbody tr:hover {
 }
 
 .role-pill.admin {
-  border: 1px solid rgba(131, 185, 92, 0.46);
-  background: rgba(131, 185, 92, 0.16);
-  color: #bce39d;
+  border: 1px solid rgba(106, 154, 42, 0.46);
+  background: rgba(106, 154, 42, 0.16);
+  color: #b6c65b;
 }
 
 .role-pill.technician {
-  border: 1px solid rgba(228, 171, 68, 0.46);
-  background: rgba(228, 171, 68, 0.16);
-  color: #ffd98a;
+  border: 1px solid rgba(255, 106, 0, 0.46);
+  background: rgba(255, 106, 0, 0.16);
+  color: #ffb15f;
 }
 
 .role-pill.operator {
-  border: 1px solid rgba(220, 55, 71, 0.46);
-  background: rgba(220, 55, 71, 0.16);
+  border: 1px solid rgba(227, 30, 36, 0.46);
+  background: rgba(227, 30, 36, 0.16);
   color: #ff9ca7;
 }
 
 .status-pill.active {
-  background: rgba(131, 185, 92, 0.18);
-  color: #aada85;
+  background: rgba(106, 154, 42, 0.18);
+  color: #b6c65b;
 }
 
 .status-pill.pending {
-  background: rgba(228, 171, 68, 0.17);
-  color: #ffd27b;
+  background: #fff4cf;
+  color: #ad7a00;
 }
 
 .status-pill.blocked {
-  background: rgba(220, 55, 71, 0.16);
+  background: rgba(227, 30, 36, 0.16);
   color: #ff7f8e;
 }
 
@@ -1255,10 +1255,10 @@ tbody tr:hover {
 
 .actions button {
   min-height: 28px;
-  border: 1px solid rgba(210, 221, 234, 0.42);
+  border: 1px solid rgba(74, 10, 10, 0.12);
   border-radius: 8px;
-  background: rgba(13, 21, 32, 0.86);
-  color: #f2f6fb;
+  background: #f7f9f3;
+  color: #4a0a0a;
   padding: 0 10px;
   font-size: 11px;
   font-weight: 900;
@@ -1266,8 +1266,8 @@ tbody tr:hover {
 }
 
 .actions button:hover {
-  border-color: rgba(91, 155, 215, 0.72);
-  color: #cfe9ff;
+  border-color: rgba(106, 154, 42, 0.45);
+  color: #6a9a2a;
 }
 
 .sidebar-toggle {
@@ -1282,11 +1282,11 @@ tbody tr:hover {
   justify-content: center;
   flex-direction: column;
   gap: 5px;
-  border: 1px solid rgba(126, 146, 170, 0.22);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(28, 40, 54, 0.9);
-  color: #d9e4ef;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+  background: #f7f9f3;
+  color: #4a0a0a;
+  box-shadow: 0 12px 28px rgba(74, 10, 10, 0.1);
 }
 
 [dir='rtl'] .sidebar-toggle {
@@ -1312,7 +1312,7 @@ tbody tr:hover {
   position: fixed;
   inset: 0;
   z-index: 35;
-  background: rgba(5, 10, 18, 0.56);
+  background: rgba(74, 10, 10, 0.32);
   backdrop-filter: blur(3px);
 }
 
@@ -1334,19 +1334,17 @@ tbody tr:hover {
   -webkit-overflow-scrolling: touch;
   display: grid;
   gap: 14px;
-  border: 1px solid rgba(126, 146, 170, 0.24);
+  border: 1px solid rgba(74, 10, 10, 0.12);
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(31, 43, 57, 0.98), rgba(16, 25, 36, 0.98)),
-    #101924;
+  background: #f7f9f3;
   padding: 22px;
-  color: #f4f7fb;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
+  color: #4a0a0a;
+  box-shadow: 0 30px 90px rgba(74, 10, 10, 0.22);
 }
 
 .user-profile-modal {
-  --role-color: #83b95c;
-  --role-soft: rgba(131, 185, 92, 0.16);
+  --role-color: #6a9a2a;
+  --role-soft: rgba(106, 154, 42, 0.16);
   position: relative;
   width: min(100%, 700px);
   max-height: calc(100vh - 96px);
@@ -1354,13 +1352,11 @@ tbody tr:hover {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.42) transparent;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid rgba(126, 146, 170, 0.24);
+  border: 1px solid rgba(74, 10, 10, 0.12);
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(31, 43, 57, 0.98), rgba(16, 25, 36, 0.98)),
-    #101924;
-  color: #f4f7fb;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
+  background: #f7f9f3;
+  color: #4a0a0a;
+  box-shadow: 0 30px 90px rgba(74, 10, 10, 0.22);
 }
 
 .user-profile-modal::-webkit-scrollbar {
@@ -1393,18 +1389,18 @@ tbody tr:hover {
 }
 
 .user-profile-modal.admin {
-  --role-color: #83b95c;
-  --role-soft: rgba(131, 185, 92, 0.16);
+  --role-color: #6a9a2a;
+  --role-soft: rgba(106, 154, 42, 0.16);
 }
 
 .user-profile-modal.technician {
-  --role-color: #e4ab44;
-  --role-soft: rgba(228, 171, 68, 0.16);
+  --role-color: #ff6a00;
+  --role-soft: rgba(255, 106, 0, 0.16);
 }
 
 .user-profile-modal.operator {
-  --role-color: #dc3747;
-  --role-soft: rgba(220, 55, 71, 0.16);
+  --role-color: #e31e24;
+  --role-soft: rgba(227, 30, 36, 0.16);
 }
 
 .profile-close {
@@ -1412,9 +1408,9 @@ tbody tr:hover {
   top: 16px;
   right: 16px;
   z-index: 2;
-  border-color: rgba(210, 221, 234, 0.28);
-  background: rgba(13, 21, 32, 0.88);
-  color: #e6edf6;
+  border-color: rgba(74, 10, 10, 0.1);
+  background: #ffffff;
+  color: #4a0a0a;
 }
 
 [dir='rtl'] .profile-close {
@@ -1429,9 +1425,9 @@ tbody tr:hover {
   align-items: stretch;
   padding: 30px 24px 16px;
   background:
-    linear-gradient(180deg, var(--role-soft), rgba(16, 25, 36, 0) 66%),
+    linear-gradient(180deg, var(--role-soft), rgba(247, 249, 243, 0) 66%),
     transparent;
-  color: #f4f7fb;
+  color: #4a0a0a;
 }
 
 .profile-identity-preview {
@@ -1439,9 +1435,9 @@ tbody tr:hover {
   align-items: center;
   justify-content: flex-start;
   gap: 16px;
-  border: 1px solid rgba(126, 146, 170, 0.22);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(22, 32, 44, 0.82);
+  background: #ffffff;
   padding: 18px;
   text-align: start;
 }
@@ -1455,11 +1451,11 @@ tbody tr:hover {
   justify-content: center;
   border: 4px solid var(--role-color);
   border-radius: 50%;
-  background: rgba(13, 21, 32, 0.88);
-  color: #f4f7fb;
+  background: #f7f9f3;
+  color: #4a0a0a;
   font-size: 21px;
   font-weight: 950;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34), 0 0 24px rgba(131, 185, 92, 0.16);
+  box-shadow: 0 16px 36px rgba(74, 10, 10, 0.14), 0 0 24px rgba(106, 154, 42, 0.14);
 }
 
 .profile-kicker {
@@ -1469,7 +1465,7 @@ tbody tr:hover {
   border-radius: 999px;
   background: var(--role-soft);
   padding: 0 10px;
-  color: #dce7ef;
+  color: #6a9a2a;
   font-size: 11px;
   font-weight: 950;
   text-transform: uppercase;
@@ -1477,14 +1473,14 @@ tbody tr:hover {
 
 .profile-identity-preview h2 {
   margin: 7px 0 4px;
-  color: #f8fbff;
+  color: #4a0a0a;
   font-size: 22px;
   font-weight: 950;
 }
 
 .profile-identity-preview p {
   margin: 0;
-  color: #aab7c7;
+  color: rgba(74, 10, 10, 0.62);
   font-size: 15px;
   font-weight: 850;
 }
@@ -1496,7 +1492,7 @@ tbody tr:hover {
   margin: 0;
   padding: 0;
   list-style: none;
-  color: #f4f7fb;
+  color: #4a0a0a;
 }
 
 .profile-info-list li {
@@ -1504,9 +1500,9 @@ tbody tr:hover {
   align-items: center;
   gap: 12px;
   min-width: 0;
-  border: 1px solid rgba(126, 146, 170, 0.2);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(13, 21, 32, 0.62);
+  background: #ffffff;
   padding: 11px 12px;
   font-size: 13px;
   font-weight: 850;
@@ -1521,7 +1517,7 @@ tbody tr:hover {
   justify-content: center;
   border-radius: 8px;
   background: var(--role-soft);
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 17px;
   line-height: 1;
 }
@@ -1551,14 +1547,14 @@ tbody tr:hover {
 
 .profile-detail-grid div {
   min-width: 0;
-  border: 1px solid rgba(126, 146, 170, 0.2);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(22, 32, 44, 0.72);
+  background: #ffffff;
   padding: 12px 14px;
 }
 
 .profile-detail-grid dt {
-  color: #aab7c7;
+  color: rgba(74, 10, 10, 0.62);
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1566,7 +1562,7 @@ tbody tr:hover {
 
 .profile-detail-grid dd {
   margin: 6px 0 0;
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 14px;
   font-weight: 900;
   word-break: break-word;
@@ -1575,9 +1571,9 @@ tbody tr:hover {
 .user-activity-card,
 .user-permissions-card {
   margin: 0 24px 24px;
-  border: 1px solid rgba(126, 146, 170, 0.2);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(17, 27, 38, 0.82);
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -1587,7 +1583,7 @@ tbody tr:hover {
 
 .activity-heading h3 {
   margin: 0;
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 15px;
   font-weight: 950;
 }
@@ -1604,7 +1600,7 @@ tbody tr:hover {
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
-  border-top: 1px solid rgba(126, 146, 170, 0.16);
+  border-top: 1px solid rgba(74, 10, 10, 0.08);
 }
 
 .activity-icon {
@@ -1619,28 +1615,28 @@ tbody tr:hover {
 }
 
 .activity-icon.blue {
-  background: rgba(75, 153, 212, 0.18);
-  color: #8fcaff;
+  background: rgba(106, 154, 42, 0.16);
+  color: #6a9a2a;
 }
 
 .activity-icon.purple {
-  background: rgba(131, 185, 92, 0.18);
-  color: #bce39d;
+  background: rgba(182, 198, 91, 0.2);
+  color: #6a9a2a;
 }
 
 .activity-icon.slate {
-  background: rgba(148, 163, 184, 0.18);
-  color: #e2e8f0;
+  background: rgba(74, 10, 10, 0.08);
+  color: #4a0a0a;
 }
 
 .activity-icon.green {
-  background: rgba(131, 185, 92, 0.18);
-  color: #bce39d;
+  background: rgba(106, 154, 42, 0.16);
+  color: #6a9a2a;
 }
 
 .activity-icon.red {
-  background: rgba(220, 55, 71, 0.18);
-  color: #ff9ca7;
+  background: rgba(227, 30, 36, 0.12);
+  color: #e31e24;
 }
 
 .user-activity-list strong,
@@ -1649,14 +1645,14 @@ tbody tr:hover {
 }
 
 .user-activity-list strong {
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 12px;
   font-weight: 900;
 }
 
 .user-activity-list small {
   margin-top: 2px;
-  color: #8d9aab;
+  color: rgba(74, 10, 10, 0.58);
   font-size: 11px;
   font-weight: 750;
 }
@@ -1665,15 +1661,15 @@ tbody tr:hover {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: #83b95c;
+  background: #6a9a2a;
 }
 
 .activity-dot.blue {
-  background: #4b99d4;
+  background: #6a9a2a;
 }
 
 .activity-dot.purple {
-  background: #83b95c;
+  background: #b6c65b;
 }
 
 .activity-dot.slate {
@@ -1681,30 +1677,30 @@ tbody tr:hover {
 }
 
 .activity-dot.green {
-  background: #83b95c;
+  background: #6a9a2a;
 }
 
 .activity-dot.red {
-  background: #dc3747;
+  background: #e31e24;
 }
 
 .view-activity-button {
   width: calc(100% - 36px);
   min-height: 38px;
   margin: 10px 18px 16px;
-  border: 1px solid rgba(210, 221, 234, 0.28);
+  border: 1px solid rgba(74, 10, 10, 0.12);
   border-radius: 8px;
-  background: rgba(13, 21, 32, 0.82);
-  color: #f2f6fb;
+  background: #f7f9f3;
+  color: #4a0a0a;
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .view-activity-button:hover {
-  border-color: rgba(91, 155, 215, 0.72);
-  background: rgba(24, 38, 53, 0.92);
-  color: #cfe9ff;
+  border-color: rgba(106, 154, 42, 0.45);
+  background: #ffffff;
+  color: #6a9a2a;
 }
 
 .permissions-mini-list {
@@ -1721,8 +1717,8 @@ tbody tr:hover {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border-top: 1px solid rgba(126, 146, 170, 0.16);
-  color: #f4f7fb;
+  border-top: 1px solid rgba(74, 10, 10, 0.08);
+  color: #4a0a0a;
   font-size: 12px;
   font-weight: 850;
 }
@@ -1735,7 +1731,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: #83b95c;
+  background: #6a9a2a;
   color: #ffffff;
   font-size: 12px;
   font-weight: 950;
@@ -1743,7 +1739,7 @@ tbody tr:hover {
 }
 
 .permissions-mini-list strong.denied {
-  background: #dc3747;
+  background: #e31e24;
 }
 
 .modal-heading {
@@ -1754,7 +1750,7 @@ tbody tr:hover {
 
 .modal-heading h2 {
   margin: 0;
-  color: #f8fbff;
+  color: #4a0a0a;
   font-size: 22px;
   font-weight: 900;
 }
@@ -1763,10 +1759,10 @@ tbody tr:hover {
   position: relative;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(210, 221, 234, 0.28);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 10px;
-  background: rgba(13, 21, 32, 0.88);
-  color: #e6edf6;
+  background: #ffffff;
+  color: #4a0a0a;
   cursor: pointer;
 }
 
@@ -1797,15 +1793,15 @@ tbody tr:hover {
 .edit-permissions-panel {
   display: grid;
   gap: 8px;
-  border: 1px solid rgba(126, 146, 170, 0.2);
+  border: 1px solid rgba(74, 10, 10, 0.1);
   border-radius: 12px;
-  background: rgba(17, 27, 38, 0.82);
+  background: #ffffff;
   padding: 14px;
 }
 
 .edit-permissions-panel h3 {
   margin: 0 0 4px;
-  color: #f4f7fb;
+  color: #4a0a0a;
   font-size: 14px;
   font-weight: 950;
 }
@@ -1817,7 +1813,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #f4f7fb !important;
+  color: #4a0a0a !important;
   font-size: 12px !important;
   font-weight: 850 !important;
 }
@@ -1825,7 +1821,7 @@ tbody tr:hover {
 .permission-toggle input {
   width: 18px !important;
   height: 18px !important;
-  accent-color: #83b95c;
+  accent-color: #6a9a2a;
 }
 
 :global(:root[data-theme='dark']) .users-layout {
