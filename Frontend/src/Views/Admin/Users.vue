@@ -2090,10 +2090,8 @@ tbody tr:hover {
 :global(:root[data-theme='light']) .stats-grid article,
 :global(:root[data-theme='light']) .users-panel {
   border-color: rgba(74, 10, 10, 0.12);
-  background:
-    linear-gradient(135deg, rgba(247, 249, 243, 0.1), rgba(247, 249, 243, 0)),
-    #4a0a0a;
-  box-shadow: 0 18px 42px rgba(74, 10, 10, 0.16);
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
 }
 
 :global(:root[data-theme='light']) .stats-grid article.total {
@@ -2115,13 +2113,13 @@ tbody tr:hover {
 
 :global(:root[data-theme='light']) .stats-grid span,
 :global(:root[data-theme='light']) th {
-  color: rgba(247, 249, 243, 0.72);
+  color: #53667f;
 }
 
 :global(:root[data-theme='light']) .stats-grid strong,
 :global(:root[data-theme='light']) td,
 :global(:root[data-theme='light']) .user-cell strong {
-  color: #f7f9f3;
+  color: #4a0a0a;
 }
 
 :global(:root[data-theme='light']) .stats-grid article.pending span {
@@ -2134,8 +2132,8 @@ tbody tr:hover {
 
 :global(:root[data-theme='light']) .toolbar,
 :global(:root[data-theme='light']) thead {
-  border-color: rgba(247, 249, 243, 0.12);
-  background: rgba(74, 10, 10, 0.18);
+  border-color: #edf0e8;
+  background: #f7f9f3;
 }
 
 :global(:root[data-theme='light']) .toolbar input,
@@ -2151,11 +2149,11 @@ tbody tr:hover {
 
 :global(:root[data-theme='light']) th,
 :global(:root[data-theme='light']) td {
-  border-color: rgba(247, 249, 243, 0.12);
+  border-color: #edf0e8;
 }
 
 :global(:root[data-theme='light']) tbody tr:hover {
-  background: rgba(247, 249, 243, 0.06);
+  background: #fbfcf8;
 }
 
 :global(:root[data-theme='light']) .actions button {
