@@ -911,11 +911,11 @@ function closeSidebar() {
 .users-page :deep(.live-control),
 .users-page :deep(.language-button) {
   min-height: 42px;
-  border: 1px solid rgba(74, 10, 10, 0.16);
+  border: 1px solid #dfe5d6;
   border-radius: 14px;
-  background: #4a0a0a;
-  color: #f7f9f3;
-  box-shadow: 0 12px 28px rgba(74, 10, 10, 0.16);
+  background: #ffffff;
+  color: #4a0a0a;
+  box-shadow: 0 10px 24px rgba(74, 10, 10, 0.06);
 }
 
 .users-page :deep(.search-control input) {
@@ -938,30 +938,31 @@ function closeSidebar() {
   align-items: center;
   border-radius: 999px;
   padding: 0 16px;
-  color: #e8b300;
+  background: #e3edcf;
+  color: #6a9a2a;
 }
 
 .users-page :deep(.language-button) {
   height: 42px;
   min-width: 86px;
   font-size: 13px;
-  color: #f7f9f3;
+  color: #4a0a0a;
 }
 
 .users-page :deep(.language-menu) {
-  border-color: rgba(247, 249, 243, 0.16);
+  border-color: #dfe5d6;
   border-radius: 12px;
-  background: #4a0a0a;
-  box-shadow: 0 18px 42px rgba(74, 10, 10, 0.28);
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(74, 10, 10, 0.12);
 }
 
 .users-page :deep(.language-menu button) {
-  color: #f7f9f3;
+  color: #4a0a0a;
 }
 
 .users-page :deep(.language-menu button:hover) {
-  background: rgba(247, 249, 243, 0.12);
-  color: #b6c65b;
+  background: #f7f9f3;
+  color: #6a9a2a;
 }
 
 .stats-grid {
@@ -1050,9 +1051,9 @@ function closeSidebar() {
 
 .users-panel {
   overflow: hidden;
-  --panel-rgb: 74, 10, 10;
-  border-color: rgba(74, 10, 10, 0.18);
-  background: #4a0a0a;
+  --panel-rgb: 106, 154, 42;
+  border-color: rgba(74, 10, 10, 0.08);
+  background: #ffffff;
 }
 
 .toolbar {
@@ -2068,23 +2069,25 @@ tbody tr:hover {
 :global(:root[data-theme='light']) .users-page :deep(.time-control),
 :global(:root[data-theme='light']) .users-page :deep(.language-button),
 :global(:root[data-theme='light']) .users-page :deep(.live-control) {
-  background: #4a0a0a;
-  border-color: rgba(74, 10, 10, 0.2);
-  color: #f7f9f3;
-  box-shadow: 0 12px 28px rgba(74, 10, 10, 0.16);
+  background: #ffffff;
+  border-color: #dfe5d6;
+  color: #4a0a0a;
+  box-shadow: 0 10px 24px rgba(74, 10, 10, 0.06);
 }
 
 :global(:root[data-theme='light']) .users-page :deep(.live-control) {
-  color: #e8b300;
+  background: #e3edcf;
+  border-color: #c7d9a8;
+  color: #6a9a2a;
 }
 
 :global(:root[data-theme='light']) .users-page :deep(.language-menu) {
-  background: #4a0a0a;
-  border-color: rgba(247, 249, 243, 0.16);
+  background: #ffffff;
+  border-color: #dfe5d6;
 }
 
 :global(:root[data-theme='light']) .users-page :deep(.language-menu button) {
-  color: #f7f9f3;
+  color: #4a0a0a;
 }
 
 :global(:root[data-theme='light']) .stats-grid article,
