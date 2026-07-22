@@ -163,9 +163,9 @@
 }
 
 :root[data-theme='light'] .sidebar-toggle {
-  background: #1f2937 !important;
-  border-color: #1f2937 !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: rgba(74, 10, 10, 0.1) !important;
+  color: #4a0a0a !important;
   box-shadow: 0 12px 30px rgba(74, 10, 10, 0.12) !important;
 }
 
