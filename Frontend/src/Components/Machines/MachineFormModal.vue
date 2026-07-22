@@ -281,26 +281,26 @@ function fieldDirection(key) {
 </script>
 
 <style scoped>
-.modal-overlay { position: fixed; z-index: 10000; inset: 0; display: grid; padding: 25px; place-items: center; background: rgba(17,24,39,.35); backdrop-filter: blur(3px); }
-.modal-card { width: min(900px, 100%); max-height: 92vh; overflow-y: auto; background: white; border-radius: 22px; box-shadow: 0 24px 70px rgba(0,0,0,.18); }
-header, footer { display: flex; justify-content: space-between; gap: 12px; padding: 22px 24px; border-bottom: 1px solid #edf0e8; }
-footer { justify-content: flex-end; border-top: 1px solid #edf0e8; border-bottom: 0; }
-header span { color: #6a9a2a; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-header h2 { margin: 5px 0 0; color: #111827; }
-header button { width: 36px; height: 36px; background: #f7f9f3; border: 0; border-radius: 10px; cursor: pointer; }
+.modal-overlay { position: fixed; z-index: 10000; inset: 0; display: grid; padding: 25px; place-items: center; background: rgba(5,10,18,.56); backdrop-filter: blur(3px); }
+.modal-card { width: min(900px, 100%); max-height: 92vh; overflow-y: auto; background: linear-gradient(180deg, rgba(31,43,57,.98), rgba(16,25,36,.98)), #101924; border: 1px solid rgba(126,146,170,.24); border-radius: 14px; color: #f4f7fb; box-shadow: 0 30px 90px rgba(0,0,0,.52); }
+header, footer { display: flex; justify-content: space-between; gap: 12px; padding: 22px 24px; border-bottom: 1px solid rgba(116,135,158,.15); }
+footer { justify-content: flex-end; border-top: 1px solid rgba(116,135,158,.15); border-bottom: 0; }
+header span { color: #83b95c; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+header h2 { margin: 5px 0 0; color: #f8fbff; }
+header button { width: 36px; height: 36px; background: rgba(13,21,32,.82); border: 1px solid rgba(210,221,234,.28); border-radius: 8px; color: #f2f6fb; cursor: pointer; }
 .form-body { display: grid; grid-template-columns: repeat(2, 1fr); gap: 17px; padding: 24px; }
 .form-group { display: flex; flex-direction: column; gap: 7px; }
 .form-group.full, .error-message { grid-column: 1 / -1; }
-label { color: #4a0a0a; font-size: 12px; font-weight: 900; }
-input, select, textarea { width: 100%; padding: 12px; background: #fafbf7; border: 1px solid #dfe5d6; border-radius: 11px; outline: none; font: inherit; box-sizing: border-box; }
-input:focus, select:focus, textarea:focus { border-color: #6a9a2a; box-shadow: 0 0 0 3px rgba(106,154,42,.12); }
-.file-picker { display: flex; align-items: center; min-height: 46px; padding: 0 12px; background: #fafbf7; border: 1px solid #dfe5d6; border-radius: 11px; color: #4a0a0a; cursor: pointer; box-sizing: border-box; }
+label { color: #aeb9c8; font-size: 12px; font-weight: 900; }
+input, select, textarea { width: 100%; padding: 12px; background: #0d1520; border: 1px solid rgba(126,146,170,.26); border-radius: 8px; outline: none; color: #f4f7fb; font: inherit; box-sizing: border-box; }
+input:focus, select:focus, textarea:focus { border-color: rgba(131,185,92,.62); box-shadow: 0 0 0 3px rgba(131,185,92,.12); }
+.file-picker { display: flex; align-items: center; min-height: 46px; padding: 0 12px; background: #0d1520; border: 1px solid rgba(126,146,170,.26); border-radius: 8px; color: #f4f7fb; cursor: pointer; box-sizing: border-box; }
 .file-picker input { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
 .file-picker span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.photo-preview { width: 100%; height: 150px; object-fit: cover; border: 1px solid #dfe5d6; border-radius: 12px; background: #fafbf7; }
-.error-message { margin: 0; color: #e31e24; font-weight: 800; }
+.photo-preview { width: 100%; height: 150px; object-fit: cover; border: 1px solid rgba(126,146,170,.26); border-radius: 8px; background: rgba(13,21,32,.72); }
+.error-message { margin: 0; color: #ff7f8e; font-weight: 800; }
 footer button { min-height: 44px; padding: 0 18px; border-radius: 11px; font-weight: 900; cursor: pointer; }
-.cancel-button { background: white; border: 1px solid #dfe5d6; color: #64748b; }
-.save-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
+.cancel-button { background: rgba(13,21,32,.82); border: 1px solid rgba(210,221,234,.28); color: #f2f6fb; }
+.save-button { background: #5f8f2f; border: 1px solid rgba(131,185,92,.44); color: white; }
 @media (max-width: 650px) { .form-body { grid-template-columns: 1fr; } .form-group.full, .error-message { grid-column: auto; } }
 </style>

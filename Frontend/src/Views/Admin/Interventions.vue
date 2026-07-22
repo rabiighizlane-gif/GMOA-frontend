@@ -290,15 +290,17 @@ function closeSidebar() {
 <style scoped>
 .interventions-layout {
   min-height: 100vh;
-  background: var(--sc-bg);
-  color: var(--sc-dark);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(77, 126, 172, 0.14), transparent 28%),
+    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
+  color: #f4f7fb;
 }
 
 .interventions-page {
   min-height: 100vh;
   display: grid;
   gap: 20px;
-  padding: 32px 28px 44px 88px;
+  padding: 28px 28px 38px 88px;
 }
 
 [dir='rtl'] .interventions-page {
@@ -317,7 +319,7 @@ nav {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  color: var(--sc-muted);
+  color: #aab7c7;
   font-size: 12px;
   font-weight: 900;
 }
@@ -329,7 +331,7 @@ p {
 
 h1 {
   margin-top: 10px;
-  color: var(--sc-dark);
+  color: #f8fbff;
   font-size: 34px;
   font-weight: 950;
   letter-spacing: 0;
@@ -337,28 +339,28 @@ h1 {
 
 p {
   margin-top: 8px;
-  color: var(--sc-muted);
+  color: #aab7c7;
   font-size: 15px;
   font-weight: 820;
 }
 
 .sidebar-toggle {
   position: fixed;
-  top: 24px;
-  left: 24px;
+  top: 22px;
+  left: 22px;
   z-index: 50;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
-  border: 1px solid var(--sc-border);
-  border-radius: 16px;
-  background: var(--sc-surface);
-  color: var(--sc-dark);
-  box-shadow: var(--sc-shadow);
+  border: 1px solid rgba(126, 146, 170, 0.22);
+  border-radius: 12px;
+  background: rgba(28, 40, 54, 0.9);
+  color: #d9e4ef;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
 [dir='rtl'] .sidebar-toggle {
@@ -383,7 +385,70 @@ p {
   position: fixed;
   inset: 0;
   z-index: 35;
-  background: rgba(74, 10, 10, 0.28);
+  background: rgba(5, 10, 18, 0.56);
+  backdrop-filter: blur(3px);
+}
+
+.interventions-page :deep(.admin-top-controls) {
+  justify-content: flex-end;
+}
+
+.interventions-page :deep(.search-control input),
+.interventions-page :deep(.notification-control),
+.interventions-page :deep(.date-control),
+.interventions-page :deep(.time-control),
+.interventions-page :deep(.live-control),
+.interventions-page :deep(.language-button) {
+  min-height: 42px;
+  border: 1px solid rgba(126, 146, 170, 0.24);
+  border-radius: 14px;
+  background: rgba(19, 29, 42, 0.9);
+  color: #f5f8fc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.interventions-page :deep(.search-control input) {
+  height: 42px;
+  color: #dbe4ef;
+  font-size: 13px;
+}
+
+.interventions-page :deep(.search-control input::placeholder) {
+  color: #8795a7;
+}
+
+.interventions-page :deep(.search-control span) {
+  color: #5b9bd7;
+}
+
+.interventions-page :deep(.live-control) {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #f4d96a;
+}
+
+.interventions-page :deep(.language-button) {
+  height: 42px;
+  min-width: 86px;
+  font-size: 13px;
+}
+
+.interventions-page :deep(.language-menu) {
+  border-color: rgba(126, 146, 170, 0.24);
+  border-radius: 12px;
+  background: #121c28;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+.interventions-page :deep(.language-menu button) {
+  color: #e7edf5;
+}
+
+.interventions-page :deep(.language-menu button:hover) {
+  background: rgba(75, 153, 212, 0.16);
+  color: #cfe9ff;
 }
 
 @media (max-width: 960px) {

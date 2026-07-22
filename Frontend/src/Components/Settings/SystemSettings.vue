@@ -25,10 +25,10 @@ const items = computed(() => {
 <style scoped>
 @import './settings.css';
 .system-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.system-grid article { padding: 16px; border: 1px solid #edf0e8; border-radius: 16px; background: #fbfcf8; }
-.system-grid span { display: block; color: #64748b; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+.system-grid article { padding: 16px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); }
+.system-grid span { display: block; color: #aeb9c8; font-size: 11px; font-weight: 900; text-transform: uppercase; }
 [dir='rtl'] .system-grid span { text-transform: none; }
-.system-grid strong { display: block; margin-top: 8px; color: #4a0a0a; font-size: 17px; font-weight: 950; }
+.system-grid strong { display: block; margin-top: 8px; color: #f8fbff; font-size: 17px; font-weight: 950; }
 @media (max-width: 900px) { .system-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 620px) { .system-grid { grid-template-columns: 1fr; } }
 </style>

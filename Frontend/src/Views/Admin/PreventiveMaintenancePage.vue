@@ -552,33 +552,36 @@ const exportMaintenances = () => {
 .preventive-page {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
-  padding: 32px 28px 44px 88px;
+  padding: 28px 28px 38px 88px;
   overflow-x: hidden;
-  background: #f7f9f3;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(77, 126, 172, 0.14), transparent 28%),
+    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
+  color: #f4f7fb;
   box-sizing: border-box;
 }
 
 .sidebar-toggle {
   position: fixed;
-  top: 24px;
-  left: 24px;
+  top: 22px;
+  left: 22px;
   z-index: 50;
   display: inline-flex;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 16px;
-  color: #4a0a0a;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.08);
+  background: rgba(28, 40, 54, 0.9);
+  border: 1px solid rgba(126, 146, 170, 0.22);
+  border-radius: 12px;
+  color: #d9e4ef;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
   cursor: pointer;
 }
 
@@ -599,7 +602,8 @@ const exportMaintenances = () => {
   position: fixed;
   inset: 0;
   z-index: 35;
-  background: rgba(74, 10, 10, 0.28);
+  background: rgba(5, 10, 18, 0.56);
+  backdrop-filter: blur(3px);
 }
 
 [dir='rtl'].preventive-page {
@@ -621,49 +625,50 @@ const exportMaintenances = () => {
 
 .breadcrumb {
   margin: 0 0 7px !important;
-  color: #6a9a2a !important;
+  color: #83b95c !important;
   font-size: 11px;
   font-weight: 800;
 }
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 29px;
 }
 
 .page-header p {
   margin: 6px 0 0;
-  color: #64748b;
+  color: #aab7c7;
   font-size: 13px;
 }
 
 .api-status {
   padding: 12px 14px;
   border: 1px solid;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 800;
 }
 
 .api-status--online {
-  background: #edf5de;
-  border-color: #d9e9c2;
-  color: #5c8a23;
+  background: rgba(131, 185, 92, 0.14);
+  border-color: rgba(131, 185, 92, 0.32);
+  color: #bce39d;
 }
 
 .api-status--offline {
-  background: #fff4e8;
-  border-color: #ffd4a8;
-  color: #a34d00;
+  background: rgba(249, 115, 22, 0.14);
+  border-color: rgba(249, 115, 22, 0.34);
+  color: #fdba74;
 }
 
 .view-switcher {
   display: flex;
   padding: 4px;
-  background: white;
-  border: 1px solid #e5eadc;
-  border-radius: 13px;
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.18);
 }
 
 .view-switcher button {
@@ -673,8 +678,8 @@ const exportMaintenances = () => {
   padding: 10px 14px;
   background: transparent;
   border: 0;
-  border-radius: 9px;
-  color: #64748b;
+  border-radius: 6px;
+  color: #aeb9c8;
   font-weight: 700;
   cursor: pointer;
 }
@@ -685,8 +690,8 @@ const exportMaintenances = () => {
 }
 
 .view-switcher button.active {
-  background: #edf5de;
-  color: #5c8a23;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 @media (max-width: 760px) {

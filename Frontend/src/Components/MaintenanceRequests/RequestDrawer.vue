@@ -114,8 +114,8 @@ const tabs = [
   position: fixed;
   z-index: 9999;
   inset: 0;
-  background: rgba(17, 24, 39, 0.25);
-  backdrop-filter: blur(2px);
+  background: rgba(5, 10, 17, 0.68);
+  backdrop-filter: blur(6px);
 }
 
 .drawer {
@@ -126,26 +126,28 @@ const tabs = [
   width: min(540px, 100%);
   height: 100%;
   flex-direction: column;
-  background: white;
-  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.12);
+  background: #111b26;
+  border-left: 1px solid rgba(126, 146, 170, 0.28);
+  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.34);
 }
 
 .drawer-header {
   display: flex;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 
-.drawer-header span { color: #6a9a2a; font-size: 12px; font-weight: 900; }
-.drawer-header h2 { margin: 5px 0 0; color: #111827; font-size: 21px; }
+.drawer-header span { color: #bce39d; font-size: 12px; font-weight: 900; }
+.drawer-header h2 { margin: 5px 0 0; color: #f8fbff; font-size: 21px; }
 
 .close-button {
   width: 36px;
   height: 36px;
-  background: #f7f9f3;
-  border: 0;
-  border-radius: 10px;
+  background: #0d1520;
+  border: 1px solid rgba(210, 221, 234, 0.18);
+  border-radius: 8px;
+  color: #f4f7fb;
   cursor: pointer;
 }
 
@@ -153,7 +155,7 @@ const tabs = [
   display: flex;
   overflow-x: auto;
   padding: 0 20px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 
 .drawer-tabs button {
@@ -164,16 +166,16 @@ const tabs = [
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
-  color: #64748b;
+  color: #8d9aab;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.drawer-tabs button.active { border-color: #6a9a2a; color: #6a9a2a; }
+.drawer-tabs button.active { border-color: #83b95c; color: #bce39d; }
 .drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
-.drawer-body h3 { margin: 5px 0 16px; color: #111827; font-size: 14px; }
+.drawer-body h3 { margin: 5px 0 16px; color: #f8fbff; font-size: 14px; }
 
 .details-grid {
   display: grid;
@@ -185,15 +187,15 @@ const tabs = [
 .details-grid div,
 .description,
 .attachment-row {
-  background: #fafbf7;
-  border: 1px solid #edf0e8;
-  border-radius: 12px;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(126, 146, 170, 0.24);
+  border-radius: 8px;
 }
 
 .details-grid div { padding: 13px; }
-.details-grid span { display: block; color: #94a3b8; font-size: 10px; }
-.details-grid strong { display: block; margin-top: 5px; color: #4a0a0a; font-size: 12px; }
-.description { padding: 15px; color: #64748b; line-height: 1.7; }
+.details-grid span { display: block; color: #8d9aab; font-size: 10px; }
+.details-grid strong { display: block; margin-top: 5px; color: #f8fbff; font-size: 12px; }
+.description { padding: 15px; color: #d7e0ec; line-height: 1.7; }
 
 .attachment-row {
   display: grid;
@@ -202,33 +204,33 @@ const tabs = [
   width: 100%;
   margin-bottom: 10px;
   padding: 14px;
-  color: #4a0a0a;
+  color: #f4f7fb;
   font-weight: 800;
   cursor: pointer;
 }
 
-.attachment-row small { color: #6a9a2a; }
+.attachment-row small { color: #bce39d; }
 
 .drawer-footer {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   padding: 18px 24px;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(126, 146, 170, 0.22);
 }
 
 .drawer-footer button {
   flex: 1;
   min-width: 110px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 900;
   cursor: pointer;
 }
 
-.secondary-button { background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
-.danger-button { background: #e31e24; border: 1px solid #e31e24; color: white; }
+.secondary-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #f2f6fb; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
+.danger-button { background: #dc3747; border: 1px solid rgba(220, 55, 71, 0.56); color: #f8fbff; }
 
 .fade-enter-active,
 .fade-leave-active { transition: opacity 0.2s ease; }

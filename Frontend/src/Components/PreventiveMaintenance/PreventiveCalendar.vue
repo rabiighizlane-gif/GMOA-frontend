@@ -293,10 +293,10 @@ const getEventClass = (status) => {
 <style scoped>
 .calendar-card {
   overflow: hidden;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 .calendar-header {
@@ -305,18 +305,18 @@ const getEventClass = (status) => {
   justify-content: space-between;
   gap: 20px;
   padding: 20px 22px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .calendar-header h2 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 17px;
 }
 
 .calendar-header p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 12px;
 }
 
@@ -328,7 +328,7 @@ const getEventClass = (status) => {
 
 .calendar-navigation strong {
   min-width: 150px;
-  color: #4a0a0a;
+  color: #f4f7fb;
   font-size: 14px;
   text-align: center;
 }
@@ -338,10 +338,10 @@ const getEventClass = (status) => {
   width: 36px;
   height: 36px;
   place-items: center;
-  background: #f7f9f3;
-  border: 1px solid #e3e9da;
-  border-radius: 10px;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  color: #f2f6fb;
   font-size: 20px;
   cursor: pointer;
 }
@@ -349,13 +349,13 @@ const getEventClass = (status) => {
 .week-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background: #fafbf7;
-  border-bottom: 1px solid #edf0e8;
+  background: rgba(43, 55, 68, 0.72);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .week-days span {
   padding: 12px;
-  color: #64748b;
+  color: #aeb9c8;
   font-size: 11px;
   font-weight: 800;
   text-align: center;
@@ -371,9 +371,9 @@ const getEventClass = (status) => {
 .calendar-day {
   min-height: 150px;
   padding: 10px;
-  background: white;
-  border-right: 1px solid #edf0e8;
-  border-bottom: 1px solid #edf0e8;
+  background: rgba(17, 27, 38, 0.72);
+  border-right: 1px solid rgba(116, 135, 158, 0.15);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .calendar-day:nth-child(7n) {
@@ -381,13 +381,13 @@ const getEventClass = (status) => {
 }
 
 .calendar-day.muted {
-  background: #fbfcf9;
+  background: rgba(13, 21, 32, 0.55);
   opacity: 0.58;
 }
 
 .calendar-day.today {
-  background: #fbfdf5;
-  box-shadow: inset 0 0 0 2px rgba(106, 154, 42, 0.35);
+  background: rgba(131, 185, 92, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(131, 185, 92, 0.35);
 }
 
 .day-number {
@@ -402,19 +402,19 @@ const getEventClass = (status) => {
   width: 28px;
   height: 28px;
   place-items: center;
-  color: #4a0a0a;
+  color: #f4f7fb;
   font-size: 12px;
   font-weight: 800;
 }
 
 .today .day-number > span {
-  background: #6a9a2a;
+  background: #5f8f2f;
   border-radius: 50%;
   color: white;
 }
 
 .day-number small {
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 9px;
   font-weight: 800;
 }

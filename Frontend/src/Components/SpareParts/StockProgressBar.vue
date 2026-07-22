@@ -77,7 +77,7 @@ const statusClass = computed(() => {
 }
 
 .stock-meta strong {
-  color: #4a0a0a;
+  color: #f8fbff;
 }
 
 .stock-ratio,
@@ -86,14 +86,14 @@ const statusClass = computed(() => {
 }
 
 .stock-meta span {
-  color: #94a3b8;
+  color: #8d9aab;
   font-weight: 700;
 }
 
 .track {
   overflow: hidden;
   height: 8px;
-  background: #eef1e9;
+  background: rgba(126, 146, 170, 0.18);
   border-radius: 999px;
 }
 
@@ -105,14 +105,14 @@ const statusClass = computed(() => {
 }
 
 .fill.available {
-  background: #6a9a2a;
+  background: #83b95c;
 }
 
 .fill.warning {
-  background: #ff6a00;
+  background: #f97316;
 }
 
 .fill.danger {
-  background: #e31e24;
+  background: #dc3747;
 }
 </style>

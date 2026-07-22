@@ -35,21 +35,21 @@ const labels = {
 const content = computed(() => labels[language.value] || labels.FR)
 const chartSeries = computed(() => [{ name: content.value.series, data: [28, 24, 21, 18, 15] }])
 const chartOptions = computed(() => ({
-  chart: { type: 'bar', toolbar: { show: false }, animations: { enabled: true, speed: 800 }, fontFamily: 'inherit' },
-  colors: ['#6A9A2A'],
+  chart: { type: 'bar', toolbar: { show: false }, animations: { enabled: true, speed: 800 }, fontFamily: 'inherit', foreColor: '#aeb9c8' },
+  colors: ['#83B95C'],
   plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '45%', dataLabels: { position: 'top' } } },
-  dataLabels: { enabled: true, offsetX: 8, style: { colors: ['#4A0A0A'], fontSize: '11px', fontWeight: 700 } },
+  dataLabels: { enabled: true, offsetX: 8, style: { colors: ['#f4f7fb'], fontSize: '11px', fontWeight: 700 } },
   xaxis: { categories: technicianNames[language.value] || technicianNames.FR, labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-  yaxis: { opposite: language.value === 'AR', labels: { style: { colors: '#4A0A0A', fontSize: '11px', fontWeight: 600 }, maxWidth: 145 } },
+  yaxis: { opposite: language.value === 'AR', labels: { style: { colors: '#e2e8f0', fontSize: '11px', fontWeight: 600 }, maxWidth: 145 } },
   grid: { show: false },
   tooltip: { y: { formatter: content.value.tooltip } },
 }))
 </script>
 
 <style scoped>
-.chart-card { height: 100%; padding: 20px; background: white; border: 1px solid #edf0e8; border-radius: 20px; box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05); }
+.chart-card { height: 100%; padding: 20px; background: rgba(17, 27, 38, 0.9); border: 1px solid rgba(116, 135, 158, 0.28); border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24); }
 .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-.chart-header h3 { margin: 0; color: #111827; font-size: 16px; font-weight: 800; }
-.chart-header p { margin: 5px 0 0; color: #94a3b8; font-size: 12px; }
-.chart-badge { padding: 6px 10px; color: #6a9a2a; background: #eff5df; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.chart-header h3 { margin: 0; color: #f8fbff; font-size: 16px; font-weight: 800; }
+.chart-header p { margin: 5px 0 0; color: #8d9aab; font-size: 12px; }
+.chart-badge { padding: 6px 10px; color: #bce39d; background: rgba(131, 185, 92, 0.18); border-radius: 999px; font-size: 11px; font-weight: 700; }
 </style>

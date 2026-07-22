@@ -694,8 +694,10 @@ function slugify(value) {
 .reports-page {
   min-height: 100vh;
   padding: 46px 38px 56px 116px;
-  background: #f7f9f3;
-  color: #4a0a0a;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(77, 126, 172, 0.14), transparent 28%),
+    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
+  color: #f4f7fb;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -715,10 +717,10 @@ function slugify(value) {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border: 1px solid #edf0e8;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 14px 32px rgba(74, 10, 10, 0.08);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  background: rgba(17, 27, 38, 0.94);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
   cursor: pointer;
 }
 
@@ -737,14 +739,15 @@ function slugify(value) {
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background: #4a0a0a;
+  background: #f4f7fb;
 }
 
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
   z-index: 80;
-  background: rgba(15, 23, 42, 0.18);
+  background: rgba(5, 10, 17, 0.54);
+  backdrop-filter: blur(3px);
 }
 
 .page-header {
@@ -757,14 +760,14 @@ function slugify(value) {
 
 .breadcrumb {
   margin: 0 0 14px;
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 13px;
   font-weight: 900;
 }
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 36px;
   font-weight: 900;
   letter-spacing: 0;
@@ -772,7 +775,7 @@ function slugify(value) {
 
 .page-header p:last-child {
   margin: 10px 0 0;
-  color: #64748b;
+  color: #aab7c7;
   font-size: 15px;
 }
 
@@ -782,25 +785,26 @@ function slugify(value) {
   gap: 4px;
   padding: 5px;
   margin-bottom: 20px;
-  background: #fff;
-  border: 1px solid #edf0e8;
-  border-radius: 16px;
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 
 .view-switcher button {
   height: 44px;
   padding: 0 18px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 8px;
   background: transparent;
-  color: #64748b;
+  color: #aab7c7;
   font-weight: 900;
   cursor: pointer;
 }
 
 .view-switcher button.active {
-  background: #eef5df;
-  color: #6a9a2a;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 .reports-page :deep(.kpi-grid),
@@ -815,10 +819,10 @@ function slugify(value) {
 
 .history-card {
   overflow: hidden;
-  background: #fff;
-  border: 1px solid #edf0e8;
-  border-radius: 22px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.92);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
 }
 
 .history-header,
@@ -831,18 +835,18 @@ function slugify(value) {
 
 .history-header {
   padding: 22px 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 
 .history-header h2 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 20px;
 }
 
 .history-header p {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 12px;
 }
 
@@ -850,15 +854,15 @@ function slugify(value) {
 .history-row button {
   min-height: 42px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .history-header button {
-  background: #6a9a2a;
-  border: 1px solid #6a9a2a;
-  color: #fff;
+  background: #5f8f2f;
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  color: #f8fbff;
 }
 
 .history-list {
@@ -867,7 +871,7 @@ function slugify(value) {
 
 .history-row {
   padding: 18px 24px;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(126, 146, 170, 0.18);
 }
 
 .history-row:first-child {
@@ -876,21 +880,21 @@ function slugify(value) {
 
 .history-row strong {
   display: block;
-  color: #4a0a0a;
+  color: #f8fbff;
   font-size: 15px;
 }
 
 .history-row span {
   display: block;
   margin-top: 5px;
-  color: #64748b;
+  color: #aab7c7;
   font-size: 12px;
 }
 
 .history-row button {
-  background: #fff;
-  border: 1px solid #dfe5d6;
-  color: #4a0a0a;
+  background: #0d1520;
+  border: 1px solid rgba(210, 221, 234, 0.2);
+  color: #f4f7fb;
 }
 
 .toast {
@@ -899,10 +903,11 @@ function slugify(value) {
   bottom: 28px;
   z-index: 10000;
   padding: 13px 16px;
-  background: #4a0a0a;
-  color: #fff;
-  border-radius: 14px;
-  box-shadow: 0 14px 32px rgba(74, 10, 10, 0.18);
+  background: rgba(17, 27, 38, 0.96);
+  border: 1px solid rgba(131, 185, 92, 0.38);
+  color: #f8fbff;
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
   font-weight: 900;
 }
 

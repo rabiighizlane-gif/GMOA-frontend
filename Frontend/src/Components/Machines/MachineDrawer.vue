@@ -303,31 +303,32 @@ function displayMachineName(name) {
 </script>
 
 <style scoped>
-.drawer-overlay { position: fixed; z-index: 9999; inset: 0; background: rgba(17, 24, 39, 0.25); backdrop-filter: blur(2px); }
-.drawer { position: absolute; top: 0; right: 0; display: flex; width: min(560px, 100%); height: 100%; flex-direction: column; background: white; box-shadow: -16px 0 40px rgba(0,0,0,.12); }
-.drawer[dir='rtl'] { right: auto; left: 0; box-shadow: 16px 0 40px rgba(0,0,0,.12); }
-.drawer-header { display: flex; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid #edf0e8; }
-.drawer-header span { color: #6a9a2a; font-size: 12px; font-weight: 900; }
-.drawer-header h2 { margin: 5px 0 0; color: #111827; font-size: 21px; letter-spacing: 0; }
-.close-button { width: 36px; height: 36px; background: #f7f9f3; border: 0; border-radius: 10px; cursor: pointer; }
-.drawer-tabs { display: flex; overflow-x: auto; padding: 0 20px; border-bottom: 1px solid #edf0e8; }
-.drawer-tabs button { padding: 15px 12px; background: transparent; border: 0; border-bottom: 2px solid transparent; color: #64748b; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-.drawer-tabs button.active { border-color: #6a9a2a; color: #6a9a2a; }
+.drawer-overlay { position: fixed; z-index: 9999; inset: 0; background: rgba(5,10,18,.56); backdrop-filter: blur(3px); }
+.drawer { position: absolute; top: 0; right: 0; display: flex; width: min(560px, 100%); height: 100%; flex-direction: column; background: linear-gradient(180deg, rgba(31,43,57,.98), rgba(16,25,36,.98)), #101924; color: #f4f7fb; box-shadow: -18px 0 54px rgba(0,0,0,.42); border-left: 1px solid rgba(126,146,170,.24); }
+.drawer[dir='rtl'] { right: auto; left: 0; box-shadow: 18px 0 54px rgba(0,0,0,.42); border-left: 0; border-right: 1px solid rgba(126,146,170,.24); }
+.drawer-header { display: flex; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid rgba(116,135,158,.15); }
+.drawer-header span { color: #83b95c; font-size: 12px; font-weight: 900; }
+.drawer-header h2 { margin: 5px 0 0; color: #f8fbff; font-size: 21px; letter-spacing: 0; }
+.close-button { width: 36px; height: 36px; background: rgba(13,21,32,.82); border: 1px solid rgba(210,221,234,.28); border-radius: 8px; color: #f2f6fb; cursor: pointer; }
+.drawer-tabs { display: flex; overflow-x: auto; padding: 0 20px; border-bottom: 1px solid rgba(116,135,158,.15); }
+.drawer-tabs button { padding: 15px 12px; background: transparent; border: 0; border-bottom: 2px solid transparent; color: #aeb9c8; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.drawer-tabs button.active { border-color: #83b95c; color: #bce39d; }
 .drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
-.machine-cover { width: 100%; height: 220px; margin-bottom: 18px; object-fit: cover; border: 1px solid #edf0e8; border-radius: 14px; background: #fafbf7; }
-.drawer-body h3 { margin: 5px 0 16px; color: #111827; font-size: 14px; letter-spacing: 0; }
+.machine-cover { width: 100%; height: 220px; margin-bottom: 18px; object-fit: cover; border: 1px solid rgba(126,146,170,.22); border-radius: 8px; background: rgba(13,21,32,.72); }
+.drawer-body h3 { margin: 5px 0 16px; color: #f8fbff; font-size: 14px; letter-spacing: 0; }
 .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 26px; }
-.details-grid div, .list-row, .document-row { background: #fafbf7; border: 1px solid #edf0e8; border-radius: 12px; }
+.details-grid div, .list-row, .document-row { background: rgba(17,27,38,.82); border: 1px solid rgba(126,146,170,.2); border-radius: 8px; }
 .details-grid div { padding: 13px; }
-.details-grid span { display: block; color: #94a3b8; font-size: 10px; }
-.details-grid strong { display: block; margin-top: 5px; color: #4a0a0a; font-size: 12px; }
-.list-row { display: grid; gap: 5px; margin-bottom: 10px; padding: 14px; color: #4a0a0a; }
-.list-row span { color: #64748b; font-size: 12px; }
-.document-row { display: block; width: 100%; margin-bottom: 10px; padding: 14px; color: #4a0a0a; text-align: start; font-weight: 800; cursor: pointer; }
-.drawer-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 24px; border-top: 1px solid #edf0e8; }
+.details-grid span { display: block; color: #8d9aab; font-size: 10px; }
+.details-grid strong { display: block; margin-top: 5px; color: #f4f7fb; font-size: 12px; }
+.list-row { display: grid; gap: 5px; margin-bottom: 10px; padding: 14px; color: #f4f7fb; }
+.list-row span { color: #aab7c7; font-size: 12px; }
+.document-row { display: block; width: 100%; margin-bottom: 10px; padding: 14px; color: #f4f7fb; text-align: start; font-weight: 800; cursor: pointer; }
+.document-row:hover { border-color: rgba(91,155,215,.54); color: #cfe9ff; }
+.drawer-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 24px; border-top: 1px solid rgba(116,135,158,.15); }
 .drawer-footer button { flex: 1; min-width: 130px; min-height: 44px; padding: 0 12px; border-radius: 12px; font-weight: 900; cursor: pointer; }
-.secondary-button { background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
+.secondary-button { background: rgba(13,21,32,.82); border: 1px solid rgba(210,221,234,.28); color: #f2f6fb; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131,185,92,.44); color: white; }
 .fade-enter-active, .fade-leave-active { transition: opacity .2s ease; }
 .fade-enter-active .drawer, .fade-leave-active .drawer { transition: transform .25s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

@@ -133,10 +133,13 @@
               :time="alert.time"
             />
           </div>
-          <button class="mt-5 inline-flex items-center gap-3 text-sm font-extrabold text-green-700">
+          <RouterLink
+            :to="{ name: 'admin-notifications' }"
+            class="mt-5 inline-flex items-center gap-3 text-sm font-extrabold text-green-700 transition hover:text-green-800"
+          >
             {{ content.viewAllAlerts }}
             <span class="text-2xl leading-none">-></span>
-          </button>
+          </RouterLink>
         </div>
       </div>
 
@@ -147,6 +150,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
 
 import AdminLanguageSwitcher from '@/Components/AdminLanguageSwitcher.vue'

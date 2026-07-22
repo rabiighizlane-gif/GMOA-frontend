@@ -46,11 +46,11 @@ const periodOptions = computed(() => {
 
 <style scoped>
 .export-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
-select, button { min-height: 44px; padding: 0 14px; border-radius: 12px; font: inherit; font-weight: 900; }
-select { min-width: 160px; background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
+select, button { min-height: 44px; padding: 0 14px; border-radius: 8px; font: inherit; font-weight: 900; }
+select { min-width: 160px; background: #0d1520; border: 1px solid rgba(126, 146, 170, 0.28); color: #f4f7fb; }
 button { cursor: pointer; }
-.secondary-button { background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
+.secondary-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #f2f6fb; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
 [dir='rtl'] .export-actions { justify-content: flex-start; }
 @media (max-width: 760px) { .export-actions, select, button { width: 100%; } }
 </style>

@@ -98,11 +98,11 @@ function displayTechnician(name) {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  border: 1px solid var(--sc-border);
-  border-radius: 18px;
-  background: var(--sc-surface);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  background: rgba(17, 27, 38, 0.9);
   padding: 14px;
-  box-shadow: var(--sc-shadow);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 .field {
@@ -110,10 +110,10 @@ function displayTechnician(name) {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid var(--sc-border);
-  border-radius: 14px;
-  background: var(--sc-bg);
-  color: var(--sc-muted);
+  border: 1px solid rgba(126, 146, 170, 0.26);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.72);
+  color: #aeb9c8;
   padding: 0 13px;
   font-size: 12px;
   font-weight: 900;
@@ -121,7 +121,7 @@ function displayTechnician(name) {
 
 .search-field {
   flex: 1 1 280px;
-  background: var(--sc-surface);
+  background: rgba(13, 21, 32, 0.72);
 }
 
 .field input,
@@ -129,7 +129,7 @@ function displayTechnician(name) {
   min-width: 120px;
   border: 0;
   background: transparent;
-  color: var(--sc-dark);
+  color: #f4f7fb;
   outline: none;
   font-size: 13px;
   font-weight: 850;
@@ -159,15 +159,15 @@ function displayTechnician(name) {
 }
 
 .ghost-button {
-  border: 1px solid var(--sc-border);
-  background: var(--sc-surface);
-  color: var(--sc-dark);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  background: rgba(13, 21, 32, 0.82);
+  color: #f2f6fb;
 }
 
 .primary-button {
-  border: 1px solid var(--sc-primary);
-  background: var(--sc-primary);
-  color: var(--sc-surface);
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  background: #5f8f2f;
+  color: #f8fbff;
 }
 
 .ghost-button:hover,
@@ -176,8 +176,8 @@ function displayTechnician(name) {
 }
 
 .ghost-button:hover {
-  background: var(--sc-soft-primary);
-  border-color: rgba(106, 154, 42, 0.28);
+  background: rgba(24, 38, 53, 0.92);
+  border-color: rgba(91, 155, 215, 0.72);
 }
 
 @media (max-width: 760px) {

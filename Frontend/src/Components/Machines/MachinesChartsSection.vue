@@ -78,17 +78,17 @@ const labels = {
 
 const content = computed(() => labels[language.value] || labels.FR)
 const statusSeries = computed(() => statusValues.map((status) => props.machines.filter((m) => m.status === status).length))
-const statusOptions = computed(() => ({ chart: { type: 'donut', ...base }, labels: content.value.statuses, colors: ['#6A9A2A', '#FF6A00', '#E31E24', '#64748B'], stroke: { width: 4, colors: ['#fff'] }, dataLabels: { enabled: false }, legend: { position: 'bottom', fontSize: '10px' } }))
+const statusOptions = computed(() => ({ chart: { type: 'donut', ...base, foreColor: '#aeb9c8' }, labels: content.value.statuses, colors: ['#83B95C', '#E4AB44', '#DC3747', '#94A3B8'], stroke: { width: 3, colors: ['#101924'] }, dataLabels: { enabled: false }, legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#aeb9c8' } } }))
 const lineLabels = computed(() => [...new Set(props.machines.map((m) => m.line))])
 const displayLineLabels = computed(() => lineLabels.value.map((line) => content.value.lines[line] || line))
 const lineSeries = computed(() => [{ name: content.value.availability, data: lineLabels.value.map((line) => { const items = props.machines.filter((m) => m.line === line); return Math.round(items.reduce((sum, m) => sum + m.availability, 0) / Math.max(1, items.length)) }) }])
-const lineOptions = computed(() => ({ chart: { type: 'bar', ...base }, colors: ['#6A9A2A'], plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } }, dataLabels: { enabled: false }, xaxis: { categories: displayLineLabels.value }, yaxis: { max: 100 }, grid: { borderColor: '#EEF1E9', strokeDashArray: 4 } }))
+const lineOptions = computed(() => ({ chart: { type: 'bar', ...base, foreColor: '#aeb9c8' }, colors: ['#83B95C'], plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } }, dataLabels: { enabled: false }, xaxis: { categories: displayLineLabels.value }, yaxis: { max: 100 }, grid: { borderColor: 'rgba(126, 146, 170, 0.16)', strokeDashArray: 4 } }))
 const unstable = computed(() => [...props.machines].sort((a, b) => b.breakdownCount - a.breakdownCount).slice(0, 5))
 const unstableSeries = computed(() => [{ name: content.value.breakdowns, data: unstable.value.map((m) => m.breakdownCount) }])
 const machineLabel = (machine) => content.value.names[machine.name] || machine.name || machine.id
 const unstableOptions = computed(() => ({
-  chart: { type: 'bar', ...base },
-  colors: ['#E31E24'],
+  chart: { type: 'bar', ...base, foreColor: '#aeb9c8' },
+  colors: ['#DC3747'],
   plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
   dataLabels: { enabled: true },
   xaxis: { categories: unstable.value.map(machineLabel), labels: { show: false } },
@@ -135,12 +135,12 @@ const orderedCharts = computed(() => {
 .charts-section { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; overflow: hidden; }
 .charts-section.is-arabic { direction: ltr; }
 .charts-section.is-arabic .chart-card { direction: rtl; }
-.chart-card { min-width: 0; overflow: hidden; padding: 20px; background: white; border: 1px solid #edf0e8; border-radius: 20px; box-shadow: 0 10px 30px rgba(74,10,10,.05); transition: .2s ease; }
-.chart-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(74,10,10,.08); }
+.chart-card { min-width: 0; overflow: hidden; padding: 20px; background: rgba(17, 27, 38, 0.9); border: 1px solid rgba(116, 135, 158, 0.28); border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24); transition: .2s ease; }
+.chart-card:hover { transform: translateY(-2px); border-color: rgba(91, 155, 215, 0.46); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 22px 46px rgba(0,0,0,.28); }
 .chart-card header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
-.chart-card h3 { margin: 0; color: #111827; font-size: 15px; font-weight: 900; }
-.chart-card p { margin: 5px 0 0; color: #94a3b8; font-size: 11px; }
-.chart-card header > span { padding: 6px 9px; background: #eff5df; border-radius: 999px; color: #6a9a2a; font-size: 10px; font-weight: 900; }
+.chart-card h3 { margin: 0; color: #f8fbff; font-size: 15px; font-weight: 900; }
+.chart-card p { margin: 5px 0 0; color: #8d9aab; font-size: 11px; }
+.chart-card header > span { padding: 6px 9px; background: rgba(131, 185, 92, 0.18); border-radius: 999px; color: #bce39d; font-size: 10px; font-weight: 900; }
 .chart-card :deep(.vue-apexcharts), .chart-card :deep(.apexcharts-canvas) { width: 100% !important; max-width: 100%; }
 @media (max-width: 1200px) { .charts-section { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 750px) { .charts-section { grid-template-columns: 1fr; } }

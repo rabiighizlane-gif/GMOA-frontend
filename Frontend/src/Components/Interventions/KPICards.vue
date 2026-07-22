@@ -34,11 +34,13 @@ defineProps({
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  border: 1px solid var(--sc-border);
-  border-radius: 18px;
-  background: var(--sc-surface);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(131, 185, 92, 0.08), rgba(18, 28, 39, 0.02)),
+    rgba(18, 28, 39, 0.86);
   padding: 18px;
-  box-shadow: var(--sc-shadow);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
   animation: intervention-rise 0.45s ease both;
   transition:
     transform 0.2s ease,
@@ -48,8 +50,8 @@ defineProps({
 
 .kpi-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(106, 154, 42, 0.28);
-  box-shadow: 0 18px 44px rgba(74, 10, 10, 0.11);
+  border-color: rgba(91, 155, 215, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 22px 46px rgba(0,0,0,.28);
 }
 
 .kpi-icon {
@@ -59,25 +61,25 @@ defineProps({
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border-radius: 14px;
-  background: var(--sc-soft-primary);
-  color: var(--sc-primary);
+  border-radius: 12px;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
   font-size: 21px;
 }
 
 .kpi-card.warning .kpi-icon {
-  background: var(--sc-soft-warning);
-  color: var(--sc-warning);
+  background: rgba(228, 171, 68, 0.18);
+  color: #ffd27b;
 }
 
 .kpi-card.danger .kpi-icon {
-  background: var(--sc-soft-danger);
-  color: var(--sc-danger);
+  background: rgba(220, 55, 71, 0.18);
+  color: #ff7f8e;
 }
 
 .kpi-card.attention .kpi-icon {
-  background: var(--sc-soft-attention);
-  color: var(--sc-attention);
+  background: rgba(228, 171, 68, 0.16);
+  color: #e4ab44;
 }
 
 .kpi-card p,
@@ -88,14 +90,14 @@ defineProps({
 
 .kpi-card p {
   margin: 0;
-  color: var(--sc-muted);
+  color: #aeb9c8;
   font-size: 12px;
   font-weight: 900;
 }
 
 .kpi-card strong {
   margin-top: 8px;
-  color: var(--sc-dark);
+  color: #f8fbff;
   font-size: 27px;
   font-weight: 950;
   line-height: 1;
@@ -103,7 +105,7 @@ defineProps({
 
 .kpi-card small {
   margin-top: 10px;
-  color: var(--sc-primary);
+  color: #bce39d;
   font-size: 12px;
   font-weight: 850;
 }

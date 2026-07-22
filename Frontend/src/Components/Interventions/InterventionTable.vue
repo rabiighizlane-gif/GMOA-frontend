@@ -189,10 +189,10 @@ function displayTechnician(name) { return displayValues[language.value]?.technic
 <style scoped>
 .intervention-table-card {
   overflow: hidden;
-  border: 1px solid var(--sc-border);
-  border-radius: 20px;
-  background: var(--sc-surface);
-  box-shadow: var(--sc-shadow);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  background: rgba(17, 27, 38, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 header,
@@ -205,7 +205,7 @@ footer {
 }
 
 header {
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 h2,
@@ -214,7 +214,7 @@ p {
 }
 
 h2 {
-  color: var(--sc-dark);
+  color: #f8fbff;
   font-size: 20px;
   font-weight: 950;
 }
@@ -222,7 +222,7 @@ h2 {
 p,
 .pagination-mini,
 footer span {
-  color: var(--sc-muted);
+  color: #8d9aab;
   font-size: 12px;
   font-weight: 850;
 }
@@ -240,7 +240,7 @@ table {
 th,
 td {
   padding: 15px 18px;
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
   text-align: left;
 }
 
@@ -250,7 +250,7 @@ td {
 }
 
 th {
-  background: rgba(247, 249, 243, 0.74);
+  background: rgba(43, 55, 68, 0.72);
 }
 
 th button {
@@ -259,14 +259,14 @@ th button {
   gap: 7px;
   border: 0;
   background: transparent;
-  color: var(--sc-muted);
+  color: #aeb9c8;
   font-size: 12px;
   font-weight: 950;
   cursor: pointer;
 }
 
 td {
-  color: var(--sc-dark);
+  color: #f4f7fb;
   font-size: 13px;
   font-weight: 820;
 }
@@ -278,7 +278,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: rgba(247, 249, 243, 0.86);
+  background: rgba(35, 49, 64, 0.92);
   transform: translateX(3px);
 }
 
@@ -298,29 +298,29 @@ tbody tr:hover {
 
 .priority.critical,
 .status.pending {
-  background: var(--sc-soft-danger);
-  color: var(--sc-danger);
+  background: rgba(220, 55, 71, 0.18);
+  color: #ff7f8e;
 }
 
 .priority.warning {
-  background: var(--sc-soft-warning);
-  color: var(--sc-warning);
+  background: rgba(249, 115, 22, 0.18);
+  color: #fdba74;
 }
 
 .priority.attention {
-  background: var(--sc-soft-attention);
-  color: #8a6b00;
+  background: rgba(250, 204, 21, 0.16);
+  color: #fde047;
 }
 
 .priority.low,
 .status.done {
-  background: var(--sc-soft-secondary);
-  color: var(--sc-primary);
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 .status.in-progress {
-  background: rgba(232, 179, 0, 0.18);
-  color: var(--sc-attention);
+  background: rgba(228, 171, 68, 0.18);
+  color: #ffd27b;
 }
 
 .technician-cell {
@@ -349,9 +349,9 @@ tbody tr:hover {
 
 .actions button,
 footer button {
-  border: 1px solid var(--sc-border);
-  background: var(--sc-surface);
-  color: var(--sc-dark);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  background: rgba(13, 21, 32, 0.82);
+  color: #f2f6fb;
   cursor: pointer;
   transition:
     background 0.18s ease,
@@ -364,18 +364,18 @@ footer button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 11px;
+  border-radius: 8px;
   font-size: 16px;
 }
 
 .actions button:hover,
 footer button:hover:not(:disabled) {
-  background: var(--sc-soft-primary);
+  background: rgba(24, 38, 53, 0.92);
   transform: translateY(-1px);
 }
 
 footer {
-  border-top: 1px solid var(--sc-border);
+  border-top: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 footer button {

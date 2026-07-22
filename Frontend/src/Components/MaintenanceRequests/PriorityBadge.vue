@@ -44,8 +44,8 @@ const badgeClass = computed(() => ({
   font-weight: 900;
   white-space: nowrap;
 }
-.critical { background: #ffe2e2; color: #e31e24; }
-.high { background: #fff0df; color: #ff6a00; }
-.medium { background: #fff4cf; color: #ad7a00; }
-.low { background: #e3f4df; color: #43852c; }
+.critical { background: rgba(220, 55, 71, 0.18); color: #ff7f8e; }
+.high { background: rgba(249, 115, 22, 0.18); color: #fdba74; }
+.medium { background: rgba(250, 204, 21, 0.16); color: #fde047; }
+.low { background: rgba(131, 185, 92, 0.18); color: #bce39d; }
 </style>

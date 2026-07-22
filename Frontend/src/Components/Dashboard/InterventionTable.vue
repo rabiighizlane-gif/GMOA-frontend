@@ -38,7 +38,7 @@
     </div>
 
     <RouterLink
-      to="/admin/interventions"
+      :to="{ name: 'admin-interventions' }"
       class="mt-5 inline-flex items-center gap-3 text-sm font-extrabold text-green-700 transition hover:text-green-800"
     >
       {{ content.viewAll }}

@@ -104,50 +104,50 @@ const categorySeries = computed(() => [145, 88, 72, 64, 49, 32])
 const categoryOptions = computed(() => ({
   chart: { type: 'donut', ...chartBase.value },
   labels: content.value.categories,
-  colors: ['#6A9A2A', '#4A0A0A', '#B6C65B', '#E8B300', '#FF6A00', '#8AAE4A'],
-  stroke: { width: 4, colors: ['#FFFFFF'] },
+  colors: ['#83B95C', '#38BDF8', '#FACC15', '#F97316', '#DC3747', '#A78BFA'],
+  stroke: { width: 4, colors: ['#111927'] },
   dataLabels: { enabled: false },
-  legend: { position: 'bottom', fontSize: '10px' },
+  legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#AAB7C7' } },
   tooltip: { y: { formatter: (value) => `${value} ${content.value.unit}` } },
 }))
 
 const consumptionSeries = computed(() => [{ name: content.value.usedParts, data: [62, 74, 69, 88, 91, 83, 94] }])
 const consumptionOptions = computed(() => ({
   chart: { type: 'area', ...chartBase.value },
-  colors: ['#6A9A2A'],
+  colors: ['#83B95C'],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
   fill: { type: 'gradient', gradient: { opacityFrom: 0.28, opacityTo: 0.02 } },
   xaxis: {
     categories: content.value.months,
-    labels: { rotate: 0, trim: false, hideOverlappingLabels: false, style: { colors: '#64748B', fontSize: '11px', fontFamily: 'inherit' } },
+    labels: { rotate: 0, trim: false, hideOverlappingLabels: false, style: { colors: '#AAB7C7', fontSize: '11px', fontFamily: 'inherit' } },
   },
-  yaxis: { labels: { style: { colors: '#64748B', fontFamily: 'inherit' } } },
-  grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+  yaxis: { labels: { style: { colors: '#AAB7C7', fontFamily: 'inherit' } } },
+  grid: { borderColor: 'rgba(126, 146, 170, 0.18)', strokeDashArray: 4 },
 }))
 
 const topSeries = computed(() => [{ name: content.value.exits, data: [26, 19, 16, 14, 11] }])
 const topOptions = computed(() => ({
   chart: { type: 'bar', ...chartBase.value },
-  colors: ['#6A9A2A'],
+  colors: ['#83B95C'],
   plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
-  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#4A0A0A'], fontSize: '10px' } },
+  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#F8FBFF'], fontSize: '10px' } },
   xaxis: { categories: content.value.topParts, labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-  yaxis: { labels: { maxWidth: 120, style: { colors: '#4A0A0A', fontSize: '11px', fontWeight: 700, fontFamily: 'inherit' } } },
+  yaxis: { labels: { maxWidth: 120, style: { colors: '#D7E0EC', fontSize: '11px', fontWeight: 700, fontFamily: 'inherit' } } },
   grid: { show: false },
 }))
 
 const stockLevelSeries = computed(() => [84])
 const stockLevelOptions = computed(() => ({
   chart: { type: 'radialBar', ...chartBase.value },
-  colors: ['#6A9A2A'],
+  colors: ['#83B95C'],
   plotOptions: {
     radialBar: {
       hollow: { size: '64%' },
-      track: { background: '#EEF1E9' },
+      track: { background: 'rgba(126, 146, 170, 0.18)' },
       dataLabels: {
-        name: { color: '#64748B', fontSize: '11px' },
-        value: { color: '#111827', fontSize: '30px', fontWeight: 900, formatter: (value) => `${Math.round(value)}%` },
+        name: { color: '#AAB7C7', fontSize: '11px' },
+        value: { color: '#F8FBFF', fontSize: '30px', fontWeight: 900, formatter: (value) => `${Math.round(value)}%` },
       },
     },
   },
@@ -169,10 +169,10 @@ const stockLevelOptions = computed(() => ({
   min-width: 0;
   overflow: hidden;
   padding: 20px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.92);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
 }
 .chart-card header {
   display: flex;
@@ -187,21 +187,21 @@ const stockLevelOptions = computed(() => ({
 }
 .chart-card h3 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 15px;
   font-weight: 900;
   letter-spacing: 0;
 }
 .chart-card p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 .chart-card header > span {
   padding: 6px 9px;
-  background: #eff5df;
+  background: rgba(131, 185, 92, 0.18);
   border-radius: 999px;
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 10px;
   font-weight: 900;
   white-space: nowrap;

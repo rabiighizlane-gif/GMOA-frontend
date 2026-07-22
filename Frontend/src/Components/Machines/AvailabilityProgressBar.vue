@@ -48,11 +48,11 @@ const tone = computed(() => ({
   margin-bottom: 6px;
   font-size: 11px;
 }
-.meta strong { color: #4a0a0a; }
-.meta span { color: #94a3b8; font-weight: 800; }
-.track { overflow: hidden; height: 8px; background: #eef1e9; border-radius: 999px; }
+.meta strong { color: #f4f7fb; }
+.meta span { color: #8d9aab; font-weight: 800; }
+.track { overflow: hidden; height: 8px; background: rgba(148, 163, 184, 0.18); border-radius: 999px; }
 .fill { display: block; height: 100%; border-radius: inherit; transition: width 0.25s ease; }
-.healthy { background: #6a9a2a; }
-.warning { background: #ff6a00; }
-.danger { background: #e31e24; }
+.healthy { background: #83b95c; }
+.warning { background: #e4ab44; }
+.danger { background: #dc3747; }
 </style>

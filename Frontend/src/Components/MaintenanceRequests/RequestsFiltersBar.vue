@@ -141,9 +141,10 @@ const updateFilter = (key, value) => emit('update-filter', { key, value })
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 12px;
   padding: 16px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 18px;
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 .search-wrapper {
   grid-column: span 2;
@@ -151,14 +152,14 @@ const updateFilter = (key, value) => emit('update-filter', { key, value })
   align-items: center;
   gap: 9px;
   padding: 0 13px;
-  background: #fafbf7;
-  border: 1px solid #e8ecdf;
-  border-radius: 12px;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.28);
+  border-radius: 8px;
 }
 .search-wrapper span {
   width: 16px;
   height: 16px;
-  border: 2px solid #4a0a0a;
+  border: 2px solid #fdba74;
   border-radius: 50%;
   position: relative;
 }
@@ -169,7 +170,7 @@ const updateFilter = (key, value) => emit('update-filter', { key, value })
   height: 2px;
   right: -5px;
   bottom: -3px;
-  background: #4a0a0a;
+  background: #fdba74;
   transform: rotate(-45deg);
 }
 .search-wrapper input {
@@ -178,29 +179,30 @@ const updateFilter = (key, value) => emit('update-filter', { key, value })
   background: transparent;
   border: 0;
   outline: none;
-  color: #111827;
+  color: #f4f7fb;
 }
+.search-wrapper input::placeholder { color: #6f7e91; }
 select,
 button {
   width: 100%;
   min-width: 0;
   height: 44px;
   padding: 0 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   font: inherit;
   font-size: 13px;
   font-weight: 800;
 }
 select {
-  background: white;
-  border: 1px solid #e8ecdf;
-  color: #4a0a0a;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.28);
+  color: #f4f7fb;
   text-overflow: ellipsis;
 }
 .reset-button {
-  background: white;
-  border: 1px solid #e8ecdf;
-  color: #64748b;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  color: #d7e0ec;
   cursor: pointer;
 }
 @media (max-width: 1500px) {

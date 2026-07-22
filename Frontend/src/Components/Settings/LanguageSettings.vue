@@ -29,6 +29,6 @@ const t = computed(() => ({
 <style scoped>
 @import './settings.css';
 .choice-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-.choice-row button { min-height: 42px; padding: 0 16px; border-radius: 12px; border: 1px solid #dfe5d6; background: white; color: #4a0a0a; font-weight: 900; }
-.choice-row button.active { border-color: #b6c65b; background: #eef5df; color: #6a9a2a; }
+.choice-row button { min-height: 42px; padding: 0 16px; border-radius: 8px; border: 1px solid rgba(210, 221, 234, 0.28); background: rgba(13, 21, 32, 0.82); color: #f2f6fb; font-weight: 900; }
+.choice-row button.active { border-color: rgba(131, 185, 92, 0.56); background: rgba(131, 185, 92, 0.18); color: #bce39d; }
 </style>

@@ -28,15 +28,15 @@ const items = computed(() => {
 <style scoped>
 @import './settings.css';
 .about-panel { text-align: center; }
-.brand-mark { width: 132px; height: 132px; display: grid; place-items: center; margin: 0 auto 18px; border-radius: 28px; background: #edf5de; overflow: hidden; }
+.brand-mark { width: 132px; height: 132px; display: grid; place-items: center; margin: 0 auto 18px; border-radius: 8px; background: rgba(131, 185, 92, 0.18); overflow: hidden; }
 .brand-mark img { width: 100%; height: 100%; object-fit: contain; padding: 14px; }
-.about-panel h2 { margin: 0; color: #111827; font-size: 30px; font-weight: 950; }
-.about-panel p { margin: 8px 0 24px; color: #64748b; font-weight: 850; }
+.about-panel h2 { margin: 0; color: #f8fbff; font-size: 30px; font-weight: 950; }
+.about-panel p { margin: 8px 0 24px; color: #8d9aab; font-weight: 850; }
 dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; text-align: left; }
 [dir='rtl'] dl { text-align: right; }
-dl div { padding: 15px; border: 1px solid #edf0e8; border-radius: 14px; background: #fbfcf8; }
-dt { color: #64748b; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+dl div { padding: 15px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); }
+dt { color: #aeb9c8; font-size: 11px; font-weight: 900; text-transform: uppercase; }
 [dir='rtl'] dt { text-transform: none; }
-dd { margin: 6px 0 0; color: #4a0a0a; font-weight: 950; }
+dd { margin: 6px 0 0; color: #f8fbff; font-weight: 950; }
 @media (max-width: 620px) { dl { grid-template-columns: 1fr; } }
 </style>

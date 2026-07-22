@@ -83,10 +83,10 @@ const updateFilter = (key, value) => emit('update-filter', { key, value })
 </script>
 
 <style scoped>
-.filters-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; padding: 16px; background: white; border: 1px solid #edf0e8; border-radius: 18px; }
-select, button { width: 100%; height: 44px; min-width: 0; padding: 0 12px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 800; }
-select { background: white; border: 1px solid #e8ecdf; color: #4a0a0a; }
+.filters-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; padding: 16px; background: rgba(17, 27, 38, 0.9); border: 1px solid rgba(116, 135, 158, 0.28); border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.22); }
+select, button { width: 100%; height: 44px; min-width: 0; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 800; }
+select { background: #0d1520; border: 1px solid rgba(126, 146, 170, 0.28); color: #f4f7fb; }
 button { cursor: pointer; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
-.reset-button { background: white; border: 1px solid #e8ecdf; color: #64748b; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
+.reset-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #d7e0ec; }
 </style>

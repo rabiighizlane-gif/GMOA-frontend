@@ -21,7 +21,7 @@ const t = computed(() => ({
 <style scoped>
 @import './settings.css';
 .toggle-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.toggle-grid label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px; border: 1px solid #edf0e8; border-radius: 14px; background: #fbfcf8; color: #4a0a0a; font-weight: 900; }
-.toggle-grid input { width: 18px; height: 18px; accent-color: #6a9a2a; }
+.toggle-grid label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); color: #f4f7fb; font-weight: 900; }
+.toggle-grid input { width: 18px; height: 18px; accent-color: #83b95c; }
 @media (max-width: 760px) { .toggle-grid { grid-template-columns: 1fr; } }
 </style>

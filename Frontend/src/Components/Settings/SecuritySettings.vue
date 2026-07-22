@@ -24,6 +24,6 @@ const t = computed(() => ({
 
 <style scoped>
 @import './settings.css';
-.single-toggle { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; padding: 15px; border: 1px solid #edf0e8; border-radius: 14px; background: #fbfcf8; color: #4a0a0a; font-weight: 900; }
-.single-toggle input { width: 18px; height: 18px; accent-color: #6a9a2a; }
+.single-toggle { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; padding: 15px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); color: #f4f7fb; font-weight: 900; }
+.single-toggle input { width: 18px; height: 18px; accent-color: #83b95c; }
 </style>

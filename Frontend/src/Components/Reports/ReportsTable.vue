@@ -201,18 +201,18 @@ const cellDirection = (column, value) => {
 </script>
 
 <style scoped>
-.table-card { overflow: hidden; background: white; border: 1px solid #edf0e8; border-radius: 20px; box-shadow: 0 10px 30px rgba(74,10,10,.05); }
-.table-header { padding: 20px 22px; border-bottom: 1px solid #edf0e8; }
-.table-header h2 { margin: 0; color: #111827; font-size: 17px; }
-.table-header p { margin: 5px 0 0; color: #94a3b8; font-size: 11px; }
+.table-card { overflow: hidden; background: rgba(17, 27, 38, 0.92); border: 1px solid rgba(116, 135, 158, 0.28); border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24); }
+.table-header { padding: 20px 22px; border-bottom: 1px solid rgba(126, 146, 170, 0.22); }
+.table-header h2 { margin: 0; color: #f8fbff; font-size: 17px; }
+.table-header p { margin: 5px 0 0; color: #8d9aab; font-size: 11px; }
 .table-wrapper { overflow-x: auto; }
 table { width: 100%; min-width: 900px; border-collapse: collapse; }
-thead { background: #fafbf7; }
-th, td { padding: 14px 15px; border-top: 1px solid #edf0e8; color: #4a0a0a; font-size: 12px; text-align: left; }
+thead { background: rgba(126, 146, 170, 0.1); }
+th, td { padding: 14px 15px; border-top: 1px solid rgba(126, 146, 170, 0.18); color: #d7e0ec; font-size: 12px; text-align: left; }
 [dir='rtl'] th,
 [dir='rtl'] td { text-align: right; }
-th { border-top: 0; color: #64748b; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+th { border-top: 0; color: #aeb9c8; font-size: 10px; font-weight: 900; text-transform: uppercase; }
 td bdi { unicode-bidi: isolate; }
-tbody tr:hover { background: #fbfcf8; }
-.empty-state { padding: 40px !important; text-align: center; color: #94a3b8; }
+tbody tr:hover { background: rgba(126, 146, 170, 0.07); }
+.empty-state { padding: 40px !important; text-align: center; color: #8d9aab; }
 </style>

@@ -437,7 +437,10 @@ function closeSidebar() {
   min-height: 100vh;
   padding: 32px 28px 44px 88px;
   overflow-x: hidden;
-  background: #f7f9f3;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(77, 126, 172, 0.14), transparent 28%),
+    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
+  color: #f4f7fb;
   box-sizing: border-box;
 }
 
@@ -454,36 +457,37 @@ function closeSidebar() {
   justify-content: center;
   flex-direction: column;
   gap: 5px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 16px;
-  color: #4a0a0a;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.08);
+  background: rgba(17, 27, 38, 0.94);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  color: #f4f7fb;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
   cursor: pointer;
 }
 .requests-page[dir='rtl'] .sidebar-toggle { right: 24px; left: auto; }
 .sidebar-toggle.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 .sidebar-toggle span { width: 22px; height: 2px; background: currentColor; border-radius: 999px; }
-.sidebar-backdrop { position: fixed; inset: 0; z-index: 80; background: rgba(74, 10, 10, 0.28); }
+.sidebar-backdrop { position: fixed; inset: 0; z-index: 80; background: rgba(5, 10, 17, 0.54); backdrop-filter: blur(3px); }
 .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
-.breadcrumb { margin: 0 0 7px !important; color: #6a9a2a !important; font-size: 11px; font-weight: 900; }
-.page-header h1 { margin: 0; color: #111827; font-size: 32px; font-weight: 900; letter-spacing: 0; }
-.page-header p { margin: 6px 0 0; color: #64748b; font-size: 13px; }
+.breadcrumb { margin: 0 0 7px !important; color: #bce39d !important; font-size: 11px; font-weight: 900; }
+.page-header h1 { margin: 0; color: #f8fbff; font-size: 32px; font-weight: 900; letter-spacing: 0; }
+.page-header p { margin: 6px 0 0; color: #aab7c7; font-size: 13px; }
 .header-actions { display: flex; gap: 12px; }
-.primary-button, .secondary-button { min-height: 44px; padding: 0 16px; border-radius: 12px; font-weight: 900; cursor: pointer; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
-.secondary-button { background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
+.primary-button, .secondary-button { min-height: 44px; padding: 0 16px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
+.secondary-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #f2f6fb; }
 .toast {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 11000;
   padding: 14px 18px;
-  background: #4a0a0a;
-  border-radius: 14px;
-  color: white;
+  background: rgba(17, 27, 38, 0.96);
+  border: 1px solid rgba(131, 185, 92, 0.38);
+  border-radius: 8px;
+  color: #f8fbff;
   font-weight: 900;
-  box-shadow: 0 18px 44px rgba(74, 10, 10, 0.22);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
 }
 .requests-page[dir='rtl'] .toast { right: auto; left: 24px; }
 .toast-enter-active, .toast-leave-active { transition: 0.22s ease; }

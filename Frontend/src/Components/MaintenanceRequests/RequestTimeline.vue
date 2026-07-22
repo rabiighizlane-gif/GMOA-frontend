@@ -24,7 +24,7 @@ defineProps({
 .timeline {
   margin-left: 12px;
   padding-left: 24px;
-  border-left: 2px solid #e4ead9;
+  border-left: 2px solid rgba(126, 146, 170, 0.26);
 }
 
 .timeline-item {
@@ -40,31 +40,31 @@ defineProps({
   width: 22px;
   height: 22px;
   place-items: center;
-  border: 3px solid #f7f9f3;
+  border: 3px solid rgba(17, 27, 38, 0.96);
   border-radius: 50%;
-  color: white;
+  color: #f8fbff;
   font-size: 10px;
   font-weight: 900;
 }
 
-.green { background: #6a9a2a; }
-.yellow { background: #e8b300; }
-.orange { background: #ff6a00; }
-.red { background: #e31e24; }
-.gray { background: #64748b; }
+.green { background: #83b95c; }
+.yellow { background: #facc15; color: #111927; }
+.orange { background: #f97316; }
+.red { background: #dc3747; }
+.gray { background: #7e92aa; }
 
 .timeline-item strong {
-  color: #111827;
+  color: #f8fbff;
 }
 
 .timeline-item p {
   margin: 5px 0;
-  color: #64748b;
+  color: #d7e0ec;
   font-size: 12px;
 }
 
 .timeline-item small {
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 </style>

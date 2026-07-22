@@ -394,10 +394,10 @@ const getStatusClass = (status) => {
 <style scoped>
 .table-card {
   overflow: hidden;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 .table-header {
@@ -405,18 +405,18 @@ const getStatusClass = (status) => {
   align-items: center;
   justify-content: space-between;
   padding: 20px 22px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .table-header h2 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 17px;
 }
 
 .table-header p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 
@@ -426,10 +426,10 @@ const getStatusClass = (status) => {
   align-items: center;
   gap: 8px;
   padding: 0 14px;
-  background: white;
-  border: 1px solid #dfe5d6;
-  border-radius: 11px;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  color: #f2f6fb;
   font-weight: 700;
   cursor: pointer;
 }
@@ -445,12 +445,12 @@ table {
 }
 
 thead {
-  background: #fafbf7;
+  background: rgba(43, 55, 68, 0.72);
 }
 
 th {
   padding: 14px 15px;
-  color: #64748b;
+  color: #aeb9c8;
   font-size: 10px;
   font-weight: 800;
   text-align: left;
@@ -459,18 +459,18 @@ th {
 
 td {
   padding: 15px;
-  color: #4a0a0a;
-  border-top: 1px solid #edf0e8;
+  color: #f4f7fb;
+  border-top: 1px solid rgba(116, 135, 158, 0.15);
   font-size: 12px;
   vertical-align: middle;
 }
 
 tbody tr:hover {
-  background: #fbfcf8;
+  background: rgba(35, 49, 64, 0.92);
 }
 
 .id-cell {
-  color: #4a0a0a;
+  color: #f8fbff;
   font-weight: 900;
 }
 
@@ -492,9 +492,9 @@ tbody tr:hover {
   height: 36px;
   flex-shrink: 0;
   place-items: center;
-  background: #f0f5e5;
-  border-radius: 10px;
-  color: #6a9a2a;
+  background: rgba(131, 185, 92, 0.18);
+  border-radius: 8px;
+  color: #bce39d;
 }
 
 .plan-cell strong,
@@ -506,13 +506,13 @@ tbody tr:hover {
 
 .plan-cell strong,
 .machine-name {
-  color: #111827;
+  color: #f8fbff;
   font-size: 12px;
 }
 
 .plan-cell small {
   margin-top: 4px;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 9px;
 }
 
@@ -528,8 +528,8 @@ tbody tr:hover {
 
 .frequency-badge {
   padding: 6px 9px;
-  background: #f0f5e5;
-  color: #6a9a2a;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 .deadline-cell small {
@@ -538,10 +538,10 @@ tbody tr:hover {
   font-weight: 700;
 }
 
-.deadline-green { color: #6a9a2a; }
-.deadline-yellow { color: #b88700; }
-.deadline-orange { color: #ff6a00; }
-.deadline-red { color: #e31e24; }
+.deadline-green { color: #bce39d; }
+.deadline-yellow { color: #fde047; }
+.deadline-orange { color: #fdba74; }
+.deadline-red { color: #ff7f8e; }
 
 .avatar {
   display: grid;
@@ -549,7 +549,7 @@ tbody tr:hover {
   height: 34px;
   flex-shrink: 0;
   place-items: center;
-  background: #6a9a2a;
+  background: #5f8f2f;
   border-radius: 50%;
   color: white;
   font-size: 10px;
@@ -560,12 +560,12 @@ tbody tr:hover {
   padding: 7px 10px;
 }
 
-.status-planned { background: #e9f3db; color: #5f8c23; }
-.status-upcoming { background: #fff4cf; color: #ad7a00; }
-.status-late { background: #ffe2e2; color: #d51c22; }
-.status-completed { background: #e3f4df; color: #43852c; }
-.status-progress { background: #fff0df; color: #ff6a00; }
-.status-default { background: #f1f5f9; color: #64748b; }
+.status-planned { background: rgba(131, 185, 92, 0.18); color: #bce39d; }
+.status-upcoming { background: rgba(250, 204, 21, 0.16); color: #fde047; }
+.status-late { background: rgba(220, 55, 71, 0.18); color: #ff7f8e; }
+.status-completed { background: rgba(131, 185, 92, 0.18); color: #bce39d; }
+.status-progress { background: rgba(249, 115, 22, 0.18); color: #fdba74; }
+.status-default { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
 
 .actions {
   gap: 6px;
@@ -576,9 +576,10 @@ tbody tr:hover {
   width: 34px;
   height: 34px;
   place-items: center;
-  background: white;
-  border: 1px solid #e4e9dc;
-  border-radius: 9px;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  color: #f2f6fb;
   cursor: pointer;
 }
 
@@ -589,12 +590,14 @@ tbody tr:hover {
 }
 
 .actions button:hover {
-  background: #f1f6e7;
+  border-color: rgba(91, 155, 215, 0.72);
+  background: rgba(24, 38, 53, 0.92);
   transform: translateY(-1px);
 }
 
 .actions .delete-button:hover {
-  background: #fff0f0;
+  border-color: rgba(220, 55, 71, 0.5);
+  color: #ff7f8e;
 }
 
 .empty-state {
@@ -614,19 +617,19 @@ tbody tr:hover {
   height: 44px;
   align-items: center;
   justify-content: center;
-  background: #f0f5e5;
-  border-radius: 14px;
-  color: #6a9a2a;
+  background: rgba(131, 185, 92, 0.18);
+  border-radius: 8px;
+  color: #bce39d;
 }
 
 .empty-content strong {
   margin-top: 10px;
-  color: #111827;
+  color: #f8fbff;
 }
 
 .empty-content p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 
@@ -636,17 +639,17 @@ tbody tr:hover {
   align-items: center;
   gap: 15px;
   padding: 16px 20px;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .pagination > button,
 .page-numbers button {
   height: 38px;
   padding: 0 13px;
-  background: white;
-  border: 1px solid #e1e7d9;
-  border-radius: 9px;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  color: #f2f6fb;
   font-weight: 700;
   cursor: pointer;
 }
@@ -657,7 +660,7 @@ tbody tr:hover {
 }
 
 .pagination > span {
-  color: #64748b;
+  color: #8d9aab;
   font-size: 11px;
   font-weight: 700;
 }
@@ -674,8 +677,8 @@ tbody tr:hover {
 }
 
 .page-numbers button.active {
-  background: #6a9a2a;
-  border-color: #6a9a2a;
+  background: #5f8f2f;
+  border-color: rgba(131, 185, 92, 0.44);
   color: white;
 }
 

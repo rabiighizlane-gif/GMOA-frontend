@@ -97,8 +97,8 @@ function changeLogo(event) {
 <style scoped>
 @import './settings.css';
 .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-.logo-box { width: 72px; height: 72px; display: grid; place-items: center; overflow: hidden; border-radius: 18px; background: #edf5de; color: #6a9a2a; font-size: 24px; font-weight: 950; }
+.logo-box { width: 72px; height: 72px; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: rgba(131, 185, 92, 0.18); color: #bce39d; font-size: 24px; font-weight: 950; }
 .logo-box img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
 .logo-input { display: none; }
-.logo-row button { min-height: 42px; padding: 0 14px; border: 1px solid #dfe5d6; border-radius: 12px; background: white; color: #4a0a0a; font-weight: 900; cursor: pointer; }
+.logo-row button { min-height: 42px; padding: 0 14px; border: 1px solid rgba(210, 221, 234, 0.28); border-radius: 8px; background: rgba(13, 21, 32, 0.82); color: #f2f6fb; font-weight: 900; cursor: pointer; }
 </style>

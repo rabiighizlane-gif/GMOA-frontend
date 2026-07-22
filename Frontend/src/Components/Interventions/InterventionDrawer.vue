@@ -161,13 +161,19 @@ const diagnosticInfo = computed(() => {
   background: rgba(74, 10, 10, 0.08);
 }
 
+.drawer-layer {
+  background: rgba(5, 10, 18, 0.56);
+  backdrop-filter: blur(3px);
+}
+
 .drawer-panel {
   width: min(430px, 92vw);
   height: 100%;
   overflow-y: auto;
-  border-left: 1px solid var(--sc-border);
-  background: var(--sc-surface);
-  box-shadow: -28px 0 80px rgba(74, 10, 10, 0.14);
+  border-left: 1px solid rgba(126, 146, 170, 0.24);
+  background: linear-gradient(180deg, rgba(31,43,57,.98), rgba(16,25,36,.98)), #101924;
+  color: #f4f7fb;
+  box-shadow: -28px 0 80px rgba(0, 0, 0, 0.42);
 }
 
 header {
@@ -176,13 +182,14 @@ header {
   justify-content: space-between;
   gap: 14px;
   padding: 24px;
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 header span,
 small,
 dt {
   color: var(--sc-muted);
+  color: #aeb9c8;
   font-size: 12px;
   font-weight: 850;
 }
@@ -197,7 +204,7 @@ dd {
 
 h2 {
   margin-top: 6px;
-  color: var(--sc-dark);
+  color: #f8fbff;
   font-size: 24px;
   font-weight: 950;
   line-height: 1.1;
@@ -205,7 +212,7 @@ h2 {
 
 header p {
   margin-top: 8px;
-  color: var(--sc-muted);
+  color: #aab7c7;
   font-size: 13px;
   font-weight: 800;
 }
@@ -217,10 +224,10 @@ header button {
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border: 1px solid var(--sc-border);
-  border-radius: 13px;
-  background: var(--sc-bg);
-  color: var(--sc-dark);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.82);
+  color: #f2f6fb;
   cursor: pointer;
 }
 
@@ -229,24 +236,24 @@ header button {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   padding: 14px;
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .drawer-tabs button {
   min-height: 38px;
-  border: 1px solid var(--sc-border);
-  border-radius: 12px;
-  background: var(--sc-surface);
-  color: var(--sc-muted);
+  border: 1px solid rgba(126, 146, 170, 0.26);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.72);
+  color: #aeb9c8;
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .drawer-tabs button.active {
-  border-color: rgba(106, 154, 42, 0.45);
-  background: var(--sc-soft-primary);
-  color: var(--sc-primary);
+  border-color: rgba(131, 185, 92, 0.54);
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 .drawer-content {
@@ -262,9 +269,9 @@ header button {
 .info-grid article,
 .responsible-card,
 .files-grid article {
-  border: 1px solid var(--sc-border);
-  border-radius: 15px;
-  background: var(--sc-bg);
+  border: 1px solid rgba(126, 146, 170, 0.2);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.72);
   padding: 13px;
 }
 
@@ -275,14 +282,14 @@ header button {
 dd {
   display: block;
   margin-top: 5px;
-  color: var(--sc-dark);
+  color: #f4f7fb;
   font-size: 13px;
   font-weight: 950;
 }
 
 h3 {
   margin: 20px 0 10px;
-  color: var(--sc-dark);
+  color: #f8fbff;
   font-size: 15px;
   font-weight: 950;
 }
@@ -311,7 +318,7 @@ h3 {
 }
 
 .diagnostic-list div {
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
   padding-bottom: 10px;
 }
 
@@ -323,15 +330,15 @@ h3 {
 .parts-table th,
 .parts-table td {
   padding: 12px 8px;
-  border-bottom: 1px solid var(--sc-border);
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
   text-align: left;
-  color: var(--sc-dark);
+  color: #f4f7fb;
   font-size: 12px;
   font-weight: 850;
 }
 
 .parts-table th {
-  color: var(--sc-muted);
+  color: #aeb9c8;
 }
 
 .timeline {
@@ -350,7 +357,7 @@ h3 {
   bottom: 8px;
   left: 7px;
   width: 2px;
-  background: var(--sc-border);
+  background: rgba(116, 135, 158, 0.28);
 }
 
 .timeline li {
@@ -363,15 +370,15 @@ h3 {
   left: -22px;
   width: 16px;
   height: 16px;
-  border: 3px solid var(--sc-surface);
+  border: 3px solid #101924;
   border-radius: 50%;
   background: var(--sc-primary);
-  box-shadow: 0 0 0 1px var(--sc-border);
+  box-shadow: 0 0 0 1px rgba(126, 146, 170, 0.24);
 }
 
 .timeline p {
   margin-top: 5px;
-  color: var(--sc-muted);
+  color: #aab7c7;
   font-size: 12px;
   font-weight: 780;
 }

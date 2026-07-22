@@ -180,30 +180,30 @@ function showToast(message) {
 
 <style scoped>
 @import './settings.css';
-.role-editor { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 1.4fr) auto; gap: 12px; align-items: end; margin-bottom: 16px; padding: 16px; border: 1px solid #edf0e8; border-radius: 16px; background: #fbfcf8; }
-.role-editor label { display: grid; gap: 7px; color: #64748b; font-size: 12px; font-weight: 900; }
-.role-editor input { min-height: 42px; min-width: 0; padding: 0 12px; border: 1px solid #dfe5d6; border-radius: 12px; color: #4a0a0a; font: inherit; font-weight: 850; }
+.role-editor { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 1.4fr) auto; gap: 12px; align-items: end; margin-bottom: 16px; padding: 16px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); }
+.role-editor label { display: grid; gap: 7px; color: #d7e0ec; font-size: 12px; font-weight: 900; }
+.role-editor input { min-height: 42px; min-width: 0; padding: 0 12px; border: 1px solid rgba(126, 146, 170, 0.28); border-radius: 8px; background: #0d1520; color: #f4f7fb; font: inherit; font-weight: 850; }
 .role-editor div { display: flex; gap: 8px; }
-.role-editor button { min-height: 42px; padding: 0 12px; border-radius: 11px; border: 1px solid #dfe5d6; background: white; color: #4a0a0a; font-weight: 900; cursor: pointer; }
-.role-editor .primary-action { margin-top: 0; color: white; }
+.role-editor button { min-height: 42px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(210, 221, 234, 0.28); background: rgba(13, 21, 32, 0.82); color: #f2f6fb; font-weight: 900; cursor: pointer; }
+.role-editor .primary-action { margin-top: 0; color: #f8fbff; }
 .role-list { display: grid; gap: 12px; }
-.role-list article { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px; border: 1px solid #edf0e8; border-radius: 16px; background: #fbfcf8; }
+.role-list article { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(13, 21, 32, 0.82); }
 .role-main { min-width: 0; }
 .role-list strong, .role-list span { display: block; }
-.role-list strong { color: #4a0a0a; font-weight: 950; }
-.role-list span { margin-top: 5px; color: #64748b; font-size: 12px; font-weight: 750; }
-.permissions-list { margin-top: 12px; padding: 12px; border: 1px solid #dfe5d6; border-radius: 14px; background: white; }
+.role-list strong { color: #f8fbff; font-weight: 950; }
+.role-list span { margin-top: 5px; color: #aab7c7; font-size: 12px; font-weight: 750; }
+.permissions-list { margin-top: 12px; padding: 12px; border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; background: rgba(126, 146, 170, 0.08); }
 .permissions-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.permissions-header strong { color: #6a9a2a; font-size: 12px; }
-.permissions-header button { min-height: 30px; padding: 0 10px; border: 1px solid #dfe5d6; border-radius: 999px; background: #fbfcf8; color: #4a0a0a; font-size: 11px; font-weight: 900; cursor: pointer; }
+.permissions-header strong { color: #bce39d; font-size: 12px; }
+.permissions-header button { min-height: 30px; padding: 0 10px; border: 1px solid rgba(210, 221, 234, 0.22); border-radius: 999px; background: #0d1520; color: #f4f7fb; font-size: 11px; font-weight: 900; cursor: pointer; }
 .permission-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.permission-tags label { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 10px; border-radius: 999px; background: #fbfcf8; border: 1px solid #dfe5d6; color: #4a0a0a; font-size: 11px; font-weight: 900; }
-.permissions-list input { accent-color: #6a9a2a; }
+.permission-tags label { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 10px; border-radius: 999px; background: #0d1520; border: 1px solid rgba(210, 221, 234, 0.2); color: #d7e0ec; font-size: 11px; font-weight: 900; }
+.permissions-list input { accent-color: #83b95c; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 [dir='rtl'] .actions { justify-content: flex-start; }
-.actions button, .danger-light { min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid #dfe5d6; background: white; color: #4a0a0a; font-weight: 900; cursor: pointer; }
-.danger-light { margin-top: 14px; border-color: #ffd6d6; color: #e31e24; }
-.mini-toast { position: fixed; right: 24px; bottom: 24px; z-index: 11000; padding: 13px 16px; border-radius: 14px; background: #4a0a0a; color: white; font-weight: 900; box-shadow: 0 18px 44px rgba(74,10,10,.22); }
+.actions button, .danger-light { min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(210, 221, 234, 0.28); background: rgba(13, 21, 32, 0.82); color: #f2f6fb; font-weight: 900; cursor: pointer; }
+.danger-light { margin-top: 14px; border-color: rgba(220, 55, 71, 0.42); color: #ff7f8e; }
+.mini-toast { position: fixed; right: 24px; bottom: 24px; z-index: 11000; padding: 13px 16px; border-radius: 8px; background: rgba(17, 27, 38, 0.96); border: 1px solid rgba(131, 185, 92, 0.38); color: #f8fbff; font-weight: 900; box-shadow: 0 18px 44px rgba(0,0,0,.34); }
 [dir='rtl'] .mini-toast { right: auto; left: 24px; }
 .toast-enter-active, .toast-leave-active { transition: .22s ease; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(8px); }

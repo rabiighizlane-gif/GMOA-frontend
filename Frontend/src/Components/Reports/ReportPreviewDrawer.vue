@@ -114,27 +114,27 @@ const periodLabel = (period) => ({
 </script>
 
 <style scoped>
-.drawer-overlay { position: fixed; z-index: 9999; inset: 0; background: rgba(17,24,39,.25); backdrop-filter: blur(2px); }
-.drawer { position: absolute; top: 0; right: 0; display: flex; width: min(560px, 100%); height: 100%; flex-direction: column; background: white; box-shadow: -16px 0 40px rgba(0,0,0,.12); }
-.drawer[dir='rtl'] { right: auto; left: 0; box-shadow: 16px 0 40px rgba(0,0,0,.12); }
-.drawer-header { display: flex; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid #edf0e8; }
-.drawer-header span { color: #6a9a2a; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-.drawer-header h2 { margin: 5px 0 0; color: #111827; font-size: 21px; }
-.close-button { width: 36px; height: 36px; background: #f7f9f3; border: 0; border-radius: 10px; cursor: pointer; }
+.drawer-overlay { position: fixed; z-index: 9999; inset: 0; background: rgba(5, 10, 17, 0.68); backdrop-filter: blur(6px); }
+.drawer { position: absolute; top: 0; right: 0; display: flex; width: min(560px, 100%); height: 100%; flex-direction: column; background: #111b26; border-left: 1px solid rgba(126, 146, 170, 0.28); box-shadow: -16px 0 40px rgba(0,0,0,.34); }
+.drawer[dir='rtl'] { right: auto; left: 0; border-right: 1px solid rgba(126, 146, 170, 0.28); border-left: 0; box-shadow: 16px 0 40px rgba(0,0,0,.34); }
+.drawer-header { display: flex; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid rgba(126, 146, 170, 0.22); }
+.drawer-header span { color: #bce39d; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.drawer-header h2 { margin: 5px 0 0; color: #f8fbff; font-size: 21px; }
+.close-button { width: 36px; height: 36px; background: #0d1520; border: 1px solid rgba(210, 221, 234, 0.18); border-radius: 8px; color: #f4f7fb; cursor: pointer; }
 .drawer-body { flex: 1; overflow-y: auto; padding: 24px; display: grid; gap: 16px; }
-section { padding: 16px; background: #fafbf7; border: 1px solid #edf0e8; border-radius: 14px; }
-.brand { color: #6a9a2a; font-size: 18px; }
-h3 { margin: 6px 0 10px; color: #111827; }
-p, .muted { color: #64748b; }
+section { padding: 16px; background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(126, 146, 170, 0.24); border-radius: 8px; }
+.brand { color: #bce39d; font-size: 18px; }
+h3 { margin: 6px 0 10px; color: #f8fbff; }
+p, .muted { color: #d7e0ec; }
 .kpi-mini { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.kpi-mini div { padding: 10px; background: white; border-radius: 10px; }
-.kpi-mini span { display: block; color: #94a3b8; font-size: 10px; }
-.kpi-mini strong { color: #4a0a0a; }
+.kpi-mini div { padding: 10px; background: rgba(126, 146, 170, 0.12); border-radius: 8px; }
+.kpi-mini span { display: block; color: #8d9aab; font-size: 10px; }
+.kpi-mini strong { color: #f8fbff; }
 .signature { min-height: 90px; display: grid; align-content: end; }
-.drawer-footer { display: flex; gap: 12px; padding: 18px 24px; border-top: 1px solid #edf0e8; }
-.drawer-footer button { flex: 1; height: 44px; border-radius: 12px; font-weight: 900; cursor: pointer; }
-.secondary-button { background: white; border: 1px solid #dfe5d6; color: #4a0a0a; }
-.primary-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
+.drawer-footer { display: flex; gap: 12px; padding: 18px 24px; border-top: 1px solid rgba(126, 146, 170, 0.22); }
+.drawer-footer button { flex: 1; height: 44px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+.secondary-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #f2f6fb; }
+.primary-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
 .fade-enter-active, .fade-leave-active { transition: opacity .2s ease; }
 .fade-enter-active .drawer, .fade-leave-active .drawer { transition: transform .25s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

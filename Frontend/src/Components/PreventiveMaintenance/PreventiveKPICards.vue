@@ -65,25 +65,28 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .kpi-card {
   display: flex;
   align-items: center;
   gap: 14px;
-  min-height: 112px;
+  min-height: 104px;
   padding: 18px;
-  background: #fff;
-  border: 1px solid #edf0e8;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(74, 10, 10, 0.05);
+  background:
+    linear-gradient(180deg, rgba(131, 185, 92, 0.08), rgba(18, 28, 39, 0.02)),
+    rgba(18, 28, 39, 0.86);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
   transition: 0.2s ease;
 }
 
 .kpi-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 32px rgba(74, 10, 10, 0.08);
+  border-color: rgba(91, 155, 215, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 22px 46px rgba(0,0,0,.28);
 }
 
 .kpi-icon {
@@ -92,7 +95,7 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
   height: 46px;
   flex-shrink: 0;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 12px;
   font-size: 21px;
 }
 
@@ -102,23 +105,23 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
 }
 
 .kpi-icon--green {
-  background: #edf5de;
-  color: #6a9a2a;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
 }
 
 .kpi-icon--yellow {
-  background: #fff6d7;
-  color: #b88700;
+  background: rgba(250, 204, 21, 0.16);
+  color: #fde047;
 }
 
 .kpi-icon--orange {
-  background: #fff0df;
-  color: #ff6a00;
+  background: rgba(249, 115, 22, 0.18);
+  color: #fdba74;
 }
 
 .kpi-icon--red {
-  background: #ffe7e7;
-  color: #e31e24;
+  background: rgba(220, 55, 71, 0.18);
+  color: #ff7f8e;
 }
 
 .kpi-content {
@@ -127,7 +130,7 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
 
 .kpi-content p {
   margin: 0;
-  color: #64748b;
+  color: #aeb9c8;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -136,7 +139,7 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
 .kpi-content strong {
   display: block;
   margin: 5px 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 24px;
 }
 
@@ -146,19 +149,19 @@ const cards = computed(() => (cardContent[language.value] || cardContent.FR).map
 }
 
 .text-green {
-  color: #6a9a2a;
+  color: #bce39d;
 }
 
 .text-yellow {
-  color: #b88700;
+  color: #fde047;
 }
 
 .text-orange {
-  color: #ff6a00;
+  color: #fdba74;
 }
 
 .text-red {
-  color: #e31e24;
+  color: #ff7f8e;
 }
 
 @media (max-width: 1500px) {

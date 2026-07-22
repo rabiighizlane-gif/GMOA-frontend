@@ -127,10 +127,10 @@ const customCharts = computed(() => {
     }[language.value]
 
     return [
-      barChart(text[0][0], text[0][1], text[0][2], months.value, [4, 7, 5, 8, 6, 9, 12], '#E31E24'),
-      donutChart(text[1][0], text[1][1], text[1][2], priorities, [12, 22, 18], ['#E31E24', '#FF6A00', '#E8B300']),
-      horizontalChart(text[2][0], text[2][1], text[2][2], ['M-309', 'M-215', 'P-204', 'M-412', 'M-102'], [7, 5, 4, 3, 2], '#E31E24'),
-      areaChart(text[3][0], text[3][1], text[3][2], months.value, [8, 14, 11, 18, 13, 20, 24], '#FF6A00'),
+      barChart(text[0][0], text[0][1], text[0][2], months.value, [4, 7, 5, 8, 6, 9, 12], '#DC3747'),
+      donutChart(text[1][0], text[1][1], text[1][2], priorities, [12, 22, 18], ['#DC3747', '#F97316', '#FACC15']),
+      horizontalChart(text[2][0], text[2][1], text[2][2], ['M-309', 'M-215', 'P-204', 'M-412', 'M-102'], [7, 5, 4, 3, 2], '#DC3747'),
+      areaChart(text[3][0], text[3][1], text[3][2], months.value, [8, 14, 11, 18, 13, 20, 24], '#F97316'),
     ]
   }
 
@@ -166,10 +166,10 @@ const customCharts = computed(() => {
   }[language.value]
 
   return [
-    barChart(text[0][0], text[0][1], text[0][2], lines, [12400, 18600, 9600, 8000], '#4A0A0A'),
-    areaChart(text[1][0], text[1][1], text[1][2], months.value, [32, 36, 34, 41, 39, 45, 48], '#FF6A00'),
-    donutChart(text[2][0], text[2][1], text[2][2], costLabels, [45, 25, 30], ['#6A9A2A', '#E8B300', '#E31E24']),
-    horizontalChart(text[3][0], text[3][1], text[3][2], ['P-204', 'M-215', 'M-309', 'M-412', 'M-102'], [9600, 8200, 7600, 5400, 4200], '#E31E24'),
+    barChart(text[0][0], text[0][1], text[0][2], lines, [12400, 18600, 9600, 8000], '#38BDF8'),
+    areaChart(text[1][0], text[1][1], text[1][2], months.value, [32, 36, 34, 41, 39, 45, 48], '#F97316'),
+    donutChart(text[2][0], text[2][1], text[2][2], costLabels, [45, 25, 30], ['#83B95C', '#FACC15', '#DC3747']),
+    horizontalChart(text[3][0], text[3][1], text[3][2], ['P-204', 'M-215', 'M-309', 'M-412', 'M-102'], [9600, 8200, 7600, 5400, 4200], '#DC3747'),
   ]
 })
 
@@ -185,8 +185,9 @@ function barChart(title, subtitle, badge, categories, data, color) {
       colors: [color],
       plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } },
       dataLabels: { enabled: false },
-      xaxis: { categories },
-      grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+      xaxis: { categories, labels: { style: { colors: '#AAB7C7', fontFamily: 'inherit' } } },
+      yaxis: { labels: { style: { colors: '#AAB7C7', fontFamily: 'inherit' } } },
+      grid: { borderColor: 'rgba(126, 146, 170, 0.18)', strokeDashArray: 4 },
     },
   }
 }
@@ -204,8 +205,9 @@ function areaChart(title, subtitle, badge, categories, data, color) {
       dataLabels: { enabled: false },
       stroke: { curve: 'smooth', width: 3 },
       fill: { type: 'gradient', gradient: { opacityFrom: 0.28, opacityTo: 0.02 } },
-      xaxis: { categories },
-      grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+      xaxis: { categories, labels: { style: { colors: '#AAB7C7', fontFamily: 'inherit' } } },
+      yaxis: { labels: { style: { colors: '#AAB7C7', fontFamily: 'inherit' } } },
+      grid: { borderColor: 'rgba(126, 146, 170, 0.18)', strokeDashArray: 4 },
     },
   }
 }
@@ -221,9 +223,9 @@ function donutChart(title, subtitle, badge, labels, series, colors) {
       chart: { type: 'donut', ...chartBase },
       labels,
       colors,
-      stroke: { width: 4, colors: ['#fff'] },
+      stroke: { width: 4, colors: ['#111927'] },
       dataLabels: { enabled: false },
-      legend: { position: 'bottom', fontSize: '10px' },
+      legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#AAB7C7' } },
     },
   }
 }
@@ -239,8 +241,9 @@ function horizontalChart(title, subtitle, badge, categories, data, color) {
       chart: { type: 'bar', ...chartBase },
       colors: [color],
       plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
-      dataLabels: { enabled: true },
+      dataLabels: { enabled: true, style: { colors: ['#F8FBFF'] } },
       xaxis: { categories, labels: { show: false } },
+      yaxis: { labels: { style: { colors: '#D7E0EC', fontFamily: 'inherit' } } },
       grid: { show: false },
     },
   }
@@ -259,16 +262,16 @@ function horizontalChart(title, subtitle, badge, categories, data, color) {
   min-width: 0;
   overflow: hidden;
   padding: 20px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.92);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
   transition: 0.2s ease;
 }
 
 .chart-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 44px rgba(0, 0, 0, 0.28);
 }
 
 .chart-card header {
@@ -281,23 +284,23 @@ function horizontalChart(title, subtitle, badge, categories, data, color) {
 
 .chart-card h3 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 15px;
   font-weight: 900;
 }
 
 .chart-card p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 
 .chart-card header > span {
   height: max-content;
   padding: 6px 9px;
-  background: #eff5df;
+  background: rgba(131, 185, 92, 0.18);
   border-radius: 999px;
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 10px;
   font-weight: 900;
 }

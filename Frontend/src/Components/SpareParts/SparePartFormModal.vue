@@ -274,42 +274,44 @@ const submitForm = () => {
   display: grid;
   padding: 25px;
   place-items: center;
-  background: rgba(17, 24, 39, 0.35);
-  backdrop-filter: blur(3px);
+  background: rgba(5, 10, 17, 0.68);
+  backdrop-filter: blur(6px);
 }
 .modal-card {
   width: min(840px, 100%);
   max-height: 92vh;
   overflow-y: auto;
-  background: white;
-  border-radius: 22px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+  background: rgba(17, 27, 38, 0.96);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
 }
 header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   padding: 22px 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 header span {
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
 }
 header h2 {
   margin: 5px 0 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 21px;
   letter-spacing: 0;
 }
 header button {
   width: 36px;
   height: 36px;
-  background: #f7f9f3;
-  border: 0;
-  border-radius: 10px;
+  background: #0d1520;
+  border: 1px solid rgba(210, 221, 234, 0.18);
+  border-radius: 8px;
+  color: #f4f7fb;
   cursor: pointer;
 }
 .form-body {
@@ -328,7 +330,7 @@ header button {
   grid-column: 1 / -1;
 }
 label {
-  color: #4a0a0a;
+  color: #d7e0ec;
   font-size: 12px;
   font-weight: 900;
 }
@@ -337,22 +339,27 @@ select,
 textarea {
   width: 100%;
   padding: 12px;
-  background: #fafbf7;
-  border: 1px solid #dfe5d6;
-  border-radius: 11px;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.28);
+  border-radius: 8px;
+  color: #f4f7fb;
   outline: none;
   font: inherit;
   box-sizing: border-box;
 }
+input::placeholder,
+textarea::placeholder {
+  color: #6f7e91;
+}
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #6a9a2a;
-  box-shadow: 0 0 0 3px rgba(106, 154, 42, 0.12);
+  border-color: #83b95c;
+  box-shadow: 0 0 0 3px rgba(131, 185, 92, 0.16);
 }
 .error-message {
   margin: 0;
-  color: #e31e24;
+  color: #ff7f8e;
   font-weight: 800;
 }
 footer {
@@ -360,7 +367,7 @@ footer {
   justify-content: flex-end;
   gap: 12px;
   padding: 18px 24px;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(126, 146, 170, 0.22);
 }
 .modal-card[dir='rtl'] footer {
   justify-content: flex-start;
@@ -368,19 +375,19 @@ footer {
 footer button {
   min-height: 44px;
   padding: 0 18px;
-  border-radius: 11px;
+  border-radius: 8px;
   font-weight: 900;
   cursor: pointer;
 }
 .cancel-button {
-  background: white;
-  border: 1px solid #dfe5d6;
-  color: #64748b;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  color: #d7e0ec;
 }
 .save-button {
-  background: #6a9a2a;
-  border: 1px solid #6a9a2a;
-  color: white;
+  background: #5f8f2f;
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  color: #f8fbff;
 }
 @media (max-width: 650px) {
   .form-body { grid-template-columns: 1fr; }

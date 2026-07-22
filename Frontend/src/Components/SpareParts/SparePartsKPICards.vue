@@ -71,10 +71,12 @@ const cards = computed(() =>
   gap: 14px;
   min-height: 112px;
   padding: 18px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(74, 10, 10, 0.05);
+  background:
+    linear-gradient(180deg, rgba(131, 185, 92, 0.08), rgba(18, 28, 39, 0.02)),
+    rgba(18, 28, 39, 0.86);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
 }
 
 .kpi-icon {
@@ -83,14 +85,14 @@ const cards = computed(() =>
   height: 46px;
   flex-shrink: 0;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 8px;
   font-size: 18px;
   font-weight: 900;
 }
 
 .kpi-card p {
   margin: 0;
-  color: #64748b;
+  color: #aeb9c8;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -99,7 +101,7 @@ const cards = computed(() =>
 .kpi-card strong {
   display: block;
   margin: 5px 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 24px;
 }
 
@@ -108,14 +110,14 @@ const cards = computed(() =>
   font-weight: 700;
 }
 
-.kpi-icon--green { background: #edf5de; color: #6a9a2a; }
-.kpi-icon--orange { background: #fff0df; color: #ff6a00; }
-.kpi-icon--red { background: #ffe7e7; color: #e31e24; }
-.kpi-icon--yellow { background: #fff6d7; color: #b88700; }
-.text-green { color: #6a9a2a; }
-.text-orange { color: #ff6a00; }
-.text-red { color: #e31e24; }
-.text-yellow { color: #b88700; }
+.kpi-icon--green { background: rgba(131, 185, 92, 0.18); color: #bce39d; }
+.kpi-icon--orange { background: rgba(249, 115, 22, 0.18); color: #fdba74; }
+.kpi-icon--red { background: rgba(220, 55, 71, 0.18); color: #ff7f8e; }
+.kpi-icon--yellow { background: rgba(250, 204, 21, 0.16); color: #fde047; }
+.text-green { color: #bce39d; }
+.text-orange { color: #fdba74; }
+.text-red { color: #ff7f8e; }
+.text-yellow { color: #fde047; }
 
 @media (max-width: 1500px) {
   .kpi-grid { grid-template-columns: repeat(3, 1fr); }

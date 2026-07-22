@@ -122,9 +122,10 @@ const updateFilter = (key, value) => {
   grid-template-columns: minmax(260px, 1fr) repeat(3, 190px) auto auto;
   gap: 12px;
   padding: 16px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 18px;
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 .search-wrapper {
@@ -132,9 +133,9 @@ const updateFilter = (key, value) => {
   align-items: center;
   gap: 9px;
   padding: 0 13px;
-  background: #fafbf7;
-  border: 1px solid #e8ecdf;
-  border-radius: 12px;
+  background: rgba(13, 21, 32, 0.72);
+  border: 1px solid rgba(126, 146, 170, 0.26);
+  border-radius: 8px;
 }
 
 .search-wrapper svg,
@@ -150,46 +151,50 @@ const updateFilter = (key, value) => {
   background: transparent;
   border: 0;
   outline: none;
-  color: #111827;
+  color: #f4f7fb;
+}
+
+.search-wrapper input::placeholder {
+  color: #77859a;
 }
 
 select {
   height: 44px;
   padding: 0 12px;
-  background: white;
-  border: 1px solid #e8ecdf;
-  border-radius: 12px;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.26);
+  border-radius: 8px;
   outline: none;
-  color: #4a0a0a;
+  color: #f4f7fb;
   cursor: pointer;
 }
 
 button {
   height: 44px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 .reset-button {
-  background: white;
-  border: 1px solid #e8ecdf;
-  color: #64748b;
+  background: rgba(13, 21, 32, 0.72);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  color: #cbd5e1;
 }
 
 .add-button {
   display: flex;
   align-items: center;
   gap: 7px;
-  background: #6a9a2a;
-  border: 1px solid #6a9a2a;
-  color: white;
+  background: #5f8f2f;
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  color: #f8fbff;
 }
 
 .add-button:hover {
-  background: #587f24;
+  background: #6fa43c;
   transform: translateY(-1px);
 }
 

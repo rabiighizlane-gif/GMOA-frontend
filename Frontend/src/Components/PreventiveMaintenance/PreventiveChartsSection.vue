@@ -128,37 +128,37 @@ const monthlySeries = computed(() => [
 ])
 
 const monthlyOptions = computed(() => ({
-  chart: { toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true, speed: 800 } },
-  colors: ['#6A9A2A'],
+  chart: { toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true, speed: 800 }, foreColor: '#aeb9c8' },
+  colors: ['#83B95C'],
   plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } },
   dataLabels: { enabled: false },
   xaxis: {
     categories: content.value.months,
     axisBorder: { show: false },
     axisTicks: { show: false },
-    labels: { style: { colors: '#64748B', fontSize: '10px' } },
+    labels: { style: { colors: '#aeb9c8', fontSize: '10px' } },
   },
-  yaxis: { labels: { style: { colors: '#64748B' } } },
-  grid: { borderColor: '#EEF1E9', strokeDashArray: 4 },
+  yaxis: { labels: { style: { colors: '#aeb9c8' } } },
+  grid: { borderColor: 'rgba(126, 146, 170, 0.16)', strokeDashArray: 4 },
   tooltip: { y: { formatter: (value) => `${value} ${content.value.maintenanceUnit}` } },
 }))
 
 const slaSeries = computed(() => [92])
 
 const slaOptions = computed(() => ({
-  chart: { type: 'radialBar', fontFamily: 'inherit', animations: { enabled: true, speed: 900 } },
-  colors: ['#6A9A2A'],
+  chart: { type: 'radialBar', fontFamily: 'inherit', animations: { enabled: true, speed: 900 }, foreColor: '#aeb9c8' },
+  colors: ['#83B95C'],
   plotOptions: {
     radialBar: {
       startAngle: -130,
       endAngle: 130,
       hollow: { size: '65%' },
-      track: { background: '#EEF1E9' },
+      track: { background: 'rgba(148, 163, 184, 0.18)' },
       dataLabels: {
-        name: { show: true, offsetY: 22, color: '#64748B', fontSize: '11px' },
+        name: { show: true, offsetY: 22, color: '#aeb9c8', fontSize: '11px' },
         value: {
           offsetY: -18,
-          color: '#111827',
+          color: '#f8fbff',
           fontSize: '30px',
           fontWeight: 800,
           formatter: (value) => `${Math.round(value)}%`,
@@ -173,19 +173,19 @@ const slaOptions = computed(() => ({
 const frequencySeries = computed(() => [12, 22, 18, 8, 4])
 
 const frequencyOptions = computed(() => ({
-  chart: { type: 'donut', fontFamily: 'inherit' },
+  chart: { type: 'donut', fontFamily: 'inherit', foreColor: '#aeb9c8' },
   labels: content.value.frequencies,
-  colors: ['#4A0A0A', '#6A9A2A', '#B6C65B', '#E8B300', '#FF6A00'],
-  stroke: { width: 4, colors: ['#FFFFFF'] },
+  colors: ['#38BDF8', '#83B95C', '#B6C65B', '#FACC15', '#F97316'],
+  stroke: { width: 4, colors: ['#101924'] },
   dataLabels: { enabled: false },
-  legend: { position: 'bottom', fontSize: '10px' },
+  legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#aeb9c8' } },
   plotOptions: {
     pie: {
       donut: {
         size: '66%',
         labels: {
           show: true,
-          total: { show: true, label: content.value.totalPlans, color: '#64748B', formatter: () => '64' },
+          total: { show: true, label: content.value.totalPlans, color: '#aeb9c8', formatter: () => '64' },
         },
       },
     },
@@ -201,17 +201,17 @@ const lateSeries = computed(() => [
 ])
 
 const lateOptions = computed(() => ({
-  chart: { toolbar: { show: false }, fontFamily: 'inherit' },
-  colors: ['#E31E24'],
+  chart: { toolbar: { show: false }, fontFamily: 'inherit', foreColor: '#aeb9c8' },
+  colors: ['#DC3747'],
   plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '42%' } },
-  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#4A0A0A'], fontSize: '10px' } },
+  dataLabels: { enabled: true, offsetX: 7, style: { colors: ['#f4f7fb'], fontSize: '10px' } },
   xaxis: {
     categories: content.value.lines,
     labels: { show: false },
     axisBorder: { show: false },
     axisTicks: { show: false },
   },
-  yaxis: { labels: { style: { colors: '#4A0A0A', fontSize: '10px', fontWeight: 600 } } },
+  yaxis: { labels: { style: { colors: '#e2e8f0', fontSize: '10px', fontWeight: 600 } } },
   grid: { show: false },
   tooltip: { y: { formatter: (value) => `${value} ${content.value.overdueName}` } },
 }))
@@ -231,10 +231,10 @@ const lateOptions = computed(() => ({
   min-width: 0;
   overflow: hidden;
   padding: 20px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05);
+  background: rgba(17, 27, 38, 0.9);
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
 }
 
 .chart-card header {
@@ -246,22 +246,22 @@ const lateOptions = computed(() => ({
 
 .chart-card h3 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 15px;
   font-weight: 800;
 }
 
 .chart-card p {
   margin: 5px 0 0;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 11px;
 }
 
 .chart-card header > span {
   padding: 6px 9px;
-  background: #eff5df;
+  background: rgba(131, 185, 92, 0.18);
   border-radius: 999px;
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 10px;
   font-weight: 800;
 }

@@ -21,17 +21,28 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
+  --sc-dark: #f1f5f9;
+  --sc-bg: #0f172a;
+  --sc-surface: #1e293b;
+  --sc-border: rgba(51, 65, 85, 0.72);
+  --sc-muted: #94a3b8;
+  --sc-soft-primary: rgba(16, 185, 129, 0.1);
+  --sc-soft-secondary: rgba(148, 163, 184, 0.12);
+  --sc-soft-danger: rgba(244, 63, 94, 0.12);
+  --sc-soft-warning: rgba(245, 158, 11, 0.12);
+  --sc-soft-attention: rgba(245, 158, 11, 0.12);
+  --sc-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
 }
 
 :root[data-theme='dark'] body,
 :root[data-theme='dark'] #app {
-  background: #10170d;
-  color: #edf6dc;
+  background: #0f172a;
+  color: #f1f5f9;
 }
 
 :root[data-theme='dark'] .bg-slate-50,
 :root[data-theme='dark'] .bg-white {
-  background-color: #121c0f !important;
+  background-color: #1e293b !important;
 }
 
 :root[data-theme='dark'] .bg-slate-100,
@@ -41,37 +52,37 @@
 :root[data-theme='dark'] .bg-amber-50,
 :root[data-theme='dark'] .bg-rose-50,
 :root[data-theme='dark'] .bg-indigo-50 {
-  background-color: #1c2816 !important;
+  background-color: #0f172a !important;
 }
 
 :root[data-theme='dark'] .text-slate-900,
 :root[data-theme='dark'] .text-slate-800,
 :root[data-theme='dark'] .text-slate-700 {
-  color: #f3f9e8 !important;
+  color: #f1f5f9 !important;
 }
 
 :root[data-theme='dark'] .text-slate-500,
 :root[data-theme='dark'] .text-slate-600 {
-  color: #b8c7aa !important;
+  color: #94a3b8 !important;
 }
 
 :root[data-theme='dark'] .border-slate-100,
 :root[data-theme='dark'] .border-slate-200,
 :root[data-theme='dark'] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(215, 236, 120, 0.18) !important;
+  border-color: rgba(51, 65, 85, 0.72) !important;
 }
 
 :root[data-theme='dark'] input,
 :root[data-theme='dark'] select,
 :root[data-theme='dark'] textarea {
-  background-color: #10170d !important;
-  border-color: rgba(215, 236, 120, 0.22) !important;
-  color: #f3f9e8 !important;
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
 }
 
 :root[data-theme='dark'] input::placeholder,
 :root[data-theme='dark'] textarea::placeholder {
-  color: #8fa181 !important;
+  color: #64748b !important;
 }
 
 :root[data-theme='dark'] .shadow-sm,
@@ -80,7 +91,7 @@
 }
 
 :root[data-theme='dark'] .sidebar-toggle {
-  background: #172112 !important;
-  color: #edf6dc !important;
-  border-color: rgba(215, 236, 120, 0.2) !important;
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
 }

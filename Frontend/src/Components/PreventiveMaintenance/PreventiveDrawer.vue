@@ -303,8 +303,8 @@ const histories = [
   position: fixed;
   z-index: 9999;
   inset: 0;
-  background: rgba(17, 24, 39, 0.25);
-  backdrop-filter: blur(2px);
+  background: rgba(5, 10, 18, 0.56);
+  backdrop-filter: blur(3px);
 }
 
 .drawer {
@@ -315,8 +315,10 @@ const histories = [
   width: min(520px, 100%);
   height: 100%;
   flex-direction: column;
-  background: white;
-  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(180deg, rgba(31,43,57,.98), rgba(16,25,36,.98)), #101924;
+  color: #f4f7fb;
+  border-left: 1px solid rgba(126, 146, 170, 0.24);
+  box-shadow: -18px 0 54px rgba(0, 0, 0, 0.42);
 }
 
 .drawer-header {
@@ -324,18 +326,18 @@ const histories = [
   align-items: flex-start;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .drawer-reference {
-  color: #6a9a2a;
+  color: #83b95c;
   font-size: 12px;
   font-weight: 800;
 }
 
 .drawer-header h2 {
   margin: 5px 0 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 21px;
 }
 
@@ -344,10 +346,10 @@ const histories = [
   width: 36px;
   height: 36px;
   place-items: center;
-  background: #f7f9f3;
-  border: 0;
-  border-radius: 10px;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 8px;
+  color: #f2f6fb;
   cursor: pointer;
 }
 
@@ -360,7 +362,7 @@ const histories = [
   display: flex;
   overflow-x: auto;
   padding: 0 20px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .drawer-tabs button {
@@ -371,7 +373,7 @@ const histories = [
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
-  color: #64748b;
+  color: #aeb9c8;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -384,8 +386,8 @@ const histories = [
 }
 
 .drawer-tabs button.active {
-  border-color: #6a9a2a;
-  color: #6a9a2a;
+  border-color: #83b95c;
+  color: #bce39d;
 }
 
 .drawer-body {
@@ -396,7 +398,7 @@ const histories = [
 
 .drawer-body h3 {
   margin: 5px 0 16px;
-  color: #111827;
+  color: #f8fbff;
   font-size: 14px;
 }
 
@@ -409,30 +411,30 @@ const histories = [
 
 .details-grid div {
   padding: 13px;
-  background: #fafbf7;
-  border: 1px solid #edf0e8;
-  border-radius: 12px;
+  background: rgba(13, 21, 32, 0.72);
+  border: 1px solid rgba(126, 146, 170, 0.2);
+  border-radius: 8px;
 }
 
 .details-grid span,
 .part-item span {
   display: block;
-  color: #94a3b8;
+  color: #8d9aab;
   font-size: 10px;
 }
 
 .details-grid strong {
   display: block;
   margin-top: 5px;
-  color: #4a0a0a;
+  color: #f4f7fb;
   font-size: 12px;
 }
 
 .description {
   padding: 15px;
-  background: #fafbf7;
-  border-radius: 12px;
-  color: #64748b;
+  background: rgba(13, 21, 32, 0.72);
+  border-radius: 8px;
+  color: #aab7c7;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -443,9 +445,9 @@ const histories = [
   gap: 11px;
   margin-bottom: 10px;
   padding: 14px;
-  background: #fafbf7;
-  border: 1px solid #edf0e8;
-  border-radius: 12px;
+  background: rgba(13, 21, 32, 0.72);
+  border: 1px solid rgba(126, 146, 170, 0.2);
+  border-radius: 8px;
 }
 
 .task-item span.completed {
@@ -458,8 +460,8 @@ const histories = [
   justify-content: space-between;
   margin-bottom: 10px;
   padding: 14px;
-  background: #fafbf7;
-  border-radius: 12px;
+  background: rgba(13, 21, 32, 0.72);
+  border-radius: 8px;
 }
 
 .part-item > div:last-child {
@@ -467,18 +469,18 @@ const histories = [
 }
 
 .available {
-  color: #6a9a2a !important;
+  color: #bce39d !important;
 }
 
 .unavailable {
-  color: #e31e24 !important;
+  color: #ff7f8e !important;
 }
 
 .timeline {
   position: relative;
   margin-left: 8px;
   padding-left: 22px;
-  border-left: 2px solid #e4ead9;
+  border-left: 2px solid rgba(116, 135, 158, 0.28);
 }
 
 .timeline-item {
@@ -492,45 +494,45 @@ const histories = [
   left: -29px;
   width: 12px;
   height: 12px;
-  background: #6a9a2a;
-  border: 3px solid #eaf3dd;
+  background: #83b95c;
+  border: 3px solid #101924;
   border-radius: 50%;
 }
 
 .timeline-item p {
   margin: 5px 0;
-  color: #64748b;
+  color: #aab7c7;
   font-size: 12px;
 }
 
 .timeline-item small {
-  color: #94a3b8;
+  color: #8d9aab;
 }
 
 .drawer-footer {
   display: flex;
   gap: 12px;
   padding: 18px 24px;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(116, 135, 158, 0.15);
 }
 
 .drawer-footer button {
   flex: 1;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 800;
   cursor: pointer;
 }
 
 .secondary-button {
-  background: white;
-  border: 1px solid #dfe5d6;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  color: #f2f6fb;
 }
 
 .primary-button {
-  background: #6a9a2a;
-  border: 1px solid #6a9a2a;
+  background: #5f8f2f;
+  border: 1px solid rgba(131, 185, 92, 0.44);
   color: white;
 }
 

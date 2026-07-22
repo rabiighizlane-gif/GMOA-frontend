@@ -128,16 +128,17 @@ function submit() {
   display: grid;
   padding: 25px;
   place-items: center;
-  background: rgba(17, 24, 39, 0.35);
-  backdrop-filter: blur(3px);
+  background: rgba(5, 10, 17, 0.68);
+  backdrop-filter: blur(6px);
 }
 
 .modal-card {
   width: min(620px, 100%);
   overflow: hidden;
-  background: white;
-  border-radius: 22px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+  background: rgba(17, 27, 38, 0.96);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
 }
 
 header,
@@ -147,18 +148,18 @@ footer {
   justify-content: space-between;
   gap: 12px;
   padding: 22px 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 
 footer {
   justify-content: flex-end;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(126, 146, 170, 0.22);
   border-bottom: 0;
 }
 
-header span { color: #6a9a2a; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-header h2 { margin: 5px 0 0; color: #111827; }
-header button { width: 36px; height: 36px; background: #f7f9f3; border: 0; border-radius: 10px; cursor: pointer; }
+header span { color: #bce39d; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+header h2 { margin: 5px 0 0; color: #f8fbff; }
+header button { width: 36px; height: 36px; background: #0d1520; border: 1px solid rgba(210, 221, 234, 0.18); border-radius: 8px; color: #f4f7fb; cursor: pointer; }
 
 .form-body {
   display: grid;
@@ -170,23 +171,25 @@ header button { width: 36px; height: 36px; background: #f7f9f3; border: 0; borde
 .form-group { display: flex; flex-direction: column; gap: 7px; }
 .form-group.full,
 .error-message { grid-column: 1 / -1; }
-label { color: #4a0a0a; font-size: 12px; font-weight: 900; }
+label { color: #d7e0ec; font-size: 12px; font-weight: 900; }
 input, select, textarea {
   width: 100%;
   padding: 12px;
-  background: #fafbf7;
-  border: 1px solid #dfe5d6;
-  border-radius: 11px;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.28);
+  border-radius: 8px;
+  color: #f4f7fb;
   outline: none;
   font: inherit;
   box-sizing: border-box;
 }
+input::placeholder, textarea::placeholder { color: #6f7e91; }
 input:focus, select:focus, textarea:focus {
-  border-color: #6a9a2a;
-  box-shadow: 0 0 0 3px rgba(106, 154, 42, 0.12);
+  border-color: #83b95c;
+  box-shadow: 0 0 0 3px rgba(131, 185, 92, 0.16);
 }
-.error-message { margin: 0; color: #e31e24; font-weight: 800; }
-footer button { min-height: 44px; padding: 0 18px; border-radius: 11px; font-weight: 900; cursor: pointer; }
-.cancel-button { background: white; border: 1px solid #dfe5d6; color: #64748b; }
-.save-button { background: #6a9a2a; border: 1px solid #6a9a2a; color: white; }
+.error-message { margin: 0; color: #ff7f8e; font-weight: 800; }
+footer button { min-height: 44px; padding: 0 18px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+.cancel-button { background: rgba(13, 21, 32, 0.82); border: 1px solid rgba(210, 221, 234, 0.28); color: #d7e0ec; }
+.save-button { background: #5f8f2f; border: 1px solid rgba(131, 185, 92, 0.44); color: #f8fbff; }
 </style>

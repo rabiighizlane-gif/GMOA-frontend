@@ -43,8 +43,8 @@ const tone = computed(() => ({
   font-weight: 900;
   white-space: nowrap;
 }
-.critical { background: #ffe2e2; color: #e31e24; }
-.high { background: #fff0df; color: #ff6a00; }
-.medium { background: #fff4cf; color: #ad7a00; }
-.low { background: #e3f4df; color: #43852c; }
+.critical { background: rgba(220, 55, 71, 0.18); color: #ff7f8e; }
+.high { background: rgba(228, 171, 68, 0.18); color: #ffd27b; }
+.medium { background: rgba(228, 171, 68, 0.16); color: #e4ab44; }
+.low { background: rgba(131, 185, 92, 0.18); color: #bce39d; }
 </style>

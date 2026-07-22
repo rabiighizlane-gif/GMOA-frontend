@@ -526,7 +526,10 @@ function closeSidebar() {
   min-height: 100vh;
   padding: 32px 28px 44px 88px;
   overflow-x: hidden;
-  background: #f7f9f3;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(77, 126, 172, 0.14), transparent 28%),
+    linear-gradient(180deg, #111927 0%, #101822 46%, #0d1520 100%);
+  color: #f4f7fb;
   box-sizing: border-box;
 }
 
@@ -546,11 +549,11 @@ function closeSidebar() {
   justify-content: center;
   flex-direction: column;
   gap: 5px;
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 16px;
-  color: #4a0a0a;
-  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.08);
+  background: rgba(17, 27, 38, 0.94);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  color: #f4f7fb;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
   cursor: pointer;
 }
 
@@ -576,7 +579,8 @@ function closeSidebar() {
   position: fixed;
   inset: 0;
   z-index: 80;
-  background: rgba(74, 10, 10, 0.28);
+  background: rgba(5, 10, 17, 0.54);
+  backdrop-filter: blur(3px);
 }
 
 .page-header {
@@ -588,21 +592,21 @@ function closeSidebar() {
 
 .breadcrumb {
   margin: 0 0 7px !important;
-  color: #6a9a2a !important;
+  color: #bce39d !important;
   font-size: 11px;
   font-weight: 900;
 }
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
+  color: #f8fbff;
   font-size: 32px;
   font-weight: 900;
 }
 
 .page-header p {
   margin: 6px 0 0;
-  color: #64748b;
+  color: #aab7c7;
   font-size: 13px;
 }
 
@@ -615,21 +619,21 @@ function closeSidebar() {
 .secondary-button {
   min-height: 44px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .primary-button {
-  background: #6a9a2a;
-  border: 1px solid #6a9a2a;
-  color: white;
+  background: #5f8f2f;
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  color: #f8fbff;
 }
 
 .secondary-button {
-  background: white;
-  border: 1px solid #dfe5d6;
-  color: #4a0a0a;
+  background: rgba(13, 21, 32, 0.82);
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  color: #f2f6fb;
 }
 
 .modal-overlay {
@@ -639,16 +643,17 @@ function closeSidebar() {
   display: grid;
   padding: 25px;
   place-items: center;
-  background: rgba(17, 24, 39, 0.35);
-  backdrop-filter: blur(3px);
+  background: rgba(5, 10, 17, 0.68);
+  backdrop-filter: blur(6px);
 }
 
 .adjust-card {
   width: min(620px, 100%);
   overflow: hidden;
-  background: white;
-  border-radius: 22px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+  background: rgba(17, 27, 38, 0.96);
+  border: 1px solid rgba(126, 146, 170, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
 }
 
 .adjust-card header,
@@ -658,17 +663,17 @@ function closeSidebar() {
   justify-content: space-between;
   gap: 12px;
   padding: 22px 24px;
-  border-bottom: 1px solid #edf0e8;
+  border-bottom: 1px solid rgba(126, 146, 170, 0.22);
 }
 
 .adjust-card footer {
   justify-content: flex-end;
-  border-top: 1px solid #edf0e8;
+  border-top: 1px solid rgba(126, 146, 170, 0.22);
   border-bottom: 0;
 }
 
 .adjust-card header span {
-  color: #6a9a2a;
+  color: #bce39d;
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
@@ -676,15 +681,16 @@ function closeSidebar() {
 
 .adjust-card h2 {
   margin: 5px 0 0;
-  color: #111827;
+  color: #f8fbff;
 }
 
 .adjust-card header button {
   width: 36px;
   height: 36px;
-  background: #f7f9f3;
-  border: 0;
-  border-radius: 10px;
+  background: #0d1520;
+  border: 1px solid rgba(210, 221, 234, 0.18);
+  border-radius: 8px;
+  color: #f4f7fb;
   cursor: pointer;
 }
 
@@ -707,7 +713,7 @@ function closeSidebar() {
 }
 
 .form-group label {
-  color: #4a0a0a;
+  color: #d7e0ec;
   font-size: 12px;
   font-weight: 900;
 }
@@ -717,24 +723,30 @@ function closeSidebar() {
 .form-group textarea {
   width: 100%;
   padding: 12px;
-  background: #fafbf7;
-  border: 1px solid #dfe5d6;
-  border-radius: 11px;
+  background: #0d1520;
+  border: 1px solid rgba(126, 146, 170, 0.28);
+  border-radius: 8px;
+  color: #f4f7fb;
   outline: none;
   font: inherit;
   box-sizing: border-box;
 }
 
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #6f7e91;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #6a9a2a;
-  box-shadow: 0 0 0 3px rgba(106, 154, 42, 0.12);
+  border-color: #83b95c;
+  box-shadow: 0 0 0 3px rgba(131, 185, 92, 0.16);
 }
 
 .error-message {
   margin: 0;
-  color: #e31e24;
+  color: #ff7f8e;
   font-weight: 800;
 }
 
