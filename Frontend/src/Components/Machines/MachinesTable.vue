@@ -225,5 +225,24 @@ tbody tr.critical { box-shadow: inset 4px 0 #e31e24; }
 .page-numbers button { width: 38px; padding: 0; }
 .page-numbers button.active { background: #5f8f2f; border-color: rgba(131, 185, 92, 0.44); color: white; }
 .pagination > span { color: #8d9aab; font-size: 11px; font-weight: 800; }
+:global(:root[data-theme='light']) .action-menu {
+  background: #4a0a0a;
+  border-color: rgba(74, 10, 10, 0.2);
+  box-shadow: 0 18px 45px rgba(74, 10, 10, 0.24);
+}
+
+:global(:root[data-theme='light']) .action-menu button {
+  background: #ffffff;
+  color: #4a0a0a;
+}
+
+:global(:root[data-theme='light']) .action-menu button:hover {
+  background: #f7f9f3;
+  color: #6a9a2a;
+}
+
+:global(:root[data-theme='light']) .action-menu .danger {
+  color: #e31e24;
+}
 @media (max-width: 700px) { .pagination { grid-template-columns: 1fr 1fr; } .page-numbers { display: none; } }
 </style>
