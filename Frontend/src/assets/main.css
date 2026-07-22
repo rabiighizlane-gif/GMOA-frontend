@@ -95,3 +95,368 @@
   color: #f1f5f9 !important;
   border-color: #334155 !important;
 }
+
+:root[data-theme='light'] body,
+:root[data-theme='light'] #app {
+  background: #f7f9f3 !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] .dashboard-layout,
+:root[data-theme='light'] .profile-layout,
+:root[data-theme='light'] .machines-layout,
+:root[data-theme='light'] .interventions-layout,
+:root[data-theme='light'] .pannes-layout,
+:root[data-theme='light'] .notifications-layout,
+:root[data-theme='light'] .users-layout,
+:root[data-theme='light'] .analytics-layout,
+:root[data-theme='light'] .activity-layout,
+:root[data-theme='light'] .settings-layout,
+:root[data-theme='light'] .dashboard-page,
+:root[data-theme='light'] .profile-page,
+:root[data-theme='light'] .machines-page,
+:root[data-theme='light'] .interventions-page,
+:root[data-theme='light'] .pannes-page,
+:root[data-theme='light'] .notifications-page,
+:root[data-theme='light'] .users-page,
+:root[data-theme='light'] .analytics-page,
+:root[data-theme='light'] .spare-parts-page,
+:root[data-theme='light'] .requests-page,
+:root[data-theme='light'] .preventive-page,
+:root[data-theme='light'] .reports-page,
+:root[data-theme='light'] .activity-page,
+:root[data-theme='light'] .settings-page {
+  background: #f7f9f3 !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] .breadcrumb,
+:root[data-theme='light'] .page-header .breadcrumb {
+  color: #6a9a2a !important;
+}
+
+:root[data-theme='light'] .page-header h1,
+:root[data-theme='light'] .machines-page h1,
+:root[data-theme='light'] .interventions-page h1,
+:root[data-theme='light'] .pannes-page h1,
+:root[data-theme='light'] .notifications-page h1,
+:root[data-theme='light'] .users-page h1,
+:root[data-theme='light'] .spare-parts-page h1,
+:root[data-theme='light'] .requests-page h1,
+:root[data-theme='light'] .preventive-page h1,
+:root[data-theme='light'] .reports-page h1,
+:root[data-theme='light'] .analytics-page h1,
+:root[data-theme='light'] .activity-page h1,
+:root[data-theme='light'] .settings-page h1 {
+  color: #111827 !important;
+}
+
+:root[data-theme='light'] .page-header p,
+:root[data-theme='light'] .table-header p,
+:root[data-theme='light'] .chart-header p,
+:root[data-theme='light'] .chart-card p,
+:root[data-theme='light'] .settings-panel p,
+:root[data-theme='light'] .role-editor p,
+:root[data-theme='light'] .form-grid label,
+:root[data-theme='light'] .field label {
+  color: #53667f !important;
+}
+
+:root[data-theme='light'] .sidebar-toggle {
+  background: #1f2937 !important;
+  border-color: #1f2937 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 30px rgba(74, 10, 10, 0.12) !important;
+}
+
+:root[data-theme='light'] .sidebar-toggle span {
+  background: currentColor !important;
+}
+
+:root[data-theme='light'] .sidebar-backdrop {
+  background: rgba(17, 24, 39, 0.35) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+:root[data-theme='light'] .kpi-card,
+:root[data-theme='light'] .kpi-grid article,
+:root[data-theme='light'] .filters-card,
+:root[data-theme='light'] .filters-bar,
+:root[data-theme='light'] .table-card,
+:root[data-theme='light'] .chart-card,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .settings-tabs,
+:root[data-theme='light'] .settings-shell,
+:root[data-theme='light'] .activity-card,
+:root[data-theme='light'] .notifications-card,
+:root[data-theme='light'] .history-card,
+:root[data-theme='light'] .role-editor,
+:root[data-theme='light'] .role-list article,
+:root[data-theme='light'] .permissions-list,
+:root[data-theme='light'] .system-grid article,
+:root[data-theme='light'] .about-panel,
+:root[data-theme='light'] .health-strip,
+:root[data-theme='light'] .info-card,
+:root[data-theme='light'] .detail-card {
+  background: #ffffff !important;
+  border-color: #edf0e8 !important;
+  box-shadow: 0 10px 30px rgba(74, 10, 10, 0.05) !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] .kpi-card strong,
+:root[data-theme='light'] .kpi-grid article strong,
+:root[data-theme='light'] .table-header h2,
+:root[data-theme='light'] .table-card h2,
+:root[data-theme='light'] .chart-header h3,
+:root[data-theme='light'] .chart-card h3,
+:root[data-theme='light'] .settings-panel h2,
+:root[data-theme='light'] .settings-panel h3,
+:root[data-theme='light'] .role-editor h3,
+:root[data-theme='light'] .health-strip strong,
+:root[data-theme='light'] .info-card strong,
+:root[data-theme='light'] .detail-card strong {
+  color: #111827 !important;
+}
+
+:root[data-theme='light'] .kpi-card p,
+:root[data-theme='light'] .kpi-card small,
+:root[data-theme='light'] .kpi-grid article p,
+:root[data-theme='light'] .kpi-grid article small,
+:root[data-theme='light'] .health-strip span,
+:root[data-theme='light'] .info-card span,
+:root[data-theme='light'] .detail-card span {
+  color: #53667f !important;
+}
+
+:root[data-theme='light'] input,
+:root[data-theme='light'] select,
+:root[data-theme='light'] textarea,
+:root[data-theme='light'] .search-wrapper,
+:root[data-theme='light'] .search-wrapper input,
+:root[data-theme='light'] .filters-card input,
+:root[data-theme='light'] .filters-card select,
+:root[data-theme='light'] .filters-bar input,
+:root[data-theme='light'] .filters-bar select {
+  background: #ffffff !important;
+  border-color: #dfe5d6 !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] input::placeholder,
+:root[data-theme='light'] textarea::placeholder,
+:root[data-theme='light'] .search-wrapper input::placeholder {
+  color: #8a98aa !important;
+}
+
+:root[data-theme='light'] .search-wrapper span,
+:root[data-theme='light'] .search-icon {
+  color: #4f83b8 !important;
+}
+
+:root[data-theme='light'] .primary-button,
+:root[data-theme='light'] .primary-action,
+:root[data-theme='light'] .save-button,
+:root[data-theme='light'] .mark-button,
+:root[data-theme='light'] .apply-button,
+:root[data-theme='light'] .new-button {
+  background: #5f8f22 !important;
+  border-color: #5f8f22 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(95, 143, 34, 0.18) !important;
+}
+
+:root[data-theme='light'] .secondary-button,
+:root[data-theme='light'] .reset-button,
+:root[data-theme='light'] .cancel-button,
+:root[data-theme='light'] .export-button,
+:root[data-theme='light'] .draft-button,
+:root[data-theme='light'] .actions button,
+:root[data-theme='light'] .button-row button,
+:root[data-theme='light'] .drawer-tabs button,
+:root[data-theme='light'] .choice-row button {
+  background: #ffffff !important;
+  border-color: #dfe5d6 !important;
+  color: #4a0a0a !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme='light'] .tabs button.active,
+:root[data-theme='light'] .settings-tabs button.active,
+:root[data-theme='light'] .drawer-tabs button.active,
+:root[data-theme='light'] .choice-row button.active {
+  background: #e3edcf !important;
+  border-color: #c7d9a8 !important;
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .danger-button,
+:root[data-theme='light'] .danger-light {
+  background: #ffe2e2 !important;
+  border-color: #f5c1c1 !important;
+  color: #c71219 !important;
+}
+
+:root[data-theme='light'] .table-card thead,
+:root[data-theme='light'] .table-wrapper thead,
+:root[data-theme='light'] .table-card th,
+:root[data-theme='light'] .table-wrapper th {
+  background: #f4f6f0 !important;
+  color: #53667f !important;
+}
+
+:root[data-theme='light'] .table-card td,
+:root[data-theme='light'] .table-wrapper td {
+  border-color: #edf0e8 !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] .table-card tbody tr,
+:root[data-theme='light'] .table-wrapper tbody tr {
+  background: #ffffff !important;
+}
+
+:root[data-theme='light'] .table-card tbody tr:hover,
+:root[data-theme='light'] .table-wrapper tbody tr:hover {
+  background: #fbfcf8 !important;
+}
+
+:root[data-theme='light'] .drawer,
+:root[data-theme='light'] .modal-card,
+:root[data-theme='light'] .adjust-card {
+  background: #ffffff !important;
+  border-color: #edf0e8 !important;
+  box-shadow: 0 24px 70px rgba(17, 24, 39, 0.18) !important;
+  color: #4a0a0a !important;
+}
+
+:root[data-theme='light'] .drawer-overlay,
+:root[data-theme='light'] .modal-overlay {
+  background: rgba(17, 24, 39, 0.35) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+:root[data-theme='light'] .drawer-header,
+:root[data-theme='light'] .drawer-footer,
+:root[data-theme='light'] .modal-header,
+:root[data-theme='light'] .modal-footer {
+  border-color: #edf0e8 !important;
+}
+
+:root[data-theme='light'] .drawer h2,
+:root[data-theme='light'] .drawer h3,
+:root[data-theme='light'] .modal-card h2,
+:root[data-theme='light'] .modal-card h3,
+:root[data-theme='light'] .adjust-card h2,
+:root[data-theme='light'] .adjust-card h3 {
+  color: #111827 !important;
+}
+
+:root[data-theme='light'] .chip,
+:root[data-theme='light'] .tag,
+:root[data-theme='light'] .badge,
+:root[data-theme='light'] .status-available,
+:root[data-theme='light'] .healthy,
+:root[data-theme='light'] .accepted,
+:root[data-theme='light'] .intervention,
+:root[data-theme='light'] .status-planned,
+:root[data-theme='light'] .status-completed,
+:root[data-theme='light'] .deadline-green {
+  background: #edf5de !important;
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .status-warning,
+:root[data-theme='light'] .maintenance,
+:root[data-theme='light'] .high,
+:root[data-theme='light'] .info,
+:root[data-theme='light'] .deadline-orange {
+  background: #fff0df !important;
+  color: #ff6a00 !important;
+}
+
+:root[data-theme='light'] .status-danger,
+:root[data-theme='light'] .broken,
+:root[data-theme='light'] .critical,
+:root[data-theme='light'] .rejected,
+:root[data-theme='light'] .result.failed,
+:root[data-theme='light'] .deadline-red {
+  background: #ffe2e2 !important;
+  color: #e31e24 !important;
+}
+
+:root[data-theme='light'] .medium,
+:root[data-theme='light'] .pending,
+:root[data-theme='light'] .status-pending,
+:root[data-theme='light'] .draft {
+  background: #fff4cf !important;
+  color: #ad7a00 !important;
+}
+
+:root[data-theme='light'] .low,
+:root[data-theme='light'] .result.success {
+  background: #edf5de !important;
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .text-green {
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .text-orange {
+  color: #ff6a00 !important;
+}
+
+:root[data-theme='light'] .text-red {
+  color: #e31e24 !important;
+}
+
+:root[data-theme='light'] .text-yellow {
+  color: #ad7a00 !important;
+}
+
+:root[data-theme='light'] .kpi-icon,
+:root[data-theme='light'] .icon-box,
+:root[data-theme='light'] .logo-box,
+:root[data-theme='light'] .brand-mark {
+  background: #e3edcf !important;
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .kpi-icon--orange,
+:root[data-theme='light'] .icon-box--orange {
+  background: #fff0df !important;
+  color: #ff6a00 !important;
+}
+
+:root[data-theme='light'] .kpi-icon--red,
+:root[data-theme='light'] .icon-box--red {
+  background: #ffe2e2 !important;
+  color: #e31e24 !important;
+}
+
+:root[data-theme='light'] .kpi-icon--yellow,
+:root[data-theme='light'] .icon-box--yellow {
+  background: #fff4cf !important;
+  color: #ad7a00 !important;
+}
+
+:root[data-theme='light'] .chart-badge,
+:root[data-theme='light'] .live-badge,
+:root[data-theme='light'] .year-badge {
+  background: #e3edcf !important;
+  color: #5f8f22 !important;
+}
+
+:root[data-theme='light'] .progress-track,
+:root[data-theme='light'] .availability-track {
+  background: #dfe5d6 !important;
+}
+
+:root[data-theme='light'] .apexcharts-text,
+:root[data-theme='light'] .apexcharts-legend-text,
+:root[data-theme='light'] .apexcharts-xaxis text,
+:root[data-theme='light'] .apexcharts-yaxis text {
+  fill: #53667f !important;
+  color: #53667f !important;
+}
