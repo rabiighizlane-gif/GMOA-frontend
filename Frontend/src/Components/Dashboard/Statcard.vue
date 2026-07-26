@@ -6,7 +6,13 @@
       <p class="text-[10px] mt-1 font-medium" :class="subTitleClass">{{ subTitle }}</p>
     </div>
     <div class="text-2xl p-2.5 rounded-lg" :class="iconBgClass">
-      {{ icon }}
+      <component
+        :is="iconComponent"
+        v-if="iconComponent"
+        :class="iconClass"
+        aria-hidden="true"
+      />
+      <span v-else>{{ icon }}</span>
     </div>
   </div>
 </template>
@@ -17,6 +23,8 @@ defineProps({
   value: [String, Number],
   subTitle: String,
   icon: String,
+  iconComponent: [Object, Function],
+  iconClass: { type: String, default: 'h-6 w-6 text-slate-700' },
   valueClass: { type: String, default: 'text-slate-800' },
   subTitleClass: { type: String, default: 'text-slate-500' },
   iconBgClass: { type: String, default: 'bg-slate-50' }

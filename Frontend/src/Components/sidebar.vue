@@ -27,8 +27,8 @@
       </div>
 
       <div class="profile-copy">
-        <h2>{{ displayUserName }}</h2>
-        <p>{{ displayUserRole }}</p>
+        <h2>{{ isProfileLoading ? 'Chargement...' : displayUserName }}</h2>
+        <p>{{ profileError || displayUserRole }}</p>
       </div>
     </div>
 
@@ -110,11 +110,14 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import AppBrand from '@/Components/AppBrand.vue'
 import { useLanguageStore } from '@/stores/language'
+import { getProfile } from '@/services/authService.js'
 
 const route = useRoute()
 const languageStore = useLanguageStore()
 const storedUser = ref(localStorage.getItem('user'))
 const imageLoadFailed = ref(false)
+const isProfileLoading = ref(false)
+const profileError = ref('')
 const language = computed(() => languageStore.language)
 
 const sidebarContent = {
@@ -200,10 +203,16 @@ const emit = defineEmits(['close'])
 const defaultUser = {
   id: null,
   fullName: 'Utilisateur',
+  first_name: '',
+  last_name: '',
   role: '',
+  profile_image_url: '',
   profile_image: '',
   profileImage: '',
 }
+
+const fallbackProfileImage =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Crect width="96" height="96" rx="48" fill="%23f8fafc"/%3E%3Ccircle cx="48" cy="36" r="16" fill="%23b8cc4c"/%3E%3Cpath d="M20 82c5-18 16-27 28-27s23 9 28 27" fill="%23d7ec78"/%3E%3C/svg%3E'
 
 const defaultImagesByRole = {
   superadmin: '/profiles/admin-default.png',
@@ -219,11 +228,16 @@ const user = computed(() => {
 
   try {
     const parsedUser = JSON.parse(storedUser.value)
+    const fullName =
+      parsedUser.fullName ||
+      parsedUser.full_name ||
+      [parsedUser.first_name, parsedUser.last_name].filter(Boolean).join(' ') ||
+      defaultUser.fullName
 
     return {
       ...defaultUser,
       ...parsedUser,
-      fullName: parsedUser.fullName || parsedUser.full_name || defaultUser.fullName,
+      fullName,
     }
   } catch {
     return defaultUser
@@ -287,9 +301,9 @@ const roleDefaultImage = computed(() => {
 })
 
 const profileImage = computed(() => {
-  if (imageLoadFailed.value) return ''
+  if (imageLoadFailed.value) return fallbackProfileImage
 
-  return user.value.profile_image || user.value.profileImage || roleDefaultImage.value
+  return user.value.profile_image_url || roleDefaultImage.value || fallbackProfileImage
 })
 
 const initials = computed(() => {
@@ -318,8 +332,23 @@ function handleImageError() {
   imageLoadFailed.value = true
 }
 
+async function loadAuthenticatedProfile() {
+  if (!localStorage.getItem('token')) return
+
+  isProfileLoading.value = true
+  profileError.value = ''
+
+  try {
+    await getProfile()
+  } catch (error) {
+    profileError.value = error.message
+  } finally {
+    isProfileLoading.value = false
+  }
+}
+
 watch(
-  () => user.value.profile_image || user.value.profileImage || roleDefaultImage.value,
+  () => user.value.profile_image_url || roleDefaultImage.value,
   () => {
     imageLoadFailed.value = false
   },
@@ -327,6 +356,7 @@ watch(
 
 onMounted(() => {
   syncUserFromStorage()
+  loadAuthenticatedProfile()
   window.addEventListener('storage', syncUserFromStorage)
 })
 

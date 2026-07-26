@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="table-wrapper">
-      <table>
+      <table :style="{ minWidth: tableMinWidth }">
         <thead>
           <tr>
             <th v-for="column in columns" :key="column.key">
@@ -19,21 +19,22 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="machine in paginatedMachines" :key="machine.id" :class="{ critical: machine.criticality === 'Critique' }">
+          <tr v-for="machine in paginatedMachines" :key="machine.id" :class="{ critical: isFieldEnabled('criticality') && machine.criticality === 'Critique' }">
             <td class="id-cell">{{ machine.id }}</td>
             <td>
               <div class="machine-cell">
-                <img class="machine-photo" :src="machine.imageUrl || fallbackImage" :alt="displayMachineName(machine.name)" />
-                <div><strong>{{ displayMachineName(machine.name) }}</strong><small>{{ displayCategory(machine.category) }}</small></div>
+                <img v-if="isFieldEnabled('image_url') && machine.imageUrl" class="machine-photo" :src="machine.imageUrl" :alt="displayMachineName(machine.name)" />
+                <div><strong>{{ displayMachineName(machine.name) }}</strong><small dir="ltr">{{ machine.code || content.unavailableValue }}</small></div>
               </div>
             </td>
             <td>{{ displayLine(machine.line) }}</td>
-            <td><span class="category-badge">{{ displayCategory(machine.category) }}</span></td>
+            <td><span class="category-badge">{{ displayCategory(machine.periodicity) }}</span></td>
+            <td v-if="isFieldEnabled('category')">{{ displayValue(machine.category) }}</td>
             <td><MachineStatusBadge :status="machine.status" /></td>
-            <td><MachineCriticalityBadge :criticality="machine.criticality" /></td>
-            <td>{{ machine.lastMaintenance }}</td>
-            <td>{{ displayDateText(machine.nextMaintenance) }}</td>
-            <td><AvailabilityProgressBar :value="machine.availability" /></td>
+            <td v-if="isFieldEnabled('criticality')"><MachineCriticalityBadge :criticality="machine.criticality" /></td>
+            <td v-if="isFieldEnabled('last_maintenance')">{{ displayValue(machine.lastMaintenance) }}</td>
+            <td v-if="isFieldEnabled('next_maintenance')">{{ displayDateText(machine.nextMaintenance) }}</td>
+            <td v-if="isFieldEnabled('availability')"><AvailabilityProgressBar :value="machine.availability" /></td>
             <td>
               <div class="actions">
                 <button type="button" :title="content.view" @click="$emit('view', machine)">&#8981;</button>
@@ -52,7 +53,7 @@
             </td>
           </tr>
           <tr v-if="paginatedMachines.length === 0">
-            <td colspan="10" class="empty-state">
+            <td :colspan="columns.length" class="empty-state">
               <strong>{{ content.emptyTitle }}</strong>
               <p>{{ content.emptyText }}</p>
             </td>
@@ -76,84 +77,32 @@ import { computed, ref, watch } from 'vue'
 import AvailabilityProgressBar from '@/Components/Machines/AvailabilityProgressBar.vue'
 import MachineCriticalityBadge from '@/Components/Machines/MachineCriticalityBadge.vue'
 import MachineStatusBadge from '@/Components/Machines/MachineStatusBadge.vue'
-import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   machines: { type: Array, default: () => [] },
   content: { type: Object, required: true },
+  enabledOptionalFields: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['view', 'edit', 'intervention', 'plan', 'breakdown', 'history', 'delete'])
-const languageStore = useLanguageStore()
-const language = computed(() => languageStore.language)
-const fallbackImage = '/documents/machines/common/photo-zone-machine.svg'
-
-const translatedValues = {
-  EN: {
-    categories: {
-      Mecanique: 'Mechanical',
-      Hydraulique: 'Hydraulic',
-      Conditionnement: 'Packaging',
-      Pneumatique: 'Pneumatic',
-      Electrique: 'Electrical',
-    },
-    lines: {
-      'Ligne Production 1': 'Production Line 1',
-      'Ligne Production 2': 'Production Line 2',
-      'Ligne Conditionnement': 'Packaging Line',
-      'Ligne Utilites': 'Utilities Line',
-    },
-    dates: {
-      "Aujourd'hui": 'Today',
-      'En retard de 2 jours': '2 days overdue',
-    },
-    names: {
-      "Tour d'usinage": 'Machining lathe',
-      'Presse hydraulique': 'Hydraulic press',
-      'Convoyeur a bande': 'Belt conveyor',
-      "Compresseur d'air": 'Air compressor',
-      'Etiqueteuse automatique': 'Automatic labeler',
-    },
-  },
-  AR: {
-    categories: {
-      Mecanique: '\u0645\u064a\u0643\u0627\u0646\u064a\u0643\u064a\u0629',
-      Hydraulique: '\u0647\u064a\u062f\u0631\u0648\u0644\u064a\u0643\u064a\u0629',
-      Conditionnement: '\u0627\u0644\u062a\u0639\u0628\u0626\u0629',
-      Pneumatique: '\u0647\u0648\u0627\u0626\u064a\u0629',
-      Electrique: '\u0643\u0647\u0631\u0628\u0627\u0626\u064a\u0629',
-    },
-    lines: {
-      'Ligne Production 1': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 1',
-      'Ligne Production 2': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 2',
-      'Ligne Conditionnement': '\u062e\u0637 \u0627\u0644\u062a\u0639\u0628\u0626\u0629',
-      'Ligne Utilites': '\u062e\u0637 \u0627\u0644\u0645\u0631\u0627\u0641\u0642',
-    },
-    dates: {
-      "Aujourd'hui": '\u0627\u0644\u064a\u0648\u0645',
-      'En retard de 2 jours': '\u0645\u062a\u0623\u062e\u0631\u0629 \u0628\u064a\u0648\u0645\u064a\u0646',
-    },
-    names: {
-      "Tour d'usinage": '\u0645\u062e\u0631\u0637\u0629 \u062a\u0635\u0646\u064a\u0639',
-      'Presse hydraulique': '\u0645\u0643\u0628\u0633 \u0647\u064a\u062f\u0631\u0648\u0644\u064a\u0643\u064a',
-      'Convoyeur a bande': '\u0646\u0627\u0642\u0644 \u0628\u0627\u0644\u062d\u0632\u0627\u0645',
-      "Compresseur d'air": '\u0636\u0627\u063a\u0637 \u0647\u0648\u0627\u0621',
-      'Etiqueteuse automatique': '\u0622\u0644\u0629 \u0648\u0633\u0645 \u0623\u0648\u062a\u0648\u0645\u0627\u062a\u064a\u0643\u064a\u0629',
-    },
-  },
-}
 
 const columns = computed(() => [
   { key: 'id', label: props.content.columns.id, sortable: true },
   { key: 'name', label: props.content.columns.name, sortable: true },
   { key: 'line', label: props.content.columns.line, sortable: true },
-  { key: 'category', label: props.content.columns.category, sortable: true },
+  { key: 'periodicity', label: props.content.columns.periodicity, sortable: true },
+  ...optionalColumns.value.filter((column) => column.key === 'category'),
   { key: 'status', label: props.content.columns.status, sortable: true },
-  { key: 'criticality', label: props.content.columns.criticality, sortable: true },
-  { key: 'lastMaintenance', label: props.content.columns.lastMaintenance, sortable: true },
-  { key: 'nextMaintenance', label: props.content.columns.nextMaintenance, sortable: true },
-  { key: 'availability', label: props.content.columns.availability, sortable: true },
+  ...optionalColumns.value.filter((column) => column.key !== 'category'),
   { key: 'actions', label: props.content.columns.actions, sortable: false },
 ])
+const optionalColumns = computed(() => [
+  { key: 'category', label: props.content.columns.category, sortable: true },
+  { key: 'criticality', label: props.content.columns.criticality, sortable: true },
+  { key: 'lastMaintenance', fieldKey: 'last_maintenance', label: props.content.columns.lastMaintenance, sortable: true },
+  { key: 'nextMaintenance', fieldKey: 'next_maintenance', label: props.content.columns.nextMaintenance, sortable: true },
+  { key: 'availability', label: props.content.columns.availability, sortable: true },
+].filter((column) => isFieldEnabled(column.fieldKey || column.key)))
+const tableMinWidth = computed(() => `${Math.max(980, columns.value.length * 132)}px`)
 const currentPage = ref(1)
 const itemsPerPage = 4
 const sortKey = ref('id')
@@ -177,10 +126,12 @@ function previousPage() { if (currentPage.value > 1) currentPage.value -= 1 }
 function nextPage() { if (currentPage.value < totalPages.value) currentPage.value += 1 }
 function toggleMenu(id) { openMenuId.value = openMenuId.value === id ? '' : id }
 function selectAction(action, machine) { openMenuId.value = ''; emit(action, machine) }
-function displayCategory(category) { return translatedValues[language.value]?.categories?.[category] || category }
-function displayLine(line) { return translatedValues[language.value]?.lines?.[line] || line }
-function displayDateText(value) { return translatedValues[language.value]?.dates?.[value] || value }
-function displayMachineName(name) { return translatedValues[language.value]?.names?.[name] || name }
+function displayCategory(category) { return category || props.content.unavailableValue }
+function displayLine(line) { return line || props.content.unavailableValue }
+function displayDateText(value) { return value || props.content.unavailableValue }
+function displayMachineName(name) { return name || props.content.unavailableValue }
+function displayValue(value) { return value ?? props.content.unavailableValue }
+function isFieldEnabled(fieldKey) { return props.enabledOptionalFields.includes(fieldKey) }
 </script>
 
 <style scoped>
@@ -189,7 +140,7 @@ function displayMachineName(name) { return translatedValues[language.value]?.nam
 .table-header h2 { margin: 0; color: #f8fbff; font-size: 17px; }
 .table-header p { margin: 5px 0 0; color: #8d9aab; font-size: 11px; }
 .table-wrapper { overflow-x: auto; }
-table { width: 100%; min-width: 1380px; border-collapse: collapse; }
+table { width: 100%; border-collapse: collapse; }
 thead { background: rgba(43, 55, 68, 0.72); }
 th, td { padding: 14px 15px; border-top: 1px solid rgba(116, 135, 158, 0.15); text-align: left; vertical-align: middle; }
 [dir='rtl'] th, [dir='rtl'] td { text-align: right; }
@@ -200,7 +151,7 @@ tbody tr { transition: 0.2s ease; }
 tbody tr:hover { background: rgba(35, 49, 64, 0.92); }
 tbody tr.critical { box-shadow: inset 4px 0 #e31e24; }
 .id-cell { font-weight: 900; }
-.machine-cell { display: flex; align-items: center; gap: 10px; }
+.machine-cell { display: flex; align-items: center; gap: 10px; min-height: 46px; }
 .machine-cell strong, .machine-cell small { display: block; }
 .machine-cell strong { color: #f8fbff; }
 .machine-cell small { margin-top: 4px; color: #8d9aab; font-size: 10px; }

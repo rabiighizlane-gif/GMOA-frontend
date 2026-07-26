@@ -22,6 +22,7 @@
 
     <section class="profile-page">
       <AdminTopControls v-model="profileSearch" class="profile-top-controls" />
+      <p v-if="profileError" class="security-message">{{ profileError }}</p>
 
       <article class="profile-card">
         <div class="profile-info">
@@ -50,7 +51,7 @@
           <div class="photo-frame">
             <img :src="profile.image" :alt="profile.name" @error="useFallbackImage" />
           </div>
-          <h1>{{ profile.name }}</h1>
+          <h1>{{ isProfileLoading ? 'Chargement...' : profile.name }}</h1>
           <p>{{ profile.role }}</p>
           <div class="status-line">
             <span aria-hidden="true"></span>
@@ -358,6 +359,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import AdminTopControls from '@/Components/AdminTopControls.vue'
 import Sidebar from '@/Components/sidebar.vue'
 import { useLanguageStore } from '@/stores/language'
+import api, { getProfile } from '@/services/authService.js'
 
 const languageStore = useLanguageStore()
 const isSidebarOpen = ref(false)
@@ -372,6 +374,8 @@ const isPreferencesEditing = ref(false)
 const showAllActivity = ref(false)
 const profileSearch = ref('')
 const imageLoadFailed = ref(false)
+const isProfileLoading = ref(false)
+const profileError = ref('')
 const storedUser = ref(loadStoredUser())
 const preferenceSettings = ref(loadPreferenceSettings())
 const editForm = ref({
@@ -576,6 +580,8 @@ const content = computed(() => ({
 
 const defaultUser = {
   fullName: 'Ghizlane Rabii',
+  first_name: 'Ghizlane',
+  last_name: 'Rabii',
   role: 'Super Administratrice',
   email: 'ghizlane@smartcalyx.ma',
   phone: '+212 6 12 34 56 78',
@@ -584,6 +590,9 @@ const defaultUser = {
   timezone: 'GMT+1 (Europe/Casablanca)',
   profile_image: '/Profiles/ghizlane.png',
 }
+
+const fallbackProfileImage =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120"%3E%3Crect width="160" height="120" rx="14" fill="%23f8fafc"/%3E%3Ccircle cx="80" cy="45" r="22" fill="%23b8cc4c"/%3E%3Cpath d="M36 112c8-30 25-45 44-45s36 15 44 45" fill="%23d7ec78"/%3E%3C/svg%3E'
 
 function loadStoredUser() {
   try {
@@ -663,9 +672,16 @@ const defaultDisplayName = computed(() =>
 
 const profile = computed(() => {
   const user = storedUser.value
+  const fullName =
+    user.fullName ||
+    user.full_name ||
+    [user.first_name, user.last_name].filter(Boolean).join(' ') ||
+    defaultDisplayName.value
 
   return {
-    name: formatName(user.fullName || user.full_name || defaultDisplayName.value),
+    name: formatName(fullName),
+    first_name: user.first_name || defaultUser.first_name,
+    last_name: user.last_name || defaultUser.last_name,
     role: formatRole(user.role || 'superadmin') || defaultUser.role,
     email: user.email || defaultUser.email,
     phone: user.phone || user.phoneNumber || defaultUser.phone,
@@ -673,8 +689,8 @@ const profile = computed(() => {
     language: getLanguageLabel(language.value),
     timezone: formatTimezone(user.timezone || defaultUser.timezone),
     image: imageLoadFailed.value
-      ? defaultUser.profile_image
-      : user.profile_image || user.profileImage || defaultUser.profile_image,
+      ? fallbackProfileImage
+      : user.profile_image_url || fallbackProfileImage,
   }
 })
 
@@ -778,6 +794,8 @@ const notificationPreferences = computed(() => [
 ])
 
 const professionalItems = computed(() => [
+  { label: pickText({ FR: 'Prenom', EN: 'First name', AR: 'الاسم الشخصي' }), value: profile.value.first_name },
+  { label: pickText({ FR: 'Nom', EN: 'Last name', AR: 'الاسم العائلي' }), value: profile.value.last_name },
   { label: pickText({ FR: 'Fonction', EN: 'Position', AR: 'الوظيفة' }), value: profile.value.role },
   {
     label: pickText({ FR: 'Département', EN: 'Department', AR: 'القسم' }),
@@ -997,6 +1015,7 @@ watch(language, (nextLanguage) => {
 
 onMounted(() => {
   updateDocumentTitle()
+  fetchProfile()
 })
 
 function updateDocumentTitle() {
@@ -1167,6 +1186,49 @@ function toggleAllActivity() {
   showAllActivity.value = !showAllActivity.value
 }
 
+const user = ref({});
+const isModalOpen = ref(false);
+const formData = ref({
+  first_name: '',
+  last_name: '',
+  phone_number: ''
+});
+
+const fetchProfile = async () => {
+  if (!localStorage.getItem('token')) return
+
+  isProfileLoading.value = true
+  profileError.value = ''
+
+  try {
+    const profileUser = await getProfile();
+    user.value = profileUser;
+    storedUser.value = profileUser;
+    
+    // Remplir le formulaire avec les données actuelles
+    formData.value = {
+      first_name: user.value.first_name || '',
+      last_name: user.value.last_name || '',
+      phone_number: user.value.phone_number || ''
+    };
+  } catch (error) {
+    profileError.value = error.message;
+  } finally {
+    isProfileLoading.value = false;
+  }
+};
+
+// 2. Modifier le profil (Form Submit)
+const handleUpdateProfile = async () => {
+  try {
+    await api.put('/auth/profile', formData.value);
+    alert('Profil mis à jour avec succès !');
+    isModalOpen.value = false; // Fermer le modal
+    fetchProfile(); // Recharger les données dyal PostgreSQL
+  } catch (error) {
+    alert('Erreur lors de la mise à jour');
+  }
+};
 </script>
 
 <style scoped>

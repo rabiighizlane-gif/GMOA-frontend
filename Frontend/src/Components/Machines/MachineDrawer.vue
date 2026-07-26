@@ -18,34 +18,35 @@
           </nav>
 
           <div v-if="machine" class="drawer-body">
-            <img class="machine-cover" :src="machine.imageUrl || fallbackImage" :alt="displayMachineName(machine.name)" />
+            <img v-if="isFieldEnabled('image_url') && machine.imageUrl" class="machine-cover" :src="machine.imageUrl" :alt="displayMachineName(machine.name)" />
 
             <section v-if="activeTab === 'info'">
               <h3>{{ content.info }}</h3>
               <div class="details-grid">
                 <div><span>{{ content.machineId }}</span><strong dir="ltr">{{ machine.id }}</strong></div>
                 <div><span>{{ content.name }}</span><strong>{{ displayMachineName(machine.name) }}</strong></div>
-                <div><span>{{ content.category }}</span><strong>{{ translate('categories', machine.category) }}</strong></div>
+                <div><span>{{ content.frequency }}</span><strong>{{ displayValue(translate('frequencies', machine.periodicity)) }}</strong></div>
+                <div v-if="isFieldEnabled('category')"><span>{{ content.category }}</span><strong>{{ displayValue(translate('categories', machine.category)) }}</strong></div>
                 <div><span>{{ content.line }}</span><strong>{{ translate('lines', machine.line) }}</strong></div>
                 <div><span>{{ content.manufacturer }}</span><strong dir="ltr">{{ machine.manufacturer }}</strong></div>
                 <div><span>{{ content.model }}</span><strong dir="ltr">{{ machine.model }}</strong></div>
                 <div><span>{{ content.serial }}</span><strong dir="ltr">{{ machine.serialNumber }}</strong></div>
                 <div><span>{{ content.commissioning }}</span><strong dir="ltr">{{ machine.commissioningDate }}</strong></div>
                 <div><span>{{ content.location }}</span><strong>{{ translate('locations', machine.location) }}</strong></div>
-                <div><span>{{ content.criticality }}</span><MachineCriticalityBadge :criticality="machine.criticality" /></div>
+                <div v-if="isFieldEnabled('criticality')"><span>{{ content.criticality }}</span><MachineCriticalityBadge :criticality="machine.criticality" /></div>
                 <div><span>{{ content.currentStatus }}</span><MachineStatusBadge :status="machine.status" /></div>
               </div>
             </section>
 
-            <section v-if="activeTab === 'performance'">
+            <section v-if="activeTab === 'performance' && hasPerformanceFields">
               <h3>{{ content.performance }}</h3>
               <div class="details-grid">
-                <div><span>{{ content.availability }}</span><strong dir="ltr">{{ machine.availability }} %</strong></div>
-                <div><span>MTBF</span><strong dir="ltr">{{ machine.mtbf }}</strong></div>
-                <div><span>MTTR</span><strong dir="ltr">{{ machine.mttr }}</strong></div>
-                <div><span>{{ content.breakdownsMonth }}</span><strong>{{ machine.breakdownCount }}</strong></div>
-                <div><span>{{ content.interventions }}</span><strong>{{ machine.interventionCount }}</strong></div>
-                <div><span>{{ content.downtime }}</span><strong dir="ltr">{{ machine.downtime }}</strong></div>
+                <div v-if="isFieldEnabled('availability')"><span>{{ content.availability }}</span><strong dir="ltr">{{ displayAvailability(machine.availability) }}</strong></div>
+                <div><span>MTBF</span><strong dir="ltr">{{ displayValue(machine.mtbf) }}</strong></div>
+                <div><span>MTTR</span><strong dir="ltr">{{ displayValue(machine.mttr) }}</strong></div>
+                <div><span>{{ content.breakdownsMonth }}</span><strong>{{ displayValue(machine.breakdownCount) }}</strong></div>
+                <div><span>{{ content.interventions }}</span><strong>{{ displayValue(machine.interventionCount) }}</strong></div>
+                <div><span>{{ content.downtime }}</span><strong dir="ltr">{{ displayValue(machine.downtime) }}</strong></div>
               </div>
             </section>
 
@@ -55,17 +56,18 @@
                 <strong><span dir="ltr">{{ item.id }}</span> - {{ translate('interventionTypes', item.type) }}</strong>
                 <span>{{ translate('names', item.technician) }} - <bdi dir="ltr">{{ item.date }}</bdi> - {{ translate('statuses', item.status) }}</span>
               </div>
+              <p v-if="!machine.interventions?.length" class="empty-text">{{ content.unavailableData }}</p>
             </section>
 
             <section v-if="activeTab === 'preventive'">
               <h3>{{ content.preventive }}</h3>
               <div class="details-grid">
-                <div><span>{{ content.activePlan }}</span><strong>{{ translate('plans', machine.preventive.plan) }}</strong></div>
-                <div><span>{{ content.frequency }}</span><strong>{{ translate('frequencies', machine.preventive.frequency) }}</strong></div>
-                <div><span>{{ content.lastDone }}</span><strong dir="ltr">{{ machine.preventive.last }}</strong></div>
-                <div><span>{{ content.nextDue }}</span><strong dir="ltr">{{ machine.preventive.next }}</strong></div>
-                <div><span>{{ content.owner }}</span><strong>{{ translate('names', machine.preventive.owner) }}</strong></div>
-                <div><span>{{ content.status }}</span><strong>{{ translate('statuses', machine.preventive.status) }}</strong></div>
+                <div><span>{{ content.activePlan }}</span><strong>{{ displayValue(translate('plans', machine.preventive?.plan)) }}</strong></div>
+                <div><span>{{ content.frequency }}</span><strong>{{ displayValue(translate('frequencies', machine.preventive?.frequency)) }}</strong></div>
+                <div><span>{{ content.lastDone }}</span><strong dir="ltr">{{ displayValue(machine.preventive?.last) }}</strong></div>
+                <div><span>{{ content.nextDue }}</span><strong dir="ltr">{{ displayValue(machine.preventive?.next) }}</strong></div>
+                <div><span>{{ content.owner }}</span><strong>{{ displayValue(translate('names', machine.preventive?.owner)) }}</strong></div>
+                <div><span>{{ content.status }}</span><strong>{{ displayValue(translate('statuses', machine.preventive?.status)) }}</strong></div>
               </div>
             </section>
 
@@ -75,6 +77,7 @@
                 <strong><span dir="ltr">{{ item.date }}</span> - {{ translate('breakdownTypes', item.type) }}</strong>
                 <span>{{ translate('descriptions', item.description) }} - <bdi dir="ltr">{{ item.downtime }}</bdi> - {{ translate('statuses', item.status) }}</span>
               </div>
+              <p v-if="!machine.breakdowns?.length" class="empty-text">{{ content.unavailableData }}</p>
             </section>
 
             <section v-if="activeTab === 'parts'">
@@ -83,11 +86,13 @@
                 <strong><span dir="ltr">{{ part.reference }}</span> - {{ translate('partsNames', part.name) }}</strong>
                 <span>{{ content.stock }} <bdi dir="ltr">{{ part.stock }}</bdi> - {{ translate('availability', part.availability) }}</span>
               </div>
+              <p v-if="!machine.parts?.length" class="empty-text">{{ content.unavailableData }}</p>
             </section>
 
             <section v-if="activeTab === 'documents'">
               <h3>{{ content.documents }}</h3>
               <button v-for="document in documents" :key="document" type="button" class="document-row">{{ document }}</button>
+              <p v-if="!documents.length" class="empty-text">{{ content.unavailableData }}</p>
             </section>
           </div>
 
@@ -109,14 +114,17 @@ import MachineCriticalityBadge from '@/Components/Machines/MachineCriticalityBad
 import MachineStatusBadge from '@/Components/Machines/MachineStatusBadge.vue'
 import { useLanguageStore } from '@/stores/language'
 
-defineProps({ open: Boolean, machine: { type: Object, default: null } })
+const props = defineProps({
+  open: Boolean,
+  machine: { type: Object, default: null },
+  enabledOptionalFields: { type: Array, default: () => [] },
+})
 defineEmits(['close', 'edit', 'intervention', 'plan'])
 
 const languageStore = useLanguageStore()
 const language = computed(() => languageStore.language)
 const pageDirection = computed(() => (language.value === 'AR' ? 'rtl' : 'ltr'))
 const activeTab = ref('info')
-const fallbackImage = '/documents/machines/common/photo-zone-machine.svg'
 
 const labels = {
   FR: {
@@ -153,6 +161,8 @@ const labels = {
     createIntervention: 'Creer une intervention',
     planMaintenance: 'Planifier maintenance',
     print: 'Imprimer la fiche',
+    unavailableValue: '—',
+    unavailableData: 'Données indisponibles',
   },
   EN: {
     close: 'Close',
@@ -188,6 +198,8 @@ const labels = {
     createIntervention: 'Create intervention',
     planMaintenance: 'Plan maintenance',
     print: 'Print sheet',
+    unavailableValue: '—',
+    unavailableData: 'Data unavailable',
   },
   AR: {
     close: 'إغلاق',
@@ -223,61 +235,14 @@ const labels = {
     createIntervention: 'إنشاء تدخل',
     planMaintenance: 'برمجة صيانة',
     print: 'طباعة البطاقة',
+    unavailableValue: '—',
+    unavailableData: 'البيانات غير متوفرة',
   },
 }
 
 const dictionaries = {
-  EN: {
-    names: {},
-    categories: { Mecanique: 'Mechanical', Hydraulique: 'Hydraulic', Electrique: 'Electrical', Pneumatique: 'Pneumatic', Conditionnement: 'Packaging', Utilites: 'Utilities' },
-    lines: { 'Ligne Production 1': 'Production line 1', 'Ligne Production 2': 'Production line 2', 'Ligne Conditionnement': 'Packaging line', 'Ligne Utilites': 'Utilities line' },
-    locations: { 'Atelier A': 'Workshop A', 'Atelier B': 'Workshop B', 'Local technique': 'Technical room' },
-    statuses: { 'En service': 'In service', 'En maintenance': 'Under maintenance', 'En panne': 'Down', 'Hors service': 'Out of service', Arretee: 'Stopped', Terminee: 'Completed', 'En cours': 'In progress', Planifie: 'Planned', Planifiee: 'Planned', Resolue: 'Resolved', 'A venir': 'Upcoming', 'En retard': 'Late' },
-    interventionTypes: { Corrective: 'Corrective', Preventive: 'Preventive' },
-    breakdownTypes: { Electrique: 'Electrical', Mecanique: 'Mechanical', Pneumatique: 'Pneumatic', 'Arret automatique': 'Automatic stop' },
-    descriptions: { 'Controle requis': 'Inspection required' },
-    frequencies: { Mensuelle: 'Monthly', Hebdomadaire: 'Weekly', Trimestrielle: 'Quarterly' },
-    plans: { 'Controle mensuel': 'Monthly inspection' },
-    partsNames: {},
-    availability: { Disponible: 'Available', 'Stock faible': 'Low stock', Rupture: 'Out of stock' },
-  },
-  AR: {
-    names: { Sara: 'سارة', Karim: 'كريم', Nabil: 'نبيل', Youssef: 'يوسف', Ahmed: 'أحمد' },
-    categories: { Mecanique: 'ميكانيكية', Hydraulique: 'هيدروليكية', Electrique: 'كهربائية', Pneumatique: 'هوائية', Conditionnement: 'التعبئة', Utilites: 'المرافق' },
-    lines: { 'Ligne Production 1': 'خط الإنتاج 1', 'Ligne Production 2': 'خط الإنتاج 2', 'Ligne Conditionnement': 'خط التكييف', 'Ligne Utilites': 'خط المرافق' },
-    locations: { 'Atelier A': 'الورشة A', 'Atelier B': 'الورشة B', 'Local technique': 'الغرفة التقنية' },
-    statuses: { 'En service': 'في الخدمة', 'En maintenance': 'في الصيانة', 'En panne': 'في عطل', 'Hors service': 'خارج الخدمة', Arretee: 'متوقفة', Terminee: 'منتهية', 'En cours': 'قيد الإنجاز', Planifie: 'مبرمجة', Planifiee: 'مبرمجة', Resolue: 'محلولة', 'A venir': 'قادمة', 'En retard': 'متأخرة' },
-    interventionTypes: { Corrective: 'تصحيحية', Preventive: 'وقائية' },
-    breakdownTypes: { Electrique: 'كهربائي', Mecanique: 'ميكانيكي', Pneumatique: 'هوائي', 'Arret automatique': 'توقف تلقائي' },
-    descriptions: { 'Controle requis': 'مراقبة مطلوبة' },
-    frequencies: { Mensuelle: 'شهرية', Hebdomadaire: 'أسبوعية', Trimestrielle: 'ربع سنوية' },
-    plans: { 'Controle mensuel': 'مراقبة شهرية' },
-    partsNames: { 'Filtre a huile': 'مرشح الزيت', 'Roulement SKF 6205': 'محمل SKF 6205', Courroie: 'حزام' },
-    availability: { Disponible: 'متوفر', 'Stock faible': 'مخزون منخفض', Rupture: 'نفاد المخزون' },
-  },
-}
-
-const translatedNames = {
-  EN: {
-    "Tour d'usinage": 'Machining lathe',
-    'Presse hydraulique': 'Hydraulic press',
-    'Convoyeur a bande': 'Belt conveyor',
-    "Compresseur d'air": 'Air compressor',
-    'Etiqueteuse automatique': 'Automatic labeler',
-  },
-  AR: {
-    "Tour d'usinage": 'مخرطة تصنيع',
-    'Presse hydraulique': 'مكبس هيدروليكي',
-    'Convoyeur a bande': 'ناقل بالحزام',
-    "Compresseur d'air": 'ضاغط هواء',
-    'Etiqueteuse automatique': 'آلة وسم أوتوماتيكية',
-  },
-}
-
-const documentsMap = {
-  FR: ['Fiche technique', 'Manuel constructeur', 'Photo', 'Certificat', 'Rapport de maintenance'],
-  EN: ['Technical sheet', 'Manufacturer manual', 'Photo', 'Certificate', 'Maintenance report'],
-  AR: ['الملف التقني', 'دليل المصنع', 'صورة', 'شهادة', 'تقرير الصيانة'],
+  EN: {},
+  AR: {},
 }
 
 const content = computed(() => labels[language.value] || labels.FR)
@@ -291,14 +256,27 @@ const tabs = computed(() => [
   { id: 'parts', label: content.value.parts },
   { id: 'documents', label: content.value.documents },
 ])
-const documents = computed(() => documentsMap[language.value] || documentsMap.FR)
+const documents = computed(() => (Array.isArray(props.machine?.documents) ? props.machine.documents : []))
+const hasPerformanceFields = computed(() => isFieldEnabled('availability'))
 
 function translate(group, value) {
   return dictionary.value[group]?.[value] || value || ''
 }
 
 function displayMachineName(name) {
-  return translatedNames[language.value]?.[name] || name || ''
+  return name || ''
+}
+
+function displayValue(value) {
+  return value === null || value === undefined || value === '' ? content.value.unavailableValue : value
+}
+
+function displayAvailability(value) {
+  return typeof value === 'number' && Number.isFinite(value) ? `${value} %` : content.value.unavailableValue
+}
+
+function isFieldEnabled(fieldKey) {
+  return props.enabledOptionalFields.includes(fieldKey)
 }
 </script>
 
@@ -325,6 +303,7 @@ function displayMachineName(name) {
 .list-row span { color: #53667f; font-size: 12px; }
 .document-row { display: block; width: 100%; margin-bottom: 10px; padding: 14px; color: #4a0a0a; text-align: start; font-weight: 800; cursor: pointer; }
 .document-row:hover { border-color: rgba(106,154,42,.34); color: #6a9a2a; }
+.empty-text { margin: 0 0 18px; color: #53667f; font-size: 12px; font-weight: 800; }
 .drawer-footer { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 24px; border-top: 1px solid #edf0e8; }
 .drawer-footer button { flex: 1; min-width: 130px; min-height: 44px; padding: 0 12px; border-radius: 12px; font-weight: 900; cursor: pointer; }
 .secondary-button { background: #ffffff; border: 1px solid #dfe5d6; color: #4a0a0a; }

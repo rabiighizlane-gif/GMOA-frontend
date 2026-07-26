@@ -2,12 +2,12 @@
   <Teleport to="body">
     <Transition name="drawer-fade">
       <div v-if="intervention" class="drawer-layer" @click.self="$emit('close')">
-        <aside class="drawer-panel" aria-label="Détail intervention">
+        <aside class="drawer-panel" aria-label="Detail intervention">
           <header>
             <div>
-              <span>{{ intervention.id }}</span>
+              <span>{{ intervention.code }}</span>
               <h2>{{ intervention.machine }}</h2>
-              <p>{{ intervention.description }}</p>
+              <p>{{ intervention.description || '-' }}</p>
             </div>
             <button type="button" aria-label="Fermer" @click="$emit('close')">
               <InterventionIcon name="x" />
@@ -41,43 +41,31 @@
               </span>
               <div>
                 <strong>{{ intervention.technician.name }}</strong>
-                <small>{{ intervention.technician.phone }} · {{ intervention.technician.service }}</small>
+                <small>{{ intervention.raw?.technician?.email || 'Non affecte' }}</small>
               </div>
             </div>
-
-            <h3>Diagnostic</h3>
-            <dl class="diagnostic-list">
-              <div v-for="item in diagnosticInfo" :key="item.label">
-                <dt>{{ item.label }}</dt>
-                <dd>{{ item.value }}</dd>
-              </div>
-            </dl>
           </section>
 
-          <section v-else-if="activeTab === 'Pièces'" class="drawer-content">
-            <table class="parts-table">
-              <thead>
-                <tr>
-                  <th>Pièce</th>
-                  <th>Référence</th>
-                  <th>Quantité</th>
-                  <th>État</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="part in intervention.parts" :key="part.reference">
-                  <td>{{ part.name }}</td>
-                  <td>{{ part.reference }}</td>
-                  <td>{{ part.quantity }}</td>
-                  <td>{{ part.state }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <section v-else-if="activeTab === 'Panne'" class="drawer-content">
+            <div class="info-grid">
+              <article>
+                <span>Code panne</span>
+                <strong>{{ intervention.raw?.breakdown?.code || '-' }}</strong>
+              </article>
+              <article>
+                <span>Statut panne</span>
+                <strong>{{ intervention.raw?.breakdown?.status || '-' }}</strong>
+              </article>
+              <article>
+                <span>Criticite</span>
+                <strong>{{ intervention.raw?.breakdown?.severity || '-' }}</strong>
+              </article>
+            </div>
           </section>
 
-          <section v-else-if="activeTab === 'Historique'" class="drawer-content">
+          <section v-else class="drawer-content">
             <ol class="timeline">
-              <li v-for="event in intervention.history" :key="event.label">
+              <li v-for="event in history" :key="event.label">
                 <span></span>
                 <div>
                   <strong>{{ event.label }}</strong>
@@ -86,16 +74,6 @@
                 </div>
               </li>
             </ol>
-          </section>
-
-          <section v-else class="drawer-content">
-            <div class="files-grid">
-              <article v-for="file in intervention.files" :key="file.title">
-                <span>{{ file.type }}</span>
-                <strong>{{ file.title }}</strong>
-                <small>{{ file.meta }}</small>
-              </article>
-            </div>
           </section>
         </aside>
       </div>
@@ -116,7 +94,7 @@ const props = defineProps({
 
 defineEmits(['close'])
 
-const tabs = ['Informations', 'Pièces', 'Historique', 'Fichiers']
+const tabs = ['Informations', 'Panne', 'Historique']
 const activeTab = ref('Informations')
 
 watch(
@@ -131,24 +109,37 @@ const generalInfo = computed(() => {
   return [
     { label: 'Machine', value: props.intervention.machine },
     { label: 'Ligne', value: props.intervention.line },
-    { label: 'Type intervention', value: props.intervention.type },
-    { label: 'Priorité', value: props.intervention.priority },
-    { label: 'Création', value: props.intervention.createdAt },
-    { label: 'Début', value: props.intervention.start },
+    { label: 'Zone', value: props.intervention.zone },
+    { label: 'Type intervention', value: props.intervention.typeLabel },
+    { label: 'Priorite', value: props.intervention.priorityLabel },
+    { label: 'Statut', value: props.intervention.statusLabel },
+    { label: 'Creation', value: formatDateTime(props.intervention.raw?.created_at) },
+    { label: 'Planification', value: formatDateTime(props.intervention.raw?.scheduled_at) },
+    { label: 'Debut', value: props.intervention.start },
     { label: 'Fin', value: props.intervention.end },
-    { label: 'Durée', value: props.intervention.duration },
+    { label: 'Duree', value: props.intervention.duration },
   ]
 })
 
-const diagnosticInfo = computed(() => {
+const history = computed(() => {
   if (!props.intervention) return []
+  const raw = props.intervention.raw || {}
   return [
-    { label: 'Cause', value: props.intervention.diagnostic.cause },
-    { label: 'Symptômes', value: props.intervention.diagnostic.symptoms },
-    { label: 'Solution', value: props.intervention.diagnostic.solution },
-    { label: 'Observations', value: props.intervention.diagnostic.notes },
-  ]
+    raw.created_at && { label: 'Creation', time: formatDateTime(raw.created_at), description: 'Intervention creee dans SmartCalyx.' },
+    raw.scheduled_at && { label: 'Planification', time: formatDateTime(raw.scheduled_at), description: 'Date planifiee enregistree.' },
+    raw.started_at && { label: 'Debut', time: formatDateTime(raw.started_at), description: 'Intervention demarree.' },
+    raw.completed_at && { label: 'Cloture', time: formatDateTime(raw.completed_at), description: 'Intervention terminee.' },
+    raw.updated_at && { label: 'Derniere mise a jour', time: formatDateTime(raw.updated_at), description: 'Donnees synchronisees avec PostgreSQL.' },
+  ].filter(Boolean)
 })
+
+function formatDateTime(value) {
+  if (!value) return '-'
+  return new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
 </script>
 
 <style scoped>
@@ -158,10 +149,6 @@ const diagnosticInfo = computed(() => {
   z-index: 100;
   display: flex;
   justify-content: flex-end;
-  background: rgba(74, 10, 10, 0.08);
-}
-
-.drawer-layer {
   background: rgba(5, 10, 18, 0.56);
   backdrop-filter: blur(3px);
 }
@@ -186,9 +173,7 @@ header {
 }
 
 header span,
-small,
-dt {
-  color: var(--sc-muted);
+small {
   color: #aeb9c8;
   font-size: 12px;
   font-weight: 850;
@@ -196,9 +181,7 @@ dt {
 
 h2,
 h3,
-p,
-dl,
-dd {
+p {
   margin: 0;
 }
 
@@ -233,7 +216,7 @@ header button {
 
 .drawer-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 14px;
   border-bottom: 1px solid rgba(116, 135, 158, 0.15);
@@ -267,8 +250,7 @@ header button {
 }
 
 .info-grid article,
-.responsible-card,
-.files-grid article {
+.responsible-card {
   border: 1px solid rgba(126, 146, 170, 0.2);
   border-radius: 8px;
   background: rgba(13, 21, 32, 0.72);
@@ -277,9 +259,7 @@ header button {
 
 .info-grid strong,
 .responsible-card strong,
-.files-grid strong,
-.timeline strong,
-dd {
+.timeline strong {
   display: block;
   margin-top: 5px;
   color: #f4f7fb;
@@ -310,35 +290,6 @@ h3 {
   color: #fff;
   font-size: 13px;
   font-weight: 950;
-}
-
-.diagnostic-list {
-  display: grid;
-  gap: 10px;
-}
-
-.diagnostic-list div {
-  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
-  padding-bottom: 10px;
-}
-
-.parts-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.parts-table th,
-.parts-table td {
-  padding: 12px 8px;
-  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
-  text-align: left;
-  color: #f4f7fb;
-  font-size: 12px;
-  font-weight: 850;
-}
-
-.parts-table th {
-  color: #aeb9c8;
 }
 
 .timeline {
@@ -383,11 +334,6 @@ h3 {
   font-weight: 780;
 }
 
-.files-grid {
-  display: grid;
-  gap: 12px;
-}
-
 .drawer-fade-enter-active,
 .drawer-fade-leave-active {
   transition: opacity 0.2s ease;
@@ -406,5 +352,55 @@ h3 {
 .drawer-fade-enter-from .drawer-panel,
 .drawer-fade-leave-to .drawer-panel {
   transform: translateX(100%);
+}
+
+:global(html[data-theme='light']) .drawer-layer {
+  background: rgba(74, 10, 10, 0.22);
+}
+
+:global(html[data-theme='light']) .drawer-panel {
+  border-left-color: #edf0e8;
+  background: #ffffff;
+  background-image: none;
+  color: #4a0a0a;
+  box-shadow: -24px 0 70px rgba(74, 10, 10, 0.16);
+}
+
+:global(html[data-theme='light']) .drawer-panel header,
+:global(html[data-theme='light']) .drawer-tabs {
+  border-color: #edf0e8;
+}
+
+:global(html[data-theme='light']) .drawer-panel h2,
+:global(html[data-theme='light']) .drawer-panel h3,
+:global(html[data-theme='light']) .info-grid strong,
+:global(html[data-theme='light']) .responsible-card strong,
+:global(html[data-theme='light']) .timeline strong {
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .drawer-panel p,
+:global(html[data-theme='light']) .drawer-panel small,
+:global(html[data-theme='light']) .drawer-panel header span {
+  color: #53667f;
+}
+
+:global(html[data-theme='light']) .info-grid article,
+:global(html[data-theme='light']) .responsible-card {
+  border-color: #edf0e8;
+  background: #f7f9f3;
+}
+
+:global(html[data-theme='light']) .drawer-tabs button,
+:global(html[data-theme='light']) .drawer-panel header button {
+  border-color: #dfe5d6;
+  background: #ffffff;
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .drawer-tabs button.active {
+  border-color: #b6c65b;
+  background: #e3edcf;
+  color: #6a9a2a;
 }
 </style>

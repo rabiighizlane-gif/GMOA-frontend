@@ -32,7 +32,7 @@
               class="h-10 w-full rounded-lg border border-slate-200 bg-white px-4 pr-10 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-green-400 focus:ring-2 focus:ring-green-100"
               :placeholder="content.searchPlaceholder"
             />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-base text-slate-500">🔍</span>
+            <Search class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
           </label>
 
           <AdminLanguageSwitcher />
@@ -42,14 +42,14 @@
             type="button"
             :aria-label="content.notifications"
           >
-            🔔
+            <Bell class="h-5 w-5" aria-hidden="true" />
             <span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-[10px] font-extrabold text-white">
-              3
+              {{ content.unavailableValue }}
             </span>
           </button>
 
           <div class="calendar-chip flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm">
-            <span class="text-base">📅</span>
+            <CalendarDays class="h-4 w-4" aria-hidden="true" />
             <span>{{ formattedDate }}</span>
           </div>
 
@@ -66,51 +66,57 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <StatCard
           :title="content.cards.machines.title"
-          value="145"
-          :subTitle="content.cards.machines.subtitle"
-          icon="⚙️"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="Settings"
+          iconClass="h-6 w-6 text-blue-700"
           iconBgClass="bg-blue-50"
           subTitleClass="text-emerald-600"
         />
         <StatCard
           :title="content.cards.users.title"
-          value="32"
-          :subTitle="content.cards.users.subtitle"
-          icon="👥"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="Users"
+          iconClass="h-6 w-6 text-emerald-700"
           iconBgClass="bg-emerald-50"
           subTitleClass="text-emerald-500"
         />
         <StatCard
           :title="content.cards.interventions.title"
-          value="18"
-          :subTitle="content.cards.interventions.subtitle"
-          icon="🔧"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="Wrench"
+          iconClass="h-6 w-6 text-amber-700"
           iconBgClass="bg-amber-50"
           subTitleClass="text-amber-500"
         />
         <StatCard
           :title="content.cards.criticalBreakdowns.title"
-          value="4"
-          :subTitle="content.cards.criticalBreakdowns.subtitle"
-          icon="🚨"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="AlertTriangle"
+          iconClass="h-6 w-6 text-rose-700"
           iconBgClass="bg-rose-50"
           valueClass="text-rose-600"
           subTitleClass="text-rose-500"
         />
         <StatCard
           :title="content.cards.planned.title"
-          value="15"
-          :subTitle="content.cards.planned.subtitle"
-          icon="📅"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="FileCheck"
+          iconClass="h-6 w-6 text-indigo-700"
           iconBgClass="bg-indigo-50"
           valueClass="text-indigo-600"
           subTitleClass="text-indigo-500"
         />
         <StatCard
           :title="content.cards.criticalParts.title"
-          value="6"
-          :subTitle="content.cards.criticalParts.subtitle"
-          icon="🔩"
+          :value="content.unavailableValue"
+          :subTitle="content.unavailable"
+          :icon-component="Package"
+          iconClass="h-6 w-6 text-slate-700"
           iconBgClass="bg-slate-100"
           subTitleClass="text-rose-500"
         />
@@ -121,17 +127,35 @@
           <MachineStatusChart />
         </div>
 
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:col-span-3">
+          <PreventiveMaintenanceChart />
+          <article class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <header class="mb-4">
+              <h3 class="text-xl font-extrabold text-slate-900">{{ content.correctiveMaintenance }}</h3>
+              <p class="mt-1 text-sm font-semibold text-slate-500">{{ content.correctiveMaintenanceUnavailable }}</p>
+            </header>
+            <div class="grid min-h-[300px] place-items-center rounded-lg border border-dashed border-slate-200 bg-slate-50 px-6 text-center text-sm font-bold text-slate-500">
+              {{ content.unavailable }}
+            </div>
+          </article>
+        </div>
+
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-3">
           <h3 class="mb-4 text-2xl font-extrabold text-slate-900">{{ content.recentAlerts }}</h3>
           <div class="overflow-hidden rounded-xl border border-slate-200 divide-y divide-slate-200">
-            <AlertItem
-              v-for="alert in recentAlerts"
-              :key="alert.id"
-              :type="alert.type"
-              :title="alert.title"
-              :description="alert.description"
-              :time="alert.time"
-            />
+            <template v-if="recentAlerts.length">
+              <AlertItem
+                v-for="alert in recentAlerts"
+                :key="alert.id"
+                :type="alert.type"
+                :title="alert.title"
+                :description="alert.description"
+                :time="alert.time"
+              />
+            </template>
+            <div v-else class="px-4 py-8 text-center text-sm font-bold text-slate-500">
+              {{ content.unavailable }}
+            </div>
           </div>
           <RouterLink
             :to="{ name: 'admin-notifications' }"
@@ -152,6 +176,17 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
+import {
+  AlertTriangle,
+  Bell,
+  CalendarDays,
+  FileCheck,
+  Package,
+  Search,
+  Settings,
+  Users,
+  Wrench,
+} from '@lucide/vue'
 
 import AdminLanguageSwitcher from '@/Components/AdminLanguageSwitcher.vue'
 import AlertItem from '@/Components/Dashboard/AlertItem.vue'
@@ -159,6 +194,7 @@ import InterventionTable from '@/Components/Dashboard/InterventionTable.vue'
 import Sidebar from '@/Components/sidebar.vue'
 import StatCard from '@/Components/Dashboard/Statcard.vue'
 import MachineStatusChart from '@/Components/Dashboard/MachineStatusChart.vue'
+import PreventiveMaintenanceChart from '@/Components/Dashboard/Charts/PreventiveMaintenanceChart.vue'
 
 const languageStore = useLanguageStore()
 const searchQuery = ref('')
@@ -178,72 +214,23 @@ const dashboardContent = {
     sidebarToggle: 'Afficher le menu',
     notifications: 'Notifications',
     live: 'Live',
+    unavailable: 'Donnees indisponibles',
+    unavailableValue: '—',
     recentAlerts: 'Alertes recentes',
+    correctiveMaintenance: 'Maintenance corrective',
+    correctiveMaintenanceUnavailable: 'Les donnees de maintenance corrective ne sont pas encore disponibles.',
     viewAllAlerts: 'Voir toutes les alertes',
     yesterday: 'Hier',
     cards: {
-      machines: { title: 'Machines', subtitle: '130 Actives | 15 Arrets' },
-      users: { title: 'Utilisateurs', subtitle: '8 En ligne' },
-      interventions: { title: 'Interventions', subtitle: '7 En cours' },
-      criticalBreakdowns: { title: 'Pannes Critiques', subtitle: 'Action requise' },
-      planned: { title: 'Prevues', subtitle: 'Cette semaine' },
-      criticalParts: { title: 'Pieces Critiques', subtitle: 'A remplacer' },
+      machines: { title: 'Machines', subtitle: 'Donnees indisponibles' },
+      users: { title: 'Utilisateurs', subtitle: 'Donnees indisponibles' },
+      interventions: { title: 'Interventions', subtitle: 'Donnees indisponibles' },
+      criticalBreakdowns: { title: 'Pannes Critiques', subtitle: 'Donnees indisponibles' },
+      planned: { title: 'Prevues', subtitle: 'Donnees indisponibles' },
+      criticalParts: { title: 'Pieces Critiques', subtitle: 'Donnees indisponibles' },
     },
-    alerts: [
-      {
-        type: 'critical',
-        title: 'Panne critique sur Pasteurisateur #2',
-        description: 'Arret immediat de la machine recommande.',
-        time: '10:15',
-      },
-      {
-        type: 'warning',
-        title: 'Maintenance preventive en retard',
-        description: 'Compresseur #1 - Echeance depassee de 3 jours.',
-        time: 'Hier',
-      },
-      {
-        type: 'anomaly',
-        title: 'Anomalie detectee',
-        description: 'Convoyeur #4 - Niveau de vibration eleve.',
-        time: 'Hier',
-      },
-      {
-        type: 'info',
-        title: 'Intervention urgente',
-        description: "Ensacheuse #3 - Fuite d'air detectee.",
-        time: 'Hier',
-      },
-    ],
-    interventions: [
-      {
-        machine: 'Pasteurisateur #2',
-        type: 'Preventif',
-        typeKey: 'preventive',
-        technician: 'Ahmed',
-        status: 'En cours',
-        statusKey: 'inProgress',
-        time: '14:32',
-      },
-      {
-        machine: 'Convoyeur #4',
-        type: 'Curatif',
-        typeKey: 'curative',
-        technician: 'Nabil',
-        status: 'En attente',
-        statusKey: 'pending',
-        time: '12:15',
-      },
-      {
-        machine: 'Pompe #1',
-        type: 'Amelioration',
-        typeKey: 'improvement',
-        technician: 'Youssef',
-        status: 'Termine',
-        statusKey: 'completed',
-        time: 'Hier',
-      },
-    ],
+    alerts: [],
+    interventions: [],
   },
   EN: {
     locale: 'en-US',
@@ -254,147 +241,49 @@ const dashboardContent = {
     sidebarToggle: 'Show menu',
     notifications: 'Notifications',
     live: 'Live',
+    unavailable: 'Data unavailable',
+    unavailableValue: '—',
     recentAlerts: 'Recent alerts',
+    correctiveMaintenance: 'Corrective maintenance',
+    correctiveMaintenanceUnavailable: 'Corrective maintenance data is not available yet.',
     viewAllAlerts: 'View all alerts',
     yesterday: 'Yesterday',
     cards: {
-      machines: { title: 'Machines', subtitle: '130 Active | 15 Stopped' },
-      users: { title: 'Users', subtitle: '8 Online' },
-      interventions: { title: 'Interventions', subtitle: '7 In progress' },
-      criticalBreakdowns: { title: 'Critical Breakdowns', subtitle: 'Action required' },
-      planned: { title: 'Planned', subtitle: 'This week' },
-      criticalParts: { title: 'Critical Parts', subtitle: 'To replace' },
+      machines: { title: 'Machines', subtitle: 'Data unavailable' },
+      users: { title: 'Users', subtitle: 'Data unavailable' },
+      interventions: { title: 'Interventions', subtitle: 'Data unavailable' },
+      criticalBreakdowns: { title: 'Critical Breakdowns', subtitle: 'Data unavailable' },
+      planned: { title: 'Planned', subtitle: 'Data unavailable' },
+      criticalParts: { title: 'Critical Parts', subtitle: 'Data unavailable' },
     },
-    alerts: [
-      {
-        type: 'critical',
-        title: 'Critical breakdown on Pasteurizer #2',
-        description: 'Immediate machine shutdown recommended.',
-        time: '10:15',
-      },
-      {
-        type: 'warning',
-        title: 'Preventive maintenance overdue',
-        description: 'Compressor #1 - Deadline exceeded by 3 days.',
-        time: 'Yesterday',
-      },
-      {
-        type: 'anomaly',
-        title: 'Anomaly detected',
-        description: 'Conveyor #4 - High vibration level.',
-        time: 'Yesterday',
-      },
-      {
-        type: 'info',
-        title: 'Urgent intervention',
-        description: 'Bagging machine #3 - Air leak detected.',
-        time: 'Yesterday',
-      },
-    ],
-    interventions: [
-      {
-        machine: 'Pasteurizer #2',
-        type: 'Preventive',
-        typeKey: 'preventive',
-        technician: 'Ahmed',
-        status: 'In progress',
-        statusKey: 'inProgress',
-        time: '14:32',
-      },
-      {
-        machine: 'Conveyor #4',
-        type: 'Curative',
-        typeKey: 'curative',
-        technician: 'Nabil',
-        status: 'Pending',
-        statusKey: 'pending',
-        time: '12:15',
-      },
-      {
-        machine: 'Pump #1',
-        type: 'Improvement',
-        typeKey: 'improvement',
-        technician: 'Youssef',
-        status: 'Completed',
-        statusKey: 'completed',
-        time: 'Yesterday',
-      },
-    ],
+    alerts: [],
+    interventions: [],
   },
   AR: {
     locale: 'ar-MA',
-    title: 'لوحة تحكم الصيانة',
-    subtitle: 'نظرة شاملة ومباشرة على حالة المصنع.',
-    searchPlaceholder: 'بحث...',
-    languageLabel: 'تغيير اللغة',
-    notifications: 'الإشعارات',
-    live: 'مباشر',
-    recentAlerts: 'التنبيهات الأخيرة',
-    viewAllAlerts: 'عرض كل التنبيهات',
-    yesterday: 'أمس',
+    title: 'Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… Ø§Ù„ØµÙŠØ§Ù†Ø©',
+    subtitle: 'Ù†Ø¸Ø±Ø© Ø´Ø§Ù…Ù„Ø© ÙˆÙ…Ø¨Ø§Ø´Ø±Ø© Ø¹Ù„Ù‰ Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØµÙ†Ø¹.',
+    searchPlaceholder: 'Ø¨Ø­Ø«...',
+    languageLabel: 'ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©',
+    notifications: 'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª',
+    live: 'Ù…Ø¨Ø§Ø´Ø±',
+    unavailable: 'Donnees indisponibles',
+    unavailableValue: '—',
+    recentAlerts: 'Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø£Ø®ÙŠØ±Ø©',
+    correctiveMaintenance: 'Maintenance corrective',
+    correctiveMaintenanceUnavailable: 'Les donnees de maintenance corrective ne sont pas encore disponibles.',
+    viewAllAlerts: 'Ø¹Ø±Ø¶ ÙƒÙ„ Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª',
+    yesterday: 'Ø£Ù…Ø³',
     cards: {
-      machines: { title: 'الآلات', subtitle: '130 نشطة | 15 متوقفة' },
-      users: { title: 'المستخدمون', subtitle: '8 متصلون' },
-      interventions: { title: 'التدخلات', subtitle: '7 قيد الإنجاز' },
-      criticalBreakdowns: { title: 'أعطال حرجة', subtitle: 'إجراء مطلوب' },
-      planned: { title: 'مبرمجة', subtitle: 'هذا الأسبوع' },
-      criticalParts: { title: 'قطع حرجة', subtitle: 'تحتاج إلى استبدال' },
+      machines: { title: 'Ø§Ù„Ø¢Ù„Ø§Øª', subtitle: 'Donnees indisponibles' },
+      users: { title: 'Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†', subtitle: 'Donnees indisponibles' },
+      interventions: { title: 'Ø§Ù„ØªØ¯Ø®Ù„Ø§Øª', subtitle: 'Donnees indisponibles' },
+      criticalBreakdowns: { title: 'Ø£Ø¹Ø·Ø§Ù„ Ø­Ø±Ø¬Ø©', subtitle: 'Ø¥Ø¬Ø±Ø§Ø¡ Ù…Ø·Ù„ÙˆØ¨' },
+      planned: { title: 'Ù…Ø¨Ø±Ù…Ø¬Ø©', subtitle: 'Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹' },
+      criticalParts: { title: 'Ù‚Ø·Ø¹ Ø­Ø±Ø¬Ø©', subtitle: 'ØªØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ø§Ø³ØªØ¨Ø¯Ø§Ù„' },
     },
-    alerts: [
-      {
-        type: 'critical',
-        title: 'عطل حرج في المبستر #2',
-        description: 'يوصى بإيقاف الآلة فورا.',
-        time: '10:15',
-      },
-      {
-        type: 'warning',
-        title: 'تأخر الصيانة الوقائية',
-        description: 'الضاغط #1 - تجاوز الموعد بثلاثة أيام.',
-        time: 'أمس',
-      },
-      {
-        type: 'anomaly',
-        title: 'تم اكتشاف خلل',
-        description: 'الناقل #4 - مستوى اهتزاز مرتفع.',
-        time: 'أمس',
-      },
-      {
-        type: 'info',
-        title: 'تدخل عاجل',
-        description: 'آلة التعبئة #3 - تم اكتشاف تسرب هواء.',
-        time: 'أمس',
-      },
-    ],
-    interventions: [
-      {
-        machine: 'المبستر #2',
-        type: 'وقائي',
-        typeKey: 'preventive',
-        technician: 'Ahmed',
-        status: 'قيد الإنجاز',
-        statusKey: 'inProgress',
-        time: '14:32',
-      },
-      {
-        machine: 'الناقل #4',
-        type: 'إصلاحي',
-        typeKey: 'curative',
-        technician: 'Nabil',
-        status: 'في الانتظار',
-        statusKey: 'pending',
-        time: '12:15',
-      },
-      {
-        machine: 'المضخة #1',
-        type: 'تحسين',
-        typeKey: 'improvement',
-        technician: 'Youssef',
-        status: 'مكتمل',
-        statusKey: 'completed',
-        time: 'أمس',
-      },
-    ],
+    alerts: [],
+    interventions: [],
   },
 }
 
@@ -420,17 +309,11 @@ const formattedTime = computed(() =>
 )
 
 const recentAlerts = computed(() =>
-  content.value.alerts.map((alert, index) => ({
-    id: index + 1,
-    ...alert,
-  })),
+  content.value.alerts,
 )
 
 const recentInterventions = computed(() =>
-  content.value.interventions.map((intervention, index) => ({
-    id: `#INT-${892 - index}`,
-    ...intervention,
-  })),
+  content.value.interventions,
 )
 
 function toggleSidebar() {

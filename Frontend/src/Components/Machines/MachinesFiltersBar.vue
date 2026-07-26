@@ -4,72 +4,49 @@
       <span>&#8981;</span>
       <input :value="filters.search" type="search" :placeholder="content.search" @input="updateFilter('search', $event.target.value)" />
     </div>
-    <select :value="filters.line" @change="updateFilter('line', $event.target.value)">
-      <option value="">{{ content.allLines }}</option>
-      <option v-for="line in lines" :key="line" :value="line">{{ displayLine(line) }}</option>
+    <select :value="filters.site" @change="updateFilter('site', $event.target.value)">
+      <option value="">{{ content.allSites }}</option>
+      <option v-for="site in sites" :key="site" :value="site">{{ displayValue(site) }}</option>
     </select>
     <select :value="filters.status" @change="updateFilter('status', $event.target.value)">
       <option value="">{{ content.allStatuses }}</option>
-      <option value="En service">{{ content.statuses.service }}</option>
-      <option value="En maintenance">{{ content.statuses.maintenance }}</option>
-      <option value="En panne">{{ content.statuses.breakdown }}</option>
-      <option value="Hors service">{{ content.statuses.offline }}</option>
+      <option value="OPERATIONAL">{{ content.statuses.OPERATIONAL }}</option>
+      <option value="IN_MAINTENANCE">{{ content.statuses.IN_MAINTENANCE }}</option>
+      <option value="OUT_OF_SERVICE">{{ content.statuses.OUT_OF_SERVICE }}</option>
+      <option value="OFFLINE">{{ content.statuses.OFFLINE }}</option>
     </select>
-    <select :value="filters.category" @change="updateFilter('category', $event.target.value)">
-      <option value="">{{ content.allCategories }}</option>
-      <option v-for="category in categories" :key="category" :value="category">{{ displayCategory(category) }}</option>
+    <select :value="filters.periodicity" @change="updateFilter('periodicity', $event.target.value)">
+      <option value="">{{ content.allPeriodicities }}</option>
+      <option v-for="periodicity in periodicities" :key="periodicity" :value="periodicity">{{ displayPeriodicity(periodicity) }}</option>
     </select>
-    <select :value="filters.criticality" @change="updateFilter('criticality', $event.target.value)">
-      <option value="">{{ content.allCriticalities }}</option>
-      <option value="Critique">{{ content.criticalities.critical }}</option>
-      <option value="Haute">{{ content.criticalities.high }}</option>
-      <option value="Moyenne">{{ content.criticalities.medium }}</option>
-      <option value="Faible">{{ content.criticalities.low }}</option>
+    <select :value="filters.zone" @change="updateFilter('zone', $event.target.value)">
+      <option value="">{{ content.allZones }}</option>
+      <option v-for="zone in zones" :key="zone" :value="zone">{{ displayValue(zone) }}</option>
     </select>
     <button type="button" class="reset-button" @click="$emit('reset')">{{ content.reset }}</button>
   </section>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useLanguageStore } from '@/stores/language'
-
 defineProps({
   filters: { type: Object, required: true },
-  lines: { type: Array, default: () => [] },
-  categories: { type: Array, default: () => [] },
+  sites: { type: Array, default: () => [] },
+  periodicities: { type: Array, default: () => [] },
+  zones: { type: Array, default: () => [] },
   content: { type: Object, required: true },
 })
 
 const emit = defineEmits(['update-filter', 'reset'])
-const languageStore = useLanguageStore()
-const language = computed(() => languageStore.language)
-
-const translatedValues = {
-  EN: {
-    categories: { Mecanique: 'Mechanical', Hydraulique: 'Hydraulic', Conditionnement: 'Packaging', Pneumatique: 'Pneumatic', Electrique: 'Electrical' },
-    lines: { 'Ligne Production 1': 'Production Line 1', 'Ligne Production 2': 'Production Line 2', 'Ligne Conditionnement': 'Packaging Line', 'Ligne Utilites': 'Utilities Line' },
-  },
-  AR: {
-    categories: {
-      Mecanique: '\u0645\u064a\u0643\u0627\u0646\u064a\u0643\u064a\u0629',
-      Hydraulique: '\u0647\u064a\u062f\u0631\u0648\u0644\u064a\u0643\u064a\u0629',
-      Conditionnement: '\u0627\u0644\u062a\u0639\u0628\u0626\u0629',
-      Pneumatique: '\u0647\u0648\u0627\u0626\u064a\u0629',
-      Electrique: '\u0643\u0647\u0631\u0628\u0627\u0626\u064a\u0629',
-    },
-    lines: {
-      'Ligne Production 1': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 1',
-      'Ligne Production 2': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 2',
-      'Ligne Conditionnement': '\u062e\u0637 \u0627\u0644\u062a\u0639\u0628\u0626\u0629',
-      'Ligne Utilites': '\u062e\u0637 \u0627\u0644\u0645\u0631\u0627\u0641\u0642',
-    },
-  },
+const periodicityLabels = {
+  HEBDOMADAIRE: 'Hebdomadaire',
+  MENSUELLE: 'Mensuelle',
+  BIMESTRIELLE: 'Tous les 2 mois',
+  TRIMESTRIELLE: 'Tous les 3 mois',
 }
 
 const updateFilter = (key, value) => emit('update-filter', { key, value })
-const displayCategory = (category) => translatedValues[language.value]?.categories?.[category] || category
-const displayLine = (line) => translatedValues[language.value]?.lines?.[line] || line
+const displayPeriodicity = (periodicity) => periodicityLabels[periodicity] || periodicity
+const displayValue = (value) => value
 </script>
 
 <style scoped>

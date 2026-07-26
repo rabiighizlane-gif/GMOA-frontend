@@ -18,55 +18,195 @@
 
     <section class="interventions-page">
       <header class="page-header">
+        <div class="light-title-icon" aria-hidden="true">
+          <InterventionIcon name="wrench" />
+        </div>
         <div>
           <nav :aria-label="content.breadcrumbLabel">
             <span>{{ content.home }}</span>
             <strong>&gt;</strong>
             <span>{{ content.title }}</span>
           </nav>
+          <span class="light-domain-badge">{{ content.domain }}</span>
           <h1>{{ content.title }}</h1>
           <p>{{ content.subtitle }}</p>
         </div>
+        <div class="light-header-actions">
+          <button type="button" class="ghost-action light-export-button" @click="exportCurrentRows">
+            <InterventionIcon name="download" />
+            {{ content.filters.export }}
+          </button>
+          <button v-if="canManageInterventions" type="button" class="primary-action light-create-button" @click="openCreateModal">
+            <InterventionIcon name="plus" />
+            {{ content.filters.create }}
+          </button>
+        </div>
         <AdminTopControls v-model="globalSearch" />
       </header>
+
       <KPICards :cards="kpiCards" />
-      <FiltersBar v-model="filters" :can-create="canManageInterventions" :content="content.filters" :technicians="technicians" />
-      <InterventionTable
-        :can-manage="canManageInterventions"
-        :content="content.table"
-        :rows="filteredInterventions"
-        @view="selectedIntervention = $event"
+
+      <FiltersBar
+        v-model="filters"
+        :can-create="canManageInterventions"
+        :content="content.filters"
+        :equipment-options="equipmentOptions"
+        :has-active-filters="hasActiveFilters"
+        :loading="loading"
+        :line-options="lineOptions"
+        :results-count="pagination.total"
+        :technicians="technicianOptions"
+        :zone-options="filteredZoneOptions"
+        @create="openCreateModal"
+        @export="exportCurrentRows"
+        @refresh="refreshAll"
+        @reset="resetFilters"
       />
 
-      <section class="charts-grid" aria-label="Graphiques interventions">
-        <InterventionsByMonth />
-        <InterventionTypesChart />
-        <TopTechniciansChart />
-        <AverageTimeChart />
-        <PriorityChart />
-        <SlaGauge />
+      <p v-if="successMessage" class="state-message success">{{ successMessage }}</p>
+
+      <section v-if="errorMessage" class="state-card" role="alert">
+        <strong>{{ errorMessage }}</strong>
+        <button type="button" @click="refreshAll">{{ content.retry }}</button>
       </section>
+
+      <section v-if="loading" class="skeleton-card" aria-label="Chargement">
+        <span v-for="item in 5" :key="item"></span>
+      </section>
+
+      <section v-else-if="!errorMessage && !interventionRows.length" class="empty-card">
+        <div class="empty-illustration" aria-hidden="true">
+          <InterventionIcon name="wrench" />
+        </div>
+        <h2>{{ content.empty.title }}</h2>
+        <p>{{ content.empty.text }}</p>
+        <button v-if="canManageInterventions" type="button" @click="openCreateModal">
+          <InterventionIcon name="plus" />
+          {{ content.empty.action }}
+        </button>
+      </section>
+
+      <InterventionTable
+        v-else
+        :can-manage="canManageInterventions"
+        :content="content.table"
+        :pagination="pagination"
+        :rows="interventionRows"
+        @delete="removeIntervention"
+        @edit="openEditModal"
+        @page-change="changePage"
+        @sort="changeSort"
+        @view="openDrawer"
+      />
     </section>
 
     <InterventionDrawer :intervention="selectedIntervention" @close="selectedIntervention = null" />
+
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="formOpen" class="modal-layer" @click.self="closeForm">
+          <form class="modal-panel" @submit.prevent="submitForm">
+            <header>
+              <div>
+                <span>{{ editingIntervention ? content.form.editBadge : content.form.createBadge }}</span>
+                <h2>{{ editingIntervention ? content.form.editTitle : content.form.createTitle }}</h2>
+              </div>
+              <button type="button" :aria-label="content.form.close" @click="closeForm">
+                <InterventionIcon name="x" />
+              </button>
+            </header>
+
+            <div class="form-grid">
+              <label>
+                <span>{{ content.form.code }}</span>
+                <input v-model.trim="form.code" required />
+              </label>
+              <label>
+                <span>{{ content.form.equipment }}</span>
+                <select v-model="form.equipment_id" required>
+                  <option value="">{{ content.form.selectEquipment }}</option>
+                  <option v-for="equipment in equipmentOptions" :key="equipment.id" :value="equipment.id">
+                    {{ equipment.code }} - {{ equipment.name }}
+                  </option>
+                </select>
+              </label>
+              <label>
+                <span>{{ content.form.type }}</span>
+                <select v-model="form.type">
+                  <option v-for="option in typeOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+              <label>
+                <span>{{ content.form.priority }}</span>
+                <select v-model="form.priority">
+                  <option v-for="option in priorityOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+              <label>
+                <span>{{ content.form.status }}</span>
+                <select v-model="form.status">
+                  <option v-for="option in statusOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+              </label>
+              <label>
+                <span>{{ content.form.technician }}</span>
+                <select v-model="form.assigned_technician_id">
+                  <option value="">{{ content.notAssigned }}</option>
+                  <option v-for="technician in technicianOptions" :key="technician.id" :value="technician.id">
+                    {{ displayUser(technician) }}
+                  </option>
+                </select>
+              </label>
+              <label>
+                <span>{{ content.form.scheduledAt }}</span>
+                <input v-model="form.scheduled_at" type="datetime-local" />
+              </label>
+              <label>
+                <span>{{ content.form.duration }}</span>
+                <input v-model.number="form.duration_minutes" min="0" type="number" />
+              </label>
+              <label class="full">
+                <span>{{ content.form.description }}</span>
+                <textarea v-model.trim="form.description" required rows="4"></textarea>
+              </label>
+            </div>
+
+            <p v-if="formError" class="form-error">{{ formError }}</p>
+
+            <footer>
+              <button type="button" class="ghost-action" @click="closeForm">{{ content.form.cancel }}</button>
+              <button type="submit" class="primary-action" :disabled="saving">
+                {{ saving ? content.form.saving : content.form.save }}
+              </button>
+            </footer>
+          </form>
+        </div>
+      </Transition>
+    </Teleport>
   </main>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AdminTopControls from '@/Components/AdminTopControls.vue'
-import AverageTimeChart from '@/Components/charts/AverageTimeChart.vue'
 import FiltersBar from '@/Components/Interventions/FiltersBar.vue'
 import InterventionDrawer from '@/Components/Interventions/InterventionDrawer.vue'
+import InterventionIcon from '@/Components/Interventions/InterventionIcon.vue'
 import InterventionTable from '@/Components/Interventions/InterventionTable.vue'
-import InterventionsByMonth from '@/Components/charts/InterventionsByMonth.vue'
-import InterventionTypesChart from '@/Components/charts/InterventionTypesChart.vue'
 import KPICards from '@/Components/Interventions/KPICards.vue'
-import PriorityChart from '@/Components/charts/PriorityChart.vue'
-import SlaGauge from '@/Components/charts/SlaGauge.vue'
 import Sidebar from '@/Components/sidebar.vue'
-import TopTechniciansChart from '@/Components/charts/TopTechniciansChart.vue'
 import { useLanguageStore } from '@/stores/language'
+import { getEquipments } from '@/services/equipmentService'
+import {
+  createIntervention,
+  deleteIntervention,
+  getInterventionById,
+  getInterventionStats,
+  getInterventions,
+  updateIntervention,
+} from '@/services/interventionsService'
+import { getProductionLines } from '@/services/productionLinesService'
+import { getUsers } from '@/services/usersService'
 
 const languageStore = useLanguageStore()
 const language = computed(() => languageStore.language)
@@ -74,208 +214,573 @@ const globalSearch = ref('')
 const selectedIntervention = ref(null)
 const isSidebarOpen = ref(false)
 const storedUser = ref(localStorage.getItem('user'))
+const loading = ref(false)
+const saving = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
+const formError = ref('')
+const formOpen = ref(false)
+const editingIntervention = ref(null)
+const interventions = ref([])
+const stats = ref({})
+const pagination = ref({ page: 1, limit: 10, total: 0, total_pages: 0 })
+const equipmentOptions = ref([])
+const lineOptions = ref([])
+const userOptions = ref([])
+let filterTimer = null
+
 const filters = ref({
   search: '',
   date: '',
-  technician: '',
+  technician_id: '',
   status: '',
+  type: '',
+  priority: '',
+  production_line_id: '',
+  production_zone_id: '',
+  equipment_id: '',
+  sort_by: 'created_at',
+  sort_order: 'desc',
 })
+
+const form = ref(defaultForm())
 
 const pageContent = {
   FR: {
     sidebarToggle: 'Afficher le menu',
     breadcrumbLabel: "Fil d'Ariane",
     home: 'Accueil',
+    domain: 'Maintenance',
     title: 'Interventions',
-    subtitle: 'Suivi operationnel des interventions de maintenance, priorites et temps de resolution.',
-    kpis: {
-      total: ['Interventions totales', '+12% ce mois'],
-      inProgress: ['En cours', '2 urgentes'],
-      done: ['Terminees', '94% validees'],
-      pending: ['En attente', 'Planification'],
-      technicians: ['Techniciens actifs', '5 disponibles'],
-      average: ["Temps moyen d'intervention", '-18 min'],
+    subtitle: "Planifiez, affectez et suivez les interventions de maintenance de l'usine.",
+    retry: 'Reessayer',
+    notAssigned: 'Non affecte',
+    noValue: '-',
+    empty: {
+      title: 'Aucune intervention enregistree',
+      text: 'Les interventions apparaitront ici des leur creation ou leur planification.',
+      action: 'Creer une intervention',
     },
-    filters: { search: 'Rechercher une intervention...', date: 'Date', technician: 'Technicien', status: 'Statut', all: 'Tous', done: 'Terminee', inProgress: 'En cours', pending: 'En attente', export: 'Export', create: 'Nouvelle intervention' },
+    kpis: {
+      total: ['Interventions totales', 'Depuis PostgreSQL'],
+      inProgress: ['En cours', 'Statut actif'],
+      done: ['Terminees', 'Cloturees ou fermees'],
+      pending: ['En attente', 'A planifier'],
+      technicians: ['Techniciens actifs', 'Affectations reelles'],
+      average: ["Temps moyen d'intervention", 'Duree calculee'],
+    },
+    filters: {
+      search: 'Rechercher intervention, machine, ligne, zone...',
+      date: 'Date',
+      technician: 'Technicien',
+      status: 'Statut',
+      type: 'Type',
+      priority: 'Priorite',
+      line: 'Ligne',
+      zone: 'Zone',
+      equipment: 'Machine',
+      sort: 'Tri',
+      all: 'Tous',
+      export: 'Export',
+      create: 'Nouvelle intervention',
+      advanced: 'Filtres avances',
+      reset: 'Reinitialiser',
+      refresh: 'Actualiser',
+      clearSearch: 'Vider la recherche',
+      found: (count) => `${count} ${count === 1 ? 'intervention trouvee' : 'interventions trouvees'}`,
+    },
     table: {
       title: 'Liste des interventions',
+      subtitle: "Suivi des interventions, des affectations et de leur etat d'avancement.",
       count: (count) => `${count} interventions trouvees`,
       page: (current, total) => `Page ${current} / ${total}`,
-      columns: { id: 'ID', machine: 'Machine', line: 'Ligne', type: 'Type', priority: 'Priorite', technicianName: 'Technicien', start: 'Debut', end: 'Fin', status: 'Statut', actions: 'Actions' },
+      columns: {
+        code: 'Code',
+        machine: 'Machine',
+        line: 'Ligne',
+        zone: 'Zone',
+        type: 'Type',
+        priority: 'Priorite',
+        technicianName: 'Technicien',
+        start: 'Debut',
+        end: 'Fin',
+        duration: 'Duree',
+        status: 'Statut',
+        actions: 'Actions',
+      },
       previous: 'Precedent',
       next: 'Suivant',
       of: 'sur',
       view: 'Voir',
       edit: 'Modifier',
-      more: 'Plus',
+      delete: 'Supprimer',
+      deleteConfirm: "Supprimer cette intervention ?",
+      assign: 'Affecter',
+      statusAction: 'Changer le statut',
+      plannedStart: 'Debut',
+      plannedEnd: 'Fin',
+      notCompleted: 'Non terminee',
     },
-  },
-  EN: {
-    sidebarToggle: 'Show menu',
-    breadcrumbLabel: 'Breadcrumb',
-    home: 'Home',
-    title: 'Interventions',
-    subtitle: 'Operational tracking of maintenance interventions, priorities, and resolution time.',
-    kpis: {
-      total: ['Total interventions', '+12% this month'],
-      inProgress: ['In progress', '2 urgent'],
-      done: ['Completed', '94% validated'],
-      pending: ['Pending', 'Planning'],
-      technicians: ['Active technicians', '5 available'],
-      average: ['Average intervention time', '-18 min'],
-    },
-    filters: { search: 'Search intervention...', date: 'Date', technician: 'Technician', status: 'Status', all: 'All', done: 'Completed', inProgress: 'In progress', pending: 'Pending', export: 'Export', create: 'New intervention' },
-    table: {
-      title: 'Intervention list',
-      count: (count) => `${count} interventions found`,
-      page: (current, total) => `Page ${current} / ${total}`,
-      columns: { id: 'ID', machine: 'Machine', line: 'Line', type: 'Type', priority: 'Priority', technicianName: 'Technician', start: 'Start', end: 'End', status: 'Status', actions: 'Actions' },
-      previous: 'Previous',
-      next: 'Next',
-      of: 'of',
-      view: 'View',
-      edit: 'Edit',
-      more: 'More',
-    },
-  },
-  AR: {
-    sidebarToggle: '\u0639\u0631\u0636 \u0627\u0644\u0642\u0627\u0626\u0645\u0629',
-    breadcrumbLabel: '\u0627\u0644\u0645\u0633\u0627\u0631',
-    home: '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629',
-    title: '\u0627\u0644\u062a\u062f\u062e\u0644\u0627\u062a',
-    subtitle: '\u0645\u062a\u0627\u0628\u0639\u0629 \u062a\u0634\u063a\u064a\u0644\u064a\u0629 \u0644\u062a\u062f\u062e\u0644\u0627\u062a \u0627\u0644\u0635\u064a\u0627\u0646\u0629 \u0648\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0627\u062a \u0648\u0645\u062f\u0629 \u0627\u0644\u062d\u0644.',
-    kpis: {
-      total: ['\u0645\u062c\u0645\u0648\u0639 \u0627\u0644\u062a\u062f\u062e\u0644\u0627\u062a', '+12% \u0647\u0630\u0627 \u0627\u0644\u0634\u0647\u0631'],
-      inProgress: ['\u0642\u064a\u062f \u0627\u0644\u062a\u0646\u0641\u064a\u0630', '\u062d\u0627\u0644\u062a\u0627\u0646 \u0639\u0627\u062c\u0644\u062a\u0627\u0646'],
-      done: ['\u0645\u0643\u062a\u0645\u0644\u0629', '94% \u0645\u0635\u0627\u062f\u0642 \u0639\u0644\u064a\u0647\u0627'],
-      pending: ['\u0641\u064a \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631', '\u062a\u062e\u0637\u064a\u0637'],
-      technicians: ['\u062a\u0642\u0646\u064a\u0648\u0646 \u0646\u0634\u0637\u0648\u0646', '5 \u0645\u062a\u0627\u062d\u0648\u0646'],
-      average: ['\u0645\u062a\u0648\u0633\u0637 \u0645\u062f\u0629 \u0627\u0644\u062a\u062f\u062e\u0644', '-18 \u062f\u0642\u064a\u0642\u0629'],
-    },
-    filters: { search: '\u0627\u0628\u062d\u062b \u0639\u0646 \u062a\u062f\u062e\u0644...', date: '\u0627\u0644\u062a\u0627\u0631\u064a\u062e', technician: '\u0627\u0644\u062a\u0642\u0646\u064a', status: '\u0627\u0644\u062d\u0627\u0644\u0629', all: '\u0627\u0644\u0643\u0644', done: '\u0645\u0643\u062a\u0645\u0644\u0629', inProgress: '\u0642\u064a\u062f \u0627\u0644\u062a\u0646\u0641\u064a\u0630', pending: '\u0641\u064a \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631', export: '\u062a\u0635\u062f\u064a\u0631', create: '\u062a\u062f\u062e\u0644 \u062c\u062f\u064a\u062f' },
-    table: {
-      title: '\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062a\u062f\u062e\u0644\u0627\u062a',
-      count: (count) => `\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 ${count} \u062a\u062f\u062e\u0644\u0627\u062a`,
-      page: (current, total) => `\u0627\u0644\u0635\u0641\u062d\u0629 ${current} / ${total}`,
-      columns: { id: '\u0627\u0644\u0645\u0639\u0631\u0641', machine: '\u0627\u0644\u0622\u0644\u0629', line: '\u0627\u0644\u062e\u0637', type: '\u0627\u0644\u0646\u0648\u0639', priority: '\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', technicianName: '\u0627\u0644\u062a\u0642\u0646\u064a', start: '\u0627\u0644\u0628\u062f\u0621', end: '\u0627\u0644\u0646\u0647\u0627\u064a\u0629', status: '\u0627\u0644\u062d\u0627\u0644\u0629', actions: '\u0625\u062c\u0631\u0627\u0621\u0627\u062a' },
-      previous: '\u0627\u0644\u0633\u0627\u0628\u0642',
-      next: '\u0627\u0644\u062a\u0627\u0644\u064a',
-      of: '\u0645\u0646',
-      view: '\u0639\u0631\u0636',
-      edit: '\u062a\u0639\u062f\u064a\u0644',
-      more: '\u0627\u0644\u0645\u0632\u064a\u062f',
+    form: {
+      createBadge: 'Creation',
+      editBadge: 'Modification',
+      createTitle: 'Nouvelle intervention',
+      editTitle: 'Modifier intervention',
+      close: 'Fermer',
+      code: 'Code',
+      equipment: 'Machine',
+      selectEquipment: 'Selectionner une machine',
+      type: 'Type',
+      priority: 'Priorite',
+      status: 'Statut',
+      technician: 'Technicien',
+      scheduledAt: 'Planifiee le',
+      duration: 'Duree minutes',
+      description: 'Description',
+      cancel: 'Annuler',
+      save: 'Enregistrer',
+      saving: 'Enregistrement...',
     },
   },
 }
 
 const content = computed(() => pageContent[language.value] || pageContent.FR)
-
-const techniciansData = {
-  nabil: { name: 'Nabil Amrani', initials: 'NA', phone: '+212 6 11 24 39 80', service: 'Maintenance', color: '#6A9A2A' },
-  ahmed: { name: 'Ahmed El Mansouri', initials: 'AE', phone: '+212 6 23 88 14 02', service: 'Hydraulique', color: '#FF6A00' },
-  youssef: { name: 'Youssef Berrada', initials: 'YB', phone: '+212 6 45 10 77 31', service: 'Production', color: '#E8B300' },
-  sara: { name: 'Sara El Idrissi', initials: 'SE', phone: '+212 6 74 52 18 46', service: 'QualitÃƒÆ’Ã‚Â©', color: '#4A0A0A' },
-  karim: { name: 'Karim El Fassi', initials: 'KF', phone: '+212 6 60 31 42 12', service: 'ÃƒÆ’Ã¢â‚¬Â°lectricitÃƒÆ’Ã‚Â©', color: '#E31E24' },
-}
-
-const interventions = [
-  buildIntervention('INT-892', 'Tour usinage M-102', 'Ligne Production 1', 'Corrective', 'Critique', techniciansData.nabil, '15/07/2026 08:30', '15/07/2026 14:10', 'Terminee', 'Fuite hydraulique sur verin principal'),
-  buildIntervention('INT-891', 'Presse hydraulique M-215', 'Ligne Production 2', 'Preventive', 'Moyenne', techniciansData.ahmed, '16/07/2026 09:00', '16/07/2026 11:25', 'Terminee', 'Controle pression et remplacement filtre'),
-  buildIntervention('INT-890', 'Convoyeur a bande M-309', 'Ligne Conditionnement', 'Corrective', 'Haute', techniciansData.youssef, '18/07/2026 10:20', '-', 'En cours', 'Vibration elevee sur tambour moteur'),
-  buildIntervention('INT-889', "Compresseur d'air M-412", 'Ligne Utilites', 'Preventive', 'Basse', techniciansData.sara, '18/07/2026 13:00', '-', 'En attente', 'Inspection securite trimestrielle'),
-  buildIntervention('INT-888', 'Pasteurisateur P-204', 'Ligne Production 1', 'Corrective', 'Critique', techniciansData.karim, '17/07/2026 15:40', '17/07/2026 18:15', 'Terminee', 'Arret automatique repete'),
-  buildIntervention('INT-887', 'Remplisseuse R-118', 'Ligne Conditionnement', 'Amelioration', 'Moyenne', techniciansData.nabil, '14/07/2026 08:15', '14/07/2026 10:00', 'Terminee', 'Reglage dosage et calibration capteurs'),
-  buildIntervention('INT-886', 'Etiqueteuse E-330', 'Ligne Conditionnement', 'Preventive', 'Basse', techniciansData.ahmed, '19/07/2026 08:00', '-', 'En attente', 'Controle alignement et nettoyage'),
-  buildIntervention('INT-885', 'Pompe CIP P-101', 'Ligne Utilites', 'Corrective', 'Haute', techniciansData.youssef, '18/07/2026 12:10', '-', 'En cours', 'Debit instable pendant le cycle'),
-]
-const technicians = computed(() => Object.values(techniciansData).map((technician) => technician.name))
-
 const currentUserRole = computed(() => {
   try {
     const user = JSON.parse(storedUser.value || '{}')
-    return String(user.role || '').toLowerCase().replace(/[\s_-]+/g, '')
+    return String(user.role || '').toLowerCase()
   } catch {
     return ''
   }
 })
+const canManageInterventions = computed(() => ['super_admin', 'admin'].includes(currentUserRole.value))
+const hasActiveFilters = computed(() =>
+  Boolean(
+    filters.value.search ||
+      filters.value.date ||
+      filters.value.technician_id ||
+      filters.value.status ||
+      filters.value.type ||
+      filters.value.priority ||
+      filters.value.production_line_id ||
+      filters.value.production_zone_id ||
+      filters.value.equipment_id,
+  ),
+)
 
-const canManageInterventions = computed(() => currentUserRole.value !== 'superadmin')
+const statusOptions = [
+  { value: 'pending', label: 'En attente' },
+  { value: 'planned', label: 'Planifiee' },
+  { value: 'in_progress', label: 'En cours' },
+  { value: 'completed', label: 'Terminee' },
+  { value: 'closed', label: 'Fermee' },
+  { value: 'cancelled', label: 'Annulee' },
+]
+const typeOptions = [
+  { value: 'corrective', label: 'Corrective' },
+  { value: 'preventive', label: 'Preventive' },
+  { value: 'improvement', label: 'Amelioration' },
+  { value: 'inspection', label: 'Inspection' },
+]
+const priorityOptions = [
+  { value: 'critical', label: 'Critique' },
+  { value: 'high', label: 'Haute' },
+  { value: 'medium', label: 'Moyenne' },
+  { value: 'low', label: 'Basse' },
+]
 
-const filteredInterventions = computed(() => {
-  const query = `${globalSearch.value} ${filters.value.search}`.trim().toLowerCase()
+const technicianOptions = computed(() =>
+  userOptions.value.filter((user) => ['technician', 'admin', 'super_admin'].includes(String(user.role || '').toLowerCase())),
+)
+const filteredZoneOptions = computed(() => {
+  const zones = lineOptions.value.flatMap((line) =>
+    Array.isArray(line.zones)
+      ? line.zones.map((zone) => ({ ...zone, production_line_id: zone.production_line_id || line.id }))
+      : [],
+  )
 
-  return interventions.filter((item) => {
-    const matchesQuery =
-      !query ||
-      [item.id, item.machine, item.line, item.type, item.priority, item.technician.name, item.status, item.description]
-        .join(' ')
-        .toLowerCase()
-        .includes(query)
-    const matchesTechnician = !filters.value.technician || item.technician.name === filters.value.technician
-    const matchesStatus = !filters.value.status || item.status === filters.value.status
-    const matchesDate = !filters.value.date || item.start.includes(formatDateFilter(filters.value.date))
-    return matchesQuery && matchesTechnician && matchesStatus && matchesDate
-  })
+  if (!filters.value.production_line_id) return zones
+  return zones.filter((zone) => Number(zone.production_line_id) === Number(filters.value.production_line_id))
+})
+const interventionRows = computed(() => interventions.value.map(normalizeInterventionRow))
+const kpiCards = computed(() => [
+  {
+    icon: 'activity',
+    title: content.value.kpis.total[0],
+    value: Number(stats.value.total_interventions || 0),
+    evolution: content.value.kpis.total[1],
+    tone: 'primary',
+  },
+  {
+    icon: 'clock',
+    title: content.value.kpis.inProgress[0],
+    value: Number(stats.value.in_progress_interventions || 0),
+    evolution: content.value.kpis.inProgress[1],
+    tone: 'attention',
+  },
+  {
+    icon: 'check',
+    title: content.value.kpis.done[0],
+    value: Number(stats.value.completed_interventions || 0),
+    evolution: content.value.kpis.done[1],
+    tone: 'primary',
+  },
+  {
+    icon: 'pause',
+    title: content.value.kpis.pending[0],
+    value: Number(stats.value.pending_interventions || 0),
+    evolution: content.value.kpis.pending[1],
+    tone: 'danger',
+  },
+  {
+    icon: 'users',
+    title: content.value.kpis.technicians[0],
+    value: Number(stats.value.active_technicians || 0),
+    evolution: content.value.kpis.technicians[1],
+    tone: 'primary',
+  },
+  {
+    icon: 'timer',
+    title: content.value.kpis.average[0],
+    value: formatDuration(stats.value.average_intervention_minutes),
+    evolution: content.value.kpis.average[1],
+    tone: 'warning',
+  },
+])
+
+watch(globalSearch, (value) => {
+  filters.value = { ...filters.value, search: value }
 })
 
-const kpiCards = computed(() => {
-  const total = interventions.length
-  const inProgress = interventions.filter((item) => item.status === 'En cours').length
-  const done = interventions.filter((item) => item.status === 'Terminee').length
-  const pending = interventions.filter((item) => item.status === 'En attente').length
-  return [
-    { icon: 'activity', title: content.value.kpis.total[0], value: total, evolution: content.value.kpis.total[1], tone: 'primary' },
-    { icon: 'clock', title: content.value.kpis.inProgress[0], value: inProgress, evolution: content.value.kpis.inProgress[1], tone: 'attention' },
-    { icon: 'check', title: content.value.kpis.done[0], value: done, evolution: content.value.kpis.done[1], tone: 'primary' },
-    { icon: 'pause', title: content.value.kpis.pending[0], value: pending, evolution: content.value.kpis.pending[1], tone: 'danger' },
-    { icon: 'users', title: content.value.kpis.technicians[0], value: technicians.value.length, evolution: content.value.kpis.technicians[1], tone: 'primary' },
-    { icon: 'timer', title: content.value.kpis.average[0], value: '2h 35', evolution: content.value.kpis.average[1], tone: 'warning' },
-  ]
-})
-function buildIntervention(id, machine, line, type, priority, technician, start, end, status, description) {
-  const isDone = status === 'Terminee'
+watch(
+  filters,
+  () => {
+    window.clearTimeout(filterTimer)
+    filterTimer = window.setTimeout(() => {
+      loadInterventions(1)
+    }, 300)
+  },
+  { deep: true },
+)
 
+onMounted(() => {
+  refreshAll()
+})
+
+function defaultForm() {
   return {
-    id,
-    machine,
-    line,
-    type,
-    priority,
-    technician,
-    start,
-    end,
-    status,
-    description,
-    createdAt: start,
-    duration: end === '-' ? 'En calcul' : '5h 40',
-    diagnostic: {
-      cause: priority === 'Critique' ? 'Usure mecanique acceleree' : 'Controle planifie ou derive mineure',
-      symptoms: description,
-      solution: isDone ? 'Action corrective realisee et test valide' : 'Diagnostic en cours',
-      notes: 'Intervention documentee dans le plan de maintenance SmartCalyx.',
-    },
-    parts: [
-      { name: 'Joint hydraulique', reference: 'JH-400-22', quantity: 1, state: 'Utilisee' },
-      { name: 'Filtre huile', reference: 'FH-110-A', quantity: 2, state: isDone ? 'Validee' : 'Reservee' },
-    ],
-    history: [
-      { label: 'Intervention creee', time: start, description: 'Demande enregistree dans SmartCalyx.' },
-      { label: 'Affectee au technicien', time: start, description: `${technician.name} affecte a l intervention.` },
-      { label: 'Debut intervention', time: start, description: 'Debut des controles terrain.' },
-      { label: 'Diagnostic', time: start, description },
-      { label: isDone ? 'Validation' : 'Reparation', time: end, description: isDone ? 'Tests termines et intervention validee.' : 'Action en progression.' },
-    ],
-    files: [
-      { type: 'Photo avant', title: `${id}-avant.jpg`, meta: 'Image terrain' },
-      { type: 'Photo apres', title: `${id}-apres.jpg`, meta: isDone ? 'Disponible' : 'A ajouter' },
-      { type: 'Rapport PDF', title: `${id}-rapport.pdf`, meta: 'PDF maintenance' },
-      { type: 'Piece jointe', title: `${id}-checklist.xlsx`, meta: 'Checklist controle' },
-    ],
+    code: '',
+    equipment_id: '',
+    type: 'corrective',
+    priority: 'medium',
+    status: 'pending',
+    description: '',
+    assigned_technician_id: '',
+    scheduled_at: '',
+    duration_minutes: '',
   }
 }
-function formatDateFilter(date) {
-  const [year, month, day] = date.split('-')
-  return `${day}/${month}/${year}`
+
+async function refreshAll() {
+  await Promise.all([loadInterventions(), loadStats(), loadReferenceData()])
+}
+
+async function loadInterventions(page = pagination.value.page || 1) {
+  loading.value = true
+  errorMessage.value = ''
+
+  try {
+    const params = buildQueryParams(page)
+    const response = await getInterventions(params)
+    interventions.value = response.interventions
+    pagination.value = response.pagination || {
+      page,
+      limit: params.limit,
+      total: response.interventions.length,
+      total_pages: response.interventions.length ? 1 : 0,
+    }
+  } catch (error) {
+    interventions.value = []
+    errorMessage.value = error.message
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadStats() {
+  try {
+    stats.value = await getInterventionStats()
+  } catch (error) {
+    stats.value = {}
+    if (!errorMessage.value) errorMessage.value = error.message
+  }
+}
+
+async function loadReferenceData() {
+  const [equipmentsResult, linesResult, usersResult] = await Promise.allSettled([
+    getEquipments(),
+    getProductionLines(),
+    getUsers(),
+  ])
+
+  equipmentOptions.value = equipmentsResult.status === 'fulfilled' ? equipmentsResult.value : []
+  lineOptions.value = linesResult.status === 'fulfilled' ? linesResult.value : []
+  userOptions.value = usersResult.status === 'fulfilled' ? usersResult.value : []
+}
+
+function buildQueryParams(page) {
+  const params = {
+    page,
+    limit: pagination.value.limit || 10,
+    sort_by: filters.value.sort_by || 'created_at',
+    sort_order: filters.value.sort_order || 'desc',
+  }
+
+  const fields = [
+    'search',
+    'status',
+    'type',
+    'priority',
+    'equipment_id',
+    'production_line_id',
+    'production_zone_id',
+    'technician_id',
+  ]
+
+  fields.forEach((field) => {
+    if (filters.value[field]) params[field] = filters.value[field]
+  })
+
+  if (filters.value.date) {
+    params.date_from = filters.value.date
+    params.date_to = filters.value.date
+  }
+
+  return params
+}
+
+function normalizeInterventionRow(intervention) {
+  const technicianName = intervention.technician ? displayUser(intervention.technician) : content.value.notAssigned
+  const equipment = intervention.equipment
+    ? `${intervention.equipment.code || ''} ${intervention.equipment.name || ''}`.trim()
+    : content.value.noValue
+
+  return {
+    ...intervention,
+    raw: intervention,
+    code: intervention.code || `#${intervention.id}`,
+    machine: equipment || content.value.noValue,
+    line: formatNested(intervention.production_line),
+    zone: formatNested(intervention.production_zone),
+    typeLabel: displayOption(typeOptions, intervention.type),
+    priorityLabel: displayOption(priorityOptions, intervention.priority),
+    technician: {
+      name: technicianName,
+      initials: initials(technicianName),
+      color: intervention.technician ? '#6A9A2A' : '#6b7280',
+    },
+    start: formatDateTime(intervention.started_at || intervention.scheduled_at) || 'Non planifiee',
+    end: formatDateTime(intervention.completed_at) || content.value.noValue,
+    duration: formatDuration(intervention.duration_minutes),
+    statusLabel: displayOption(statusOptions, intervention.status),
+  }
+}
+
+function formatNested(value) {
+  if (!value) return content.value.noValue
+  return `${value.code || ''} ${value.name || ''}`.trim() || content.value.noValue
+}
+
+function displayOption(options, value) {
+  return options.find((option) => option.value === value)?.label || value || content.value.noValue
+}
+
+function displayUser(user) {
+  return [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email || content.value.notAssigned
+}
+
+function initials(name) {
+  return String(name || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || '--'
+}
+
+function formatDateTime(value) {
+  if (!value) return ''
+  return new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
+function formatDuration(value) {
+  const minutes = Number(value || 0)
+  if (!minutes) return content.value.noValue
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  if (!hours) return `${rest} min`
+  return `${hours}h ${String(rest).padStart(2, '0')}`
+}
+
+async function openDrawer(row) {
+  try {
+    selectedIntervention.value = normalizeInterventionRow(await getInterventionById(row.raw?.id || row.id))
+  } catch (error) {
+    errorMessage.value = error.message
+  }
+}
+
+function openCreateModal() {
+  editingIntervention.value = null
+  form.value = defaultForm()
+  formError.value = ''
+  formOpen.value = true
+}
+
+function openEditModal(row) {
+  const intervention = row.raw || row
+  editingIntervention.value = intervention
+  form.value = {
+    code: intervention.code || '',
+    equipment_id: intervention.equipment?.id || '',
+    type: intervention.type || 'corrective',
+    priority: intervention.priority || 'medium',
+    status: intervention.status || 'pending',
+    description: intervention.description || '',
+    assigned_technician_id: intervention.technician?.id || '',
+    scheduled_at: toDatetimeLocal(intervention.scheduled_at),
+    duration_minutes: intervention.duration_minutes ?? '',
+  }
+  formError.value = ''
+  formOpen.value = true
+}
+
+function closeForm() {
+  formOpen.value = false
+  formError.value = ''
+}
+
+async function submitForm() {
+  saving.value = true
+  formError.value = ''
+
+  try {
+    const payload = normalizeFormPayload()
+    if (editingIntervention.value) {
+      await updateIntervention(editingIntervention.value.id, payload)
+      successMessage.value = 'Intervention modifiee avec succes.'
+    } else {
+      await createIntervention(payload)
+      successMessage.value = 'Intervention creee avec succes.'
+    }
+    closeForm()
+    await Promise.all([loadInterventions(), loadStats()])
+  } catch (error) {
+    formError.value = error.message
+  } finally {
+    saving.value = false
+  }
+}
+
+function normalizeFormPayload() {
+  return {
+    code: form.value.code,
+    equipment_id: form.value.equipment_id,
+    type: form.value.type,
+    priority: form.value.priority,
+    status: form.value.status,
+    description: form.value.description,
+    assigned_technician_id: form.value.assigned_technician_id || null,
+    scheduled_at: form.value.scheduled_at || null,
+    duration_minutes: form.value.duration_minutes === '' ? null : Number(form.value.duration_minutes),
+  }
+}
+
+async function removeIntervention(row) {
+  if (!window.confirm(content.value.table.deleteConfirm)) return
+
+  try {
+    await deleteIntervention(row.raw?.id || row.id)
+    successMessage.value = 'Intervention supprimee avec succes.'
+    await Promise.all([loadInterventions(), loadStats()])
+  } catch (error) {
+    errorMessage.value = error.message
+  }
+}
+
+function changePage(page) {
+  loadInterventions(page)
+}
+
+function changeSort(sort) {
+  filters.value = {
+    ...filters.value,
+    sort_by: sort.key,
+    sort_order: sort.direction,
+  }
+}
+
+function resetFilters() {
+  filters.value = {
+    search: '',
+    date: '',
+    technician_id: '',
+    status: '',
+    type: '',
+    priority: '',
+    production_line_id: '',
+    production_zone_id: '',
+    equipment_id: '',
+    sort_by: 'created_at',
+    sort_order: 'desc',
+  }
+  globalSearch.value = ''
+}
+
+function exportCurrentRows() {
+  if (!interventionRows.value.length) {
+    successMessage.value = 'Aucune intervention reelle a exporter.'
+    return
+  }
+
+  const headers = ['code', 'machine', 'line', 'zone', 'type', 'priority', 'technician', 'start', 'end', 'duration', 'status']
+  const csv = [
+    headers.join(';'),
+    ...interventionRows.value.map((row) =>
+      [
+        row.code,
+        row.machine,
+        row.line,
+        row.zone,
+        row.typeLabel,
+        row.priorityLabel,
+        row.technician.name,
+        row.start,
+        row.end,
+        row.duration,
+        row.statusLabel,
+      ]
+        .map((value) => `"${String(value || '').replace(/"/g, '""')}"`)
+        .join(';'),
+    ),
+  ].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'interventions.csv'
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function toDatetimeLocal(value) {
+  if (!value) return ''
+  const date = new Date(value)
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  return date.toISOString().slice(0, 16)
 }
 
 function toggleSidebar() {
@@ -337,7 +842,7 @@ h1 {
   letter-spacing: 0;
 }
 
-p {
+.page-header p {
   margin-top: 8px;
   color: #aab7c7;
   font-size: 15px;
@@ -389,8 +894,214 @@ p {
   backdrop-filter: blur(3px);
 }
 
+.state-card,
+.empty-card,
+.skeleton-card,
+.state-message {
+  border: 1px solid rgba(116, 135, 158, 0.28);
+  border-radius: 8px;
+  background: rgba(17, 27, 38, 0.9);
+  padding: 22px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
+}
+
+.state-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #ffb4be;
+}
+
+.state-card button,
+.empty-card button,
+.primary-action {
+  border: 1px solid rgba(131, 185, 92, 0.44);
+  border-radius: 12px;
+  background: #5f8f2f;
+  color: #f8fbff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 950;
+  min-height: 42px;
+  padding: 0 16px;
+}
+
+.state-message.success {
+  color: #bce39d;
+}
+
+.skeleton-card {
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton-card span {
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(126,146,170,.12), rgba(126,146,170,.26), rgba(126,146,170,.12));
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.empty-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.empty-card h2 {
+  margin: 0;
+  color: #f8fbff;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.empty-card p {
+  color: #aab7c7;
+  font-weight: 820;
+}
+
+.empty-illustration {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(131, 185, 92, 0.18);
+  color: #bce39d;
+  font-size: 32px;
+}
+
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 10, 18, 0.62);
+  backdrop-filter: blur(3px);
+  padding: 18px;
+}
+
+.modal-panel {
+  width: min(760px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  border: 1px solid rgba(126, 146, 170, 0.24);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(31,43,57,.98), rgba(16,25,36,.98)), #101924;
+  color: #f4f7fb;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.44);
+}
+
+.modal-panel header,
+.modal-panel footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(116, 135, 158, 0.15);
+}
+
+.modal-panel footer {
+  border-top: 1px solid rgba(116, 135, 158, 0.15);
+  border-bottom: 0;
+}
+
+.modal-panel header span {
+  color: #bce39d;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.modal-panel h2 {
+  margin: 5px 0 0;
+  color: #f8fbff;
+  font-size: 21px;
+  font-weight: 950;
+}
+
+.modal-panel header button,
+.ghost-action {
+  min-height: 40px;
+  border: 1px solid rgba(210, 221, 234, 0.28);
+  border-radius: 10px;
+  background: rgba(13, 21, 32, 0.82);
+  color: #f2f6fb;
+  cursor: pointer;
+  padding: 0 14px;
+  font-weight: 900;
+}
+
+.modal-panel header button {
+  width: 40px;
+  padding: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 20px;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 7px;
+  color: #aeb9c8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.form-grid label.full {
+  grid-column: 1 / -1;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  width: 100%;
+  border: 1px solid rgba(126, 146, 170, 0.26);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.72);
+  color: #f4f7fb;
+  outline: none;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.form-error {
+  color: #ffb4be;
+  padding: 0 20px 18px;
+  font-weight: 850;
+}
+
+.primary-action:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
 .interventions-page :deep(.admin-top-controls) {
   justify-content: flex-end;
+}
+
+.light-title-icon,
+.light-domain-badge,
+.light-header-actions {
+  display: none;
 }
 
 .interventions-page :deep(.search-control input),
@@ -407,48 +1118,9 @@ p {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
-.interventions-page :deep(.search-control input) {
-  height: 42px;
-  color: #dbe4ef;
-  font-size: 13px;
-}
-
-.interventions-page :deep(.search-control input::placeholder) {
-  color: #8795a7;
-}
-
-.interventions-page :deep(.search-control span) {
-  color: #5b9bd7;
-}
-
-.interventions-page :deep(.live-control) {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0 16px;
-  color: #f4d96a;
-}
-
-.interventions-page :deep(.language-button) {
-  height: 42px;
-  min-width: 86px;
-  font-size: 13px;
-}
-
-.interventions-page :deep(.language-menu) {
-  border-color: rgba(126, 146, 170, 0.24);
-  border-radius: 12px;
-  background: #121c28;
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
-}
-
-.interventions-page :deep(.language-menu button) {
-  color: #e7edf5;
-}
-
-.interventions-page :deep(.language-menu button:hover) {
-  background: rgba(75, 153, 212, 0.16);
-  color: #cfe9ff;
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
 @media (max-width: 960px) {
@@ -462,22 +1134,201 @@ p {
   [dir='rtl'] .interventions-page {
     padding: 88px 16px 32px;
   }
-}
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 24px;
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-@media (max-width: 1300px) {
-  .charts-grid {
+:global(html[data-theme='light']) .interventions-layout,
+:global(html[data-theme='light']) .interventions-page {
+  background: #f7f9f3 !important;
+  background-image: none !important;
+  color: #4a0a0a !important;
+}
+
+:global(html[data-theme='light']) .interventions-page {
+  gap: 18px;
+}
+
+:global(html[data-theme='light']) .page-header {
+  align-items: center;
+}
+
+:global(html[data-theme='light']) .page-header nav {
+  display: none;
+}
+
+:global(html[data-theme='light']) .light-title-icon {
+  width: 54px;
+  height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(106, 154, 42, 0.22);
+  border-radius: 16px;
+  background: #ffffff;
+  color: #6a9a2a;
+  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.07);
+  font-size: 25px;
+}
+
+:global(html[data-theme='light']) .light-domain-badge {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #e3edcf;
+  color: #6a9a2a;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+:global(html[data-theme='light']) .page-header h1 {
+  margin-top: 7px;
+  color: #4a0a0a !important;
+  font-size: 32px;
+}
+
+:global(html[data-theme='light']) .page-header p {
+  max-width: 700px;
+  color: #53667f !important;
+  line-height: 1.55;
+}
+
+:global(html[data-theme='light']) .light-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+:global(html[data-theme='light']) .light-export-button,
+:global(html[data-theme='light']) .light-create-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 0 15px;
+  font-size: 14px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+:global(html[data-theme='light']) .light-export-button {
+  border: 1px solid #dfe5d6;
+  background: #ffffff;
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .light-create-button {
+  border: 1px solid #6a9a2a;
+  background: #6a9a2a;
+  color: #ffffff;
+}
+
+:global(html[data-theme='light']) .page-header > .admin-top-controls,
+:global(html[data-theme='light']) .interventions-page :deep(.admin-top-controls) {
+  display: none;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-grid) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-card) {
+  min-height: 96px;
+  align-items: center;
+  border-color: #edf0e8;
+  background: #ffffff;
+  background-image: none;
+  box-shadow: 0 10px 26px rgba(74, 10, 10, 0.05);
+  padding: 14px;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-card:nth-child(n+5)) {
+  display: none;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-card strong) {
+  color: #4a0a0a;
+  font-size: 24px;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-card p) {
+  color: #4a0a0a;
+  font-size: 12px;
+}
+
+:global(html[data-theme='light']) .interventions-page :deep(.kpi-card small) {
+  color: #53667f;
+}
+
+:global(html[data-theme='light']) .state-card,
+:global(html[data-theme='light']) .empty-card,
+:global(html[data-theme='light']) .skeleton-card,
+:global(html[data-theme='light']) .state-message {
+  border-color: #edf0e8;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(74, 10, 10, 0.06);
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .empty-card h2 {
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .empty-card p {
+  color: #53667f;
+}
+
+:global(html[data-theme='light']) .modal-panel {
+  border-color: #edf0e8;
+  background: #ffffff;
+  background-image: none;
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .modal-panel h2 {
+  color: #4a0a0a;
+}
+
+:global(html[data-theme='light']) .form-grid input,
+:global(html[data-theme='light']) .form-grid select,
+:global(html[data-theme='light']) .form-grid textarea {
+  border-color: #dfe5d6;
+  background: #f7f9f3;
+  color: #4a0a0a;
+}
+
+@media (max-width: 1180px) {
+  :global(html[data-theme='light']) .interventions-page :deep(.kpi-grid) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 768px) {
-  .charts-grid {
+@media (max-width: 760px) {
+  :global(html[data-theme='light']) .page-header {
+    align-items: flex-start;
+  }
+
+  :global(html[data-theme='light']) .light-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+
+  :global(html[data-theme='light']) .light-export-button,
+  :global(html[data-theme='light']) .light-create-button {
+    flex: 1 1 180px;
+  }
+
+  :global(html[data-theme='light']) .interventions-page :deep(.kpi-grid) {
     grid-template-columns: 1fr;
   }
 }

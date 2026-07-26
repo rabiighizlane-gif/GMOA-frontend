@@ -51,9 +51,7 @@
             <span>{{ content.role }}</span>
             <select v-model="selectedRole">
               <option value="all">{{ content.allRoles }}</option>
-              <option value="admin">{{ roleLabels.admin }}</option>
-              <option value="technician">{{ roleLabels.technician }}</option>
-              <option value="operator">{{ roleLabels.operator }}</option>
+              <option v-for="role in roleOptions" :key="role" :value="role">{{ roleLabel(role) }}</option>
             </select>
           </label>
 
@@ -61,11 +59,13 @@
             <span>{{ content.status }}</span>
             <select v-model="selectedStatus">
               <option value="all">{{ content.allStatuses }}</option>
-              <option value="active">{{ content.active }}</option>
-              <option value="pending">{{ content.pending }}</option>
-              <option value="blocked">{{ content.blocked }}</option>
+              <option v-for="status in statusOptions" :key="status" :value="status">{{ statusLabel(status) }}</option>
             </select>
           </label>
+        </div>
+
+        <div v-if="actionMessage" class="users-state users-state-info" role="status">
+          {{ actionMessage }}
         </div>
 
         <div class="table-wrap">
@@ -81,41 +81,58 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in filteredUsers" :key="user.id">
-                <td>
-                  <div class="user-cell">
-                    <span :class="avatarTone(user.name)">{{ getInitials(user.name) }}</span>
-                    <div>
-                      <strong>{{ displayName(user.name) }}</strong>
-                      <small>{{ user.email }}</small>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="role-pill" :class="user.role">{{ roleLabels[user.role] }}</span>
-                </td>
-                <td>{{ departmentLabel(user.department) }}</td>
-                <td>
-                  <span class="status-pill" :class="user.status">{{ statusLabel(user.status) }}</span>
-                </td>
-                <td>{{ displayDate(user.lastLogin) }}</td>
-                <td>
-                  <div class="actions">
-                    <button type="button" @click="openUserProfile(user)">{{ content.view }}</button>
-                    <button type="button" @click="openEditModal(user)">{{ content.edit }}</button>
-                  </div>
+              <tr v-if="loading">
+                <td colspan="6" class="users-empty-cell">
+                  {{ content.loadingUsers }}
                 </td>
               </tr>
+              <tr v-else-if="errorMessage">
+                <td colspan="6" class="users-empty-cell">
+                  {{ errorMessage }}
+                </td>
+              </tr>
+              <tr v-else-if="filteredUsers.length === 0">
+                <td colspan="6" class="users-empty-cell">
+                  {{ content.emptyUsers }}
+                </td>
+              </tr>
+              <template v-else>
+                <tr v-for="user in filteredUsers" :key="user.id">
+                  <td>
+                    <div class="user-cell">
+                      <span :class="avatarTone(user.role)">{{ getInitials(userFullName(user)) }}</span>
+                      <div>
+                        <strong>{{ displayName(userFullName(user)) }}</strong>
+                        <small>{{ user.email || content.unavailableValue }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-pill" :class="roleClass(user.role)">{{ roleLabel(user.role) }}</span>
+                  </td>
+                  <td>{{ departmentLabel(user.department) }}</td>
+                  <td>
+                    <span class="status-pill" :class="statusClass(user.status)">{{ statusLabel(user.status) }}</span>
+                  </td>
+                  <td>{{ displayDate(user.last_login) }}</td>
+                  <td>
+                    <div class="actions">
+                      <button type="button" @click="openUserProfile(user)">{{ content.view }}</button>
+                      <button type="button" @click="openEditModal(user)">{{ content.edit }}</button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
       </section>
     </section>
 
-    <div v-if="isUserModalOpen" class="modal-backdrop" @click.self="closeUserModal">
+    <div v-if="isUserModalOpen || isEditModalOpen" class="modal-backdrop" @click.self="closeUserModal">
       <form class="user-modal" @submit.prevent="saveUser">
         <div class="modal-heading">
-          <h2>{{ editingUserId ? content.edit : content.addUser }}</h2>
+          <h2>{{ isEditModalOpen ? content.editUser : content.addUser }}</h2>
           <button type="button" class="modal-close" :aria-label="content.close" @click="closeUserModal">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -123,45 +140,71 @@
         </div>
 
         <label>
-          <span>{{ content.fullName }}</span>
-          <input v-model="newUser.name" type="text" required />
+          <span>{{ content.firstName }}</span>
+          <input v-model.trim="newUser.first_name" type="text" required />
+        </label>
+
+        <label>
+          <span>{{ content.lastName }}</span>
+          <input v-model.trim="newUser.last_name" type="text" required />
         </label>
 
         <label>
           <span>{{ content.email }}</span>
-          <input v-model="newUser.email" type="email" required />
+          <input v-model.trim="newUser.email" type="email" required />
+        </label>
+
+        <label v-if="!isEditModalOpen">
+          <span>{{ content.password }}</span>
+          <input v-model="newUser.password" type="password" autocomplete="new-password" required />
+        </label>
+
+        <label v-if="!isEditModalOpen">
+          <span>{{ content.passwordConfirmation }}</span>
+          <input v-model="newUser.password_confirmation" type="password" autocomplete="new-password" required />
         </label>
 
         <label>
           <span>{{ content.role }}</span>
-          <select v-model="newUser.role" @change="syncPermissionDefaults">
-            <option value="admin">{{ roleLabels.admin }}</option>
-            <option value="technician">{{ roleLabels.technician }}</option>
-            <option value="operator">{{ roleLabels.operator }}</option>
+          <select v-model="newUser.role" required>
+            <option value="" disabled>{{ content.selectRole }}</option>
+            <option v-for="role in createRoleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
           </select>
         </label>
 
         <label>
           <span>{{ content.department }}</span>
-          <input v-model="newUser.department" type="text" required />
+          <select v-model="newUser.department" required>
+            <option value="" disabled>{{ content.selectDepartment }}</option>
+            <option v-for="department in departmentOptions" :key="department.value" :value="department.value">
+              {{ department.label }}
+            </option>
+          </select>
         </label>
 
-        <section v-if="editingUserId" class="edit-permissions-panel">
-          <h3>{{ pickText({ FR: 'Permissions', EN: 'Permissions', AR: 'الصلاحيات' }) }}</h3>
-          <label v-for="permission in editablePermissions" :key="permission.key" class="permission-toggle">
-            <span>{{ permission.label }}</span>
-            <input v-model="permissionForm[permission.key]" type="checkbox" />
-          </label>
-        </section>
+        <label>
+          <span>{{ content.status }}</span>
+          <select v-model="newUser.status" required>
+            <option v-for="status in createStatusOptions" :key="status.value" :value="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+        </label>
+
+        <p v-if="showSelfStatusWarning" class="modal-warning" role="status">{{ content.selfStatusWarning }}</p>
+
+        <p v-if="modalErrorMessage || editError" class="modal-error" role="alert">{{ modalErrorMessage || editError }}</p>
 
         <div class="modal-actions">
           <button type="button" class="secondary-button" @click="closeUserModal">{{ content.cancel }}</button>
-          <button type="submit" class="primary-button">{{ content.save }}</button>
+          <button type="submit" class="primary-button" :disabled="formSubmitting">
+            {{ formSubmitting ? content.saving : isEditModalOpen ? content.saveChanges : content.save }}
+          </button>
         </div>
       </form>
     </div>
 
-    <div v-if="selectedUser" class="modal-backdrop" @click.self="closeUserProfile">
+    <div v-if="selectedUser && !isEditModalOpen" class="modal-backdrop" @click.self="closeUserProfile">
       <article class="user-profile-modal" :class="selectedUser.role">
         <button type="button" class="modal-close profile-close" :aria-label="content.close" @click="closeUserProfile">
           <span aria-hidden="true"></span>
@@ -170,13 +213,13 @@
 
         <div class="user-profile-card">
           <div class="profile-identity-preview">
-            <div class="profile-photo" :class="avatarTone(selectedUser.name)">
-              {{ getInitials(displayName(selectedUser.name)) }}
+            <div class="profile-photo" :class="avatarTone(selectedUser.role)">
+              {{ getInitials(displayName(userFullName(selectedUser))) }}
             </div>
             <div>
               <span class="profile-kicker">{{ content.user }}</span>
-              <h2>{{ displayName(selectedUser.name) }}</h2>
-              <p>{{ roleLabels[selectedUser.role] }}</p>
+              <h2>{{ displayName(userFullName(selectedUser)) }}</h2>
+              <p>{{ roleLabel(selectedUser.role) }}</p>
             </div>
           </div>
 
@@ -184,15 +227,15 @@
             <ul>
               <li>
                 <span aria-hidden="true">✉</span>
-                <strong>{{ selectedUser.email }}</strong>
+                <strong>{{ selectedUser.email || content.unavailableValue }}</strong>
               </li>
               <li>
                 <span aria-hidden="true">☎</span>
-                <strong>{{ selectedUser.phone || '+212 6 12 34 56 78' }}</strong>
+                <strong>{{ selectedUser.phone || content.unavailableValue }}</strong>
               </li>
               <li>
                 <span aria-hidden="true">⌖</span>
-                <strong>{{ selectedUser.location || locationLabel }}</strong>
+                <strong>{{ selectedUser.location || content.unavailableValue }}</strong>
               </li>
               <li>
                 <span aria-hidden="true">◎</span>
@@ -200,29 +243,29 @@
               </li>
               <li>
                 <span aria-hidden="true">◷</span>
-                <strong>GMT+1 (Europe/Casablanca)</strong>
+                <strong>{{ selectedUser.timezone || content.unavailableValue }}</strong>
               </li>
             </ul>
           </div>
         </div>
 
         <div class="profile-role-line">
-          <span class="role-pill" :class="selectedUser.role">{{ roleLabels[selectedUser.role] }}</span>
-          <span class="status-pill" :class="selectedUser.status">{{ statusLabel(selectedUser.status) }}</span>
+          <span class="role-pill" :class="roleClass(selectedUser.role)">{{ roleLabel(selectedUser.role) }}</span>
+          <span class="status-pill" :class="statusClass(selectedUser.status)">{{ statusLabel(selectedUser.status) }}</span>
         </div>
 
         <dl class="profile-detail-grid">
           <div>
             <dt>{{ content.fullName }}</dt>
-            <dd>{{ displayName(selectedUser.name) }}</dd>
+            <dd>{{ displayName(userFullName(selectedUser)) }}</dd>
           </div>
           <div>
             <dt>{{ content.email }}</dt>
-            <dd>{{ selectedUser.email }}</dd>
+            <dd>{{ selectedUser.email || content.unavailableValue }}</dd>
           </div>
           <div>
             <dt>{{ content.role }}</dt>
-            <dd>{{ roleLabels[selectedUser.role] }}</dd>
+            <dd>{{ roleLabel(selectedUser.role) }}</dd>
           </div>
           <div>
             <dt>{{ content.department }}</dt>
@@ -234,7 +277,7 @@
           </div>
           <div>
             <dt>{{ content.lastLogin }}</dt>
-            <dd>{{ displayDate(selectedUser.lastLogin) }}</dd>
+            <dd>{{ displayDate(selectedUser.last_login) }}</dd>
           </div>
         </dl>
 
@@ -244,14 +287,22 @@
           </div>
 
           <ol class="user-activity-list">
-            <li v-for="activity in userActivities(selectedUser)" :key="activity.title">
-              <span class="activity-icon" :class="activity.tone" aria-hidden="true">{{ activity.icon }}</span>
+            <li v-if="userActivities(selectedUser).length === 0">
               <div>
-                <strong>{{ activity.title }}</strong>
-                <small>{{ activity.time }}</small>
+                <strong>{{ content.unavailableData }}</strong>
+                <small>{{ content.unavailableData }}</small>
               </div>
-              <span class="activity-dot" :class="activity.tone" aria-hidden="true"></span>
             </li>
+            <template v-else>
+              <li v-for="activity in userActivities(selectedUser)" :key="activity.title">
+                <span class="activity-icon" :class="activity.tone" aria-hidden="true">{{ activity.icon }}</span>
+                <div>
+                  <strong>{{ activity.title }}</strong>
+                  <small>{{ activity.time }}</small>
+                </div>
+                <span class="activity-dot" :class="activity.tone" aria-hidden="true"></span>
+              </li>
+            </template>
           </ol>
 
           <button type="button" class="view-activity-button">
@@ -265,12 +316,18 @@
           </div>
 
           <ul class="permissions-mini-list">
-            <li v-for="permission in userPermissions(selectedUser)" :key="permission.label">
-              <span>{{ permission.label }}</span>
-              <strong :class="{ denied: !permission.allowed }" aria-hidden="true">
-                {{ permission.allowed ? '✓' : '×' }}
-              </strong>
+            <li v-if="userPermissions(selectedUser).length === 0">
+              <span>{{ content.unavailableData }}</span>
+              <strong aria-hidden="true">—</strong>
             </li>
+            <template v-else>
+              <li v-for="permission in userPermissions(selectedUser)" :key="permission.label">
+                <span>{{ permission.label }}</span>
+                <strong :class="{ denied: !permission.allowed }" aria-hidden="true">
+                  {{ permission.allowed ? '✓' : '×' }}
+                </strong>
+              </li>
+            </template>
           </ul>
         </section>
       </article>
@@ -279,61 +336,34 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AdminTopControls from '@/Components/AdminTopControls.vue'
 import Sidebar from '@/Components/sidebar.vue'
+import { createUser, getUsers, updateUser } from '@/services/usersService'
 import { useLanguageStore } from '@/stores/language'
 
 const languageStore = useLanguageStore()
 const isSidebarOpen = ref(false)
 const isUserModalOpen = ref(false)
+const isEditModalOpen = ref(false)
 const selectedUser = ref(null)
-const editingUserId = ref(null)
 const searchQuery = ref('')
 const selectedRole = ref('all')
 const selectedStatus = ref('all')
-const permissionForm = ref({})
-const users = ref([
-  {
-    id: 1,
-    name: 'Ghizlane Rabii',
-    email: 'ghizlane@smartcalyx.ma',
-    role: 'admin',
-    department: 'administration',
-    status: 'active',
-    lastLogin: '2026-07-16 15:30',
-  },
-  {
-    id: 2,
-    name: 'Ahmed El Mansouri',
-    email: 'ahmed@smartcalyx.ma',
-    role: 'technician',
-    department: 'maintenance',
-    status: 'active',
-    lastLogin: '2026-07-16 12:10',
-  },
-  {
-    id: 3,
-    name: 'Nabil Amrani',
-    email: 'nabil@smartcalyx.ma',
-    role: 'operator',
-    department: 'production',
-    status: 'pending',
-    lastLogin: '2026-07-15 18:22',
-  },
-  {
-    id: 4,
-    name: 'Youssef Berrada',
-    email: 'youssef@smartcalyx.ma',
-    role: 'technician',
-    department: 'maintenance',
-    status: 'blocked',
-    lastLogin: '2026-07-10 09:42',
-  },
-])
+const users = ref([])
+const loading = ref(true)
+const errorMessage = ref('')
+const actionMessage = ref('')
+const modalErrorMessage = ref('')
+const savingUser = ref(false)
+const editLoading = ref(false)
+const editError = ref('')
+const editSuccess = ref('')
 const newUser = ref(createEmptyUser())
 
 const language = computed(() => languageStore.language)
+
+onMounted(loadUsers)
 
 const pageContent = {
   FR: {
@@ -341,6 +371,16 @@ const pageContent = {
     title: 'Gestion des utilisateurs',
     subtitle: 'Ajoutez, filtrez et suivez les comptes de la plateforme.',
     addUser: 'Ajouter un utilisateur',
+    createUnavailable: "La création d'utilisateur sera disponible prochainement.",
+    editUser: "Modifier l'utilisateur",
+    saveChanges: 'Enregistrer les modifications',
+    firstName: 'Prénom',
+    lastName: 'Nom',
+    password: 'Mot de passe',
+    passwordConfirmation: 'Confirmation du mot de passe',
+    selectRole: 'Sélectionner un rôle',
+    selectDepartment: 'Sélectionner un département',
+    saving: 'Enregistrement...',
     search: 'Recherche',
     searchPlaceholder: 'Rechercher par nom ou e-mail...',
     role: 'Rôle',
@@ -361,6 +401,18 @@ const pageContent = {
     email: 'E-mail',
     cancel: 'Annuler',
     save: 'Enregistrer',
+    loadingUsers: 'Chargement des utilisateurs...',
+    emptyUsers: 'Aucun utilisateur trouvé.',
+    loadError: 'Impossible de charger les utilisateurs.',
+    unavailableValue: '—',
+    unavailableData: 'Données indisponibles',
+    never: 'Jamais',
+    createSuccess: 'Utilisateur créé avec succès.',
+    updateSuccess: 'Utilisateur modifié avec succès.',
+    invalidEmail: 'Veuillez saisir une adresse e-mail valide.',
+    passwordMismatch: 'La confirmation du mot de passe ne correspond pas.',
+    requiredFields: 'Veuillez remplir tous les champs obligatoires.',
+    selfStatusWarning: 'Vous modifiez le statut de votre propre compte. Le backend validera cette action.',
     totalUsers: 'Utilisateurs',
     activeUsers: 'Actifs',
     pendingUsers: 'En attente',
@@ -371,6 +423,16 @@ const pageContent = {
     title: 'User management',
     subtitle: 'Add, filter, and monitor platform accounts.',
     addUser: 'Add user',
+    createUnavailable: 'User creation will be available soon.',
+    editUser: 'Edit user',
+    saveChanges: 'Save changes',
+    firstName: 'First name',
+    lastName: 'Last name',
+    password: 'Password',
+    passwordConfirmation: 'Password confirmation',
+    selectRole: 'Select a role',
+    selectDepartment: 'Select a department',
+    saving: 'Saving...',
     search: 'Search',
     searchPlaceholder: 'Search by name or e-mail...',
     role: 'Role',
@@ -391,6 +453,18 @@ const pageContent = {
     email: 'E-mail',
     cancel: 'Cancel',
     save: 'Save',
+    loadingUsers: 'Loading users...',
+    emptyUsers: 'No users found.',
+    loadError: 'Unable to load users.',
+    unavailableValue: '—',
+    unavailableData: 'Data unavailable',
+    never: 'Never',
+    createSuccess: 'User created successfully.',
+    updateSuccess: 'User updated successfully.',
+    invalidEmail: 'Please enter a valid email address.',
+    passwordMismatch: 'Password confirmation does not match.',
+    requiredFields: 'Please fill in all required fields.',
+    selfStatusWarning: 'You are changing the status of your own account. The backend will validate this action.',
     totalUsers: 'Users',
     activeUsers: 'Active',
     pendingUsers: 'Pending',
@@ -401,6 +475,16 @@ const pageContent = {
     title: 'إدارة المستخدمين',
     subtitle: 'إضافة الحسابات وتصفيتها ومتابعتها داخل المنصة.',
     addUser: 'إضافة مستخدم',
+    createUnavailable: 'سيكون إنشاء المستخدم متاحًا قريبًا.',
+    editUser: 'تعديل المستخدم',
+    saveChanges: 'حفظ التعديلات',
+    firstName: 'الاسم الشخصي',
+    lastName: 'الاسم العائلي',
+    password: 'كلمة المرور',
+    passwordConfirmation: 'تأكيد كلمة المرور',
+    selectRole: 'اختر الدور',
+    selectDepartment: 'اختر القسم',
+    saving: 'جاري الحفظ...',
     search: 'البحث',
     searchPlaceholder: 'ابحث بالاسم أو البريد الإلكتروني...',
     role: 'الدور',
@@ -421,6 +505,18 @@ const pageContent = {
     email: 'البريد الإلكتروني',
     cancel: 'إلغاء',
     save: 'حفظ',
+    loadingUsers: 'جاري تحميل المستخدمين...',
+    emptyUsers: 'لم يتم العثور على مستخدمين.',
+    loadError: 'تعذر تحميل المستخدمين.',
+    unavailableValue: '—',
+    unavailableData: 'البيانات غير متوفرة',
+    never: 'أبدًا',
+    createSuccess: 'تم إنشاء المستخدم بنجاح.',
+    updateSuccess: 'تم تعديل المستخدم بنجاح.',
+    invalidEmail: 'يرجى إدخال بريد إلكتروني صحيح.',
+    passwordMismatch: 'تأكيد كلمة المرور غير مطابق.',
+    requiredFields: 'يرجى ملء جميع الحقول الإلزامية.',
+    selfStatusWarning: 'أنت تغيّر حالة حسابك الحالي. سيقوم backend بالتحقق من هذه العملية.',
     totalUsers: 'المستخدمون',
     activeUsers: 'نشطون',
     pendingUsers: 'في الانتظار',
@@ -438,32 +534,75 @@ const languageLabel = computed(() =>
   }),
 )
 
-const locationLabel = computed(() =>
-  pickText({
-    FR: 'Casablanca, Maroc',
-    EN: 'Casablanca, Morocco',
-    AR: 'الدار البيضاء، المغرب',
-  }),
-)
-
 const roleLabels = computed(() => ({
-  admin: pickText({ FR: 'Administratrice', EN: 'Administrator', AR: 'مديرة' }),
+  super_admin: pickText({ FR: 'Super administrateur', EN: 'Super administrator', AR: 'مدير عام' }),
+  admin: pickText({ FR: 'Administrateur', EN: 'Administrator', AR: 'مدير' }),
   technician: pickText({ FR: 'Technicien', EN: 'Technician', AR: 'تقني' }),
   operator: pickText({ FR: 'Opérateur', EN: 'Operator', AR: 'مشغل' }),
 }))
 
+const departmentLabels = computed(() => ({
+  ADMINISTRATION: pickText({ FR: 'Administration', EN: 'Administration', AR: 'الإدارة' }),
+  MAINTENANCE: pickText({ FR: 'Maintenance', EN: 'Maintenance', AR: 'الصيانة' }),
+  PRODUCTION: pickText({ FR: 'Production', EN: 'Production', AR: 'الإنتاج' }),
+  QUALITE: pickText({ FR: 'Qualité', EN: 'Quality', AR: 'الجودة' }),
+  LOGISTIQUE: pickText({ FR: 'Logistique', EN: 'Logistics', AR: 'اللوجستيك' }),
+  AUTRE: pickText({ FR: 'Autre', EN: 'Other', AR: 'أخرى' }),
+}))
+
+const roleOptions = computed(() => ['super_admin', 'admin', 'technician', 'operator'])
+const statusOptions = computed(() => ['ACTIVE', 'PENDING', 'BLOCKED'])
+const createRoleOptions = computed(() =>
+  ['admin', 'technician', 'operator'].map((role) => ({
+    value: role,
+    label: roleLabel(role),
+  })),
+)
+const departmentOptions = computed(() =>
+  Object.keys(departmentLabels.value).map((department) => ({
+    value: department,
+    label: departmentLabel(department),
+  })),
+)
+const createStatusOptions = computed(() =>
+  statusOptions.value.map((status) => ({
+    value: status,
+    label: statusLabel(status),
+  })),
+)
+const formSubmitting = computed(() => savingUser.value || editLoading.value)
+const connectedUserId = computed(() => {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
+    return storedUser.id
+  } catch {
+    return null
+  }
+})
+const showSelfStatusWarning = computed(
+  () =>
+    isEditModalOpen.value &&
+    selectedUser.value?.id &&
+    String(selectedUser.value.id) === String(connectedUserId.value) &&
+    ['BLOCKED', 'PENDING'].includes(newUser.value.status),
+)
+
 const stats = computed(() => [
-  { label: content.value.totalUsers, value: users.value.length, tone: 'total' },
-  { label: content.value.activeUsers, value: users.value.filter((user) => user.status === 'active').length, tone: 'active' },
-  { label: content.value.pendingUsers, value: users.value.filter((user) => user.status === 'pending').length, tone: 'pending' },
-  { label: content.value.blockedUsers, value: users.value.filter((user) => user.status === 'blocked').length, tone: 'blocked' },
+  { label: content.value.totalUsers, value: loading.value || errorMessage.value ? content.value.unavailableValue : users.value.length, tone: 'total' },
+  { label: content.value.activeUsers, value: loading.value || errorMessage.value ? content.value.unavailableValue : countStatus('ACTIVE'), tone: 'active' },
+  { label: content.value.pendingUsers, value: loading.value || errorMessage.value ? content.value.unavailableValue : countStatus('PENDING'), tone: 'pending' },
+  { label: content.value.blockedUsers, value: loading.value || errorMessage.value ? content.value.unavailableValue : countStatus('BLOCKED'), tone: 'blocked' },
 ])
 
 const filteredUsers = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
 
   return users.value.filter((user) => {
-    const matchesSearch = !query || user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
+    const matchesSearch =
+      !query ||
+      String(user.first_name || '').toLowerCase().includes(query) ||
+      String(user.last_name || '').toLowerCase().includes(query) ||
+      String(user.email || '').toLowerCase().includes(query)
     const matchesRole = selectedRole.value === 'all' || user.role === selectedRole.value
     const matchesStatus = selectedStatus.value === 'all' || user.status === selectedStatus.value
 
@@ -471,255 +610,90 @@ const filteredUsers = computed(() => {
   })
 })
 
-const editablePermissions = computed(() => permissionDefinitions())
-
 function pickText(texts) {
   return texts[language.value] || texts.FR
 }
 
-function departmentLabel(department) {
-  const labels = {
-    administration: {
-      FR: 'Administration générale',
-      EN: 'General administration',
-      AR: 'الإدارة العامة',
-    },
-    maintenance: {
-      FR: 'Maintenance',
-      EN: 'Maintenance',
-      AR: 'الصيانة',
-    },
-    production: {
-      FR: 'Production',
-      EN: 'Production',
-      AR: 'الإنتاج',
-    },
-  }
-
-  return labels[department]?.[language.value] || department
+function countStatus(status) {
+  return users.value.filter((user) => user.status === status).length
 }
 
-function normalizeDepartment(department) {
-  const value = String(department || '').trim().toLowerCase()
+function roleLabel(role) {
+  return roleLabels.value[role] || role || content.value.unavailableValue
+}
 
-  if (value.includes('admin') || value.includes('الإدارة')) return 'administration'
-  if (value.includes('maintenance') || value.includes('صيانة')) return 'maintenance'
-  if (value.includes('production') || value.includes('إنتاج')) return 'production'
+function roleClass(role) {
+  return role === 'super_admin' ? 'admin' : role
+}
 
-  return department
+function departmentLabel(department) {
+  return departmentLabels.value[department] || department || content.value.unavailableValue
 }
 
 function statusLabel(status) {
-  return content.value[status] || status
+  if (status === 'ACTIVE') return content.value.active
+  if (status === 'PENDING') return content.value.pending
+  if (status === 'BLOCKED') return content.value.blocked
+
+  return status || content.value.unavailableValue
+}
+
+function statusClass(status) {
+  return String(status || '').toLowerCase()
+}
+
+function userFullName(user) {
+  return [user.first_name, user.last_name].filter(Boolean).join(' ')
 }
 
 function userActivities(user) {
-  const commonTimes = {
-    now: pickText({ FR: "Aujourd'hui à 08:42", EN: 'Today at 08:42', AR: 'اليوم على 08:42' }),
-    morning: pickText({ FR: "Aujourd'hui à 08:15", EN: 'Today at 08:15', AR: 'اليوم على 08:15' }),
-    yesterdayLate: pickText({ FR: 'Hier à 17:21', EN: 'Yesterday at 17:21', AR: 'أمس على 17:21' }),
-    yesterdayMid: pickText({ FR: 'Hier à 16:48', EN: 'Yesterday at 16:48', AR: 'أمس على 16:48' }),
-    yesterdayEarly: pickText({ FR: 'Hier à 15:33', EN: 'Yesterday at 15:33', AR: 'أمس على 15:33' }),
-  }
-
-  const activitiesByRole = {
-    admin: [
-      {
-        icon: '↗',
-        tone: 'blue',
-        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
-        time: commonTimes.now,
-      },
-      {
-        icon: '⚙',
-        tone: 'purple',
-        title: pickText({ FR: 'Modification des permissions', EN: 'Updated permissions', AR: 'تعديل الصلاحيات' }),
-        time: commonTimes.morning,
-      },
-      {
-        icon: '▣',
-        tone: 'slate',
-        title: pickText({ FR: "Mise à jour d'un rapport", EN: 'Updated a report', AR: 'تحديث تقرير' }),
-        time: commonTimes.yesterdayLate,
-      },
-      {
-        icon: '✓',
-        tone: 'green',
-        title: pickText({ FR: "Validation d'une intervention", EN: 'Approved an intervention', AR: 'المصادقة على تدخل' }),
-        time: commonTimes.yesterdayMid,
-      },
-      {
-        icon: '!',
-        tone: 'red',
-        title: pickText({ FR: "Ajout d'une pièce de rechange", EN: 'Added a spare part', AR: 'إضافة قطعة غيار' }),
-        time: commonTimes.yesterdayEarly,
-      },
-    ],
-    technician: [
-      {
-        icon: '↗',
-        tone: 'blue',
-        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
-        time: commonTimes.now,
-      },
-      {
-        icon: '🔧',
-        tone: 'purple',
-        title: pickText({ FR: "Création d'une intervention", EN: 'Created an intervention', AR: 'إنشاء تدخل' }),
-        time: commonTimes.morning,
-      },
-      {
-        icon: '▣',
-        tone: 'slate',
-        title: pickText({ FR: "Mise à jour d'un rapport", EN: 'Updated a report', AR: 'تحديث تقرير' }),
-        time: commonTimes.yesterdayLate,
-      },
-      {
-        icon: '✓',
-        tone: 'green',
-        title: pickText({ FR: "Validation d'une intervention", EN: 'Validated an intervention', AR: 'تأكيد تدخل' }),
-        time: commonTimes.yesterdayMid,
-      },
-      {
-        icon: '!',
-        tone: 'red',
-        title: pickText({ FR: "Signalement d'une panne", EN: 'Reported a breakdown', AR: 'التبليغ عن عطل' }),
-        time: commonTimes.yesterdayEarly,
-      },
-    ],
-    operator: [
-      {
-        icon: '↗',
-        tone: 'blue',
-        title: pickText({ FR: 'Connexion à la plateforme', EN: 'Signed in to the platform', AR: 'تسجيل الدخول إلى المنصة' }),
-        time: commonTimes.now,
-      },
-      {
-        icon: '!',
-        tone: 'red',
-        title: pickText({ FR: "Signalement d'une panne", EN: 'Reported a breakdown', AR: 'التبليغ عن عطل' }),
-        time: commonTimes.morning,
-      },
-      {
-        icon: '▣',
-        tone: 'slate',
-        title: pickText({ FR: "Ajout d'une demande", EN: 'Added a request', AR: 'إضافة طلب' }),
-        time: commonTimes.yesterdayLate,
-      },
-      {
-        icon: '✓',
-        tone: 'green',
-        title: pickText({ FR: 'Clôture d’une demande', EN: 'Closed a request', AR: 'إغلاق طلب' }),
-        time: commonTimes.yesterdayMid,
-      },
-      {
-        icon: '↻',
-        tone: 'purple',
-        title: pickText({ FR: "Mise à jour de l'état machine", EN: 'Updated machine status', AR: 'تحديث حالة الآلة' }),
-        time: commonTimes.yesterdayEarly,
-      },
-    ],
-  }
-
-  return activitiesByRole[user.role] || activitiesByRole.operator
-}
-
-function permissionDefinitions() {
-  return [
-    {
-      key: 'viewMachines',
-      label: pickText({ FR: 'Consulter les machines', EN: 'View machines', AR: 'عرض الآلات' }),
-      roles: ['admin', 'technician', 'operator'],
-    },
-    {
-      key: 'createIntervention',
-      label: pickText({ FR: 'Créer une intervention', EN: 'Create an intervention', AR: 'إنشاء تدخل' }),
-      roles: ['admin', 'technician'],
-    },
-    {
-      key: 'editIntervention',
-      label: pickText({ FR: 'Modifier les interventions', EN: 'Edit interventions', AR: 'تعديل التدخلات' }),
-      roles: ['admin', 'technician'],
-    },
-    {
-      key: 'validateIntervention',
-      label: pickText({ FR: 'Valider les interventions', EN: 'Approve interventions', AR: 'المصادقة على التدخلات' }),
-      roles: ['admin'],
-    },
-    {
-      key: 'manageUsers',
-      label: pickText({ FR: 'Gérer les utilisateurs', EN: 'Manage users', AR: 'إدارة المستخدمين' }),
-      roles: ['admin'],
-    },
-    {
-      key: 'editSettings',
-      label: pickText({ FR: 'Modifier les paramètres', EN: 'Edit settings', AR: 'تعديل الإعدادات' }),
-      roles: ['admin'],
-    },
-    {
-      key: 'addReports',
-      label: pickText({ FR: 'Ajouter des rapports', EN: 'Add reports', AR: 'إضافة تقارير' }),
-      roles: ['admin', 'technician'],
-    },
-    {
-      key: 'viewReports',
-      label: pickText({ FR: 'Consulter les rapports', EN: 'View reports', AR: 'عرض التقارير' }),
-      roles: ['admin', 'technician'],
-    },
-  ]
-}
-
-function defaultPermissionsForRole(role) {
-  return permissionDefinitions().reduce((permissions, permission) => {
-    permissions[permission.key] = permission.roles.includes(role)
-    return permissions
-  }, {})
+  return Array.isArray(user.activities) ? user.activities : []
 }
 
 function userPermissions(user) {
-  const savedPermissions = user.permissions || defaultPermissionsForRole(user.role)
+  const savedPermissions = user.permissions
 
-  return permissionDefinitions().map((permission) => ({
-    ...permission,
-    allowed: Boolean(savedPermissions[permission.key]),
+  if (!savedPermissions) return []
+
+  if (Array.isArray(savedPermissions)) {
+    return savedPermissions.map((permission) => {
+      if (typeof permission === 'string') {
+        return { label: permission, allowed: true }
+      }
+
+      return {
+        label: permission.label || permission.name || permission.key || content.value.unavailableValue,
+        allowed: permission.allowed ?? permission.enabled ?? true,
+      }
+    })
+  }
+
+  return Object.entries(savedPermissions).map(([label, allowed]) => ({
+    label,
+    allowed: Boolean(allowed),
   }))
 }
 
 function displayDate(date) {
-  if (language.value === 'AR') {
-    return date
-      .replace('2026-07-16', '16 يوليو 2026')
-      .replace('2026-07-15', '15 يوليو 2026')
-      .replace('2026-07-10', '10 يوليو 2026')
-  }
+  if (!date) return content.value.never
 
-  if (language.value === 'EN') {
-    return date
-      .replace('2026-07-16', 'July 16, 2026')
-      .replace('2026-07-15', 'July 15, 2026')
-      .replace('2026-07-10', 'July 10, 2026')
-  }
+  const parsedDate = new Date(date)
 
-  return date
-    .replace('2026-07-16', '16 juillet 2026')
-    .replace('2026-07-15', '15 juillet 2026')
-    .replace('2026-07-10', '10 juillet 2026')
+  if (Number.isNaN(parsedDate.getTime())) return date
+
+  return new Intl.DateTimeFormat(content.value.locale || 'fr-FR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(parsedDate)
 }
 
 function displayName(name) {
-  if (language.value !== 'AR') return name
-
-  const names = {
-    'Ghizlane Rabii': 'غزلان ربيعي',
-    'Ahmed El Mansouri': 'أحمد المنصوري',
-    'Nabil Amrani': 'نبيل العمراني',
-    'Youssef Berrada': 'يوسف برادة',
-  }
-
-  return names[name] || name
+  return name || content.value.unavailableValue
 }
 
 function getInitials(name) {
+  if (!name) return '--'
+
   return name
     .split(/\s+/)
     .filter(Boolean)
@@ -730,49 +704,82 @@ function getInitials(name) {
 }
 
 function avatarTone(name) {
-  const tones = ['avatar-slate', 'avatar-indigo', 'avatar-teal', 'avatar-stone']
-  const seed = String(name || '')
-    .split('')
-    .reduce((total, char) => total + char.charCodeAt(0), 0)
+  const role = roleClass(name)
 
-  return tones[seed % tones.length]
+  if (role === 'admin') return 'avatar-admin'
+  if (role === 'technician') return 'avatar-technician'
+  if (role === 'operator') return 'avatar-operator'
+
+  return 'avatar-admin'
 }
 
 function createEmptyUser() {
   return {
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    role: 'operator',
+    password: '',
+    password_confirmation: '',
+    role: '',
     department: '',
+    status: 'ACTIVE',
+  }
+}
+
+function createEditableUser(user) {
+  return {
+    first_name: user.first_name || '',
+    last_name: user.last_name || '',
+    email: user.email || '',
+    password: '',
+    password_confirmation: '',
+    role: user.role || '',
+    department: user.department || '',
+    status: user.status || 'ACTIVE',
+  }
+}
+
+async function loadUsers() {
+  try {
+    loading.value = true
+    errorMessage.value = ''
+    users.value = await getUsers()
+  } catch (error) {
+    errorMessage.value = error.message || content.value.loadError
+    users.value = []
+  } finally {
+    loading.value = false
   }
 }
 
 function openCreateModal() {
-  editingUserId.value = null
-  permissionForm.value = {}
+  selectedUser.value = null
+  isEditModalOpen.value = false
+  editError.value = ''
+  editSuccess.value = ''
+  modalErrorMessage.value = ''
   newUser.value = createEmptyUser()
   isUserModalOpen.value = true
 }
 
 function openEditModal(user) {
-  editingUserId.value = user.id
-  newUser.value = {
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    department: departmentLabel(user.department),
-  }
-  permissionForm.value = {
-    ...defaultPermissionsForRole(user.role),
-    ...(user.permissions || {}),
-  }
-  isUserModalOpen.value = true
+  selectedUser.value = user
+  isUserModalOpen.value = false
+  isEditModalOpen.value = true
+  modalErrorMessage.value = ''
+  editError.value = ''
+  editSuccess.value = ''
+  newUser.value = createEditableUser(user)
 }
 
 function closeUserModal() {
   isUserModalOpen.value = false
-  editingUserId.value = null
-  permissionForm.value = {}
+  isEditModalOpen.value = false
+  selectedUser.value = null
+  modalErrorMessage.value = ''
+  savingUser.value = false
+  editLoading.value = false
+  editError.value = ''
 }
 
 function openUserProfile(user) {
@@ -783,37 +790,94 @@ function closeUserProfile() {
   selectedUser.value = null
 }
 
-function syncPermissionDefaults() {
-  if (!editingUserId.value) return
+function validateNewUser() {
+  const requiredValues = [
+    newUser.value.first_name,
+    newUser.value.last_name,
+    newUser.value.email,
+    newUser.value.role,
+    newUser.value.department,
+    newUser.value.status,
+  ]
 
-  permissionForm.value = defaultPermissionsForRole(newUser.value.role)
+  if (!isEditModalOpen.value) {
+    requiredValues.push(newUser.value.password, newUser.value.password_confirmation)
+  }
+
+  if (requiredValues.some((value) => !String(value || '').trim())) {
+    return content.value.requiredFields
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUser.value.email)) {
+    return content.value.invalidEmail
+  }
+
+  if (!isEditModalOpen.value && newUser.value.password !== newUser.value.password_confirmation) {
+    return content.value.passwordMismatch
+  }
+
+  return ''
 }
 
-function saveUser() {
-  if (editingUserId.value) {
-    const userIndex = users.value.findIndex((user) => user.id === editingUserId.value)
+function buildCreatePayload() {
+  return {
+    first_name: newUser.value.first_name,
+    last_name: newUser.value.last_name,
+    email: newUser.value.email,
+    password: newUser.value.password,
+    role: newUser.value.role,
+    department: newUser.value.department,
+    status: newUser.value.status,
+  }
+}
 
-    if (userIndex !== -1) {
-      users.value[userIndex] = {
-        ...users.value[userIndex],
-        ...newUser.value,
-        department: normalizeDepartment(newUser.value.department),
-        permissions: { ...permissionForm.value },
-      }
+function buildUpdatePayload() {
+  return {
+    first_name: newUser.value.first_name,
+    last_name: newUser.value.last_name,
+    email: newUser.value.email,
+    role: newUser.value.role,
+    department: newUser.value.department,
+    status: newUser.value.status,
+  }
+}
+
+async function saveUser() {
+  modalErrorMessage.value = validateNewUser()
+  editError.value = ''
+
+  if (modalErrorMessage.value) return
+
+  if (isEditModalOpen.value) {
+    try {
+      editLoading.value = true
+      const result = await updateUser(selectedUser.value.id, buildUpdatePayload())
+      editSuccess.value = result?.message || content.value.updateSuccess
+      actionMessage.value = editSuccess.value
+      closeUserModal()
+      newUser.value = createEmptyUser()
+      await loadUsers()
+    } catch (error) {
+      editError.value = error.message || "Impossible de modifier l'utilisateur."
+    } finally {
+      editLoading.value = false
     }
 
-    closeUserModal()
     return
   }
 
-  users.value.unshift({
-    id: Date.now(),
-    ...newUser.value,
-    department: normalizeDepartment(newUser.value.department),
-    status: 'pending',
-    lastLogin: '2026-07-16 00:00',
-  })
-  closeUserModal()
+  try {
+    savingUser.value = true
+    const result = await createUser(buildCreatePayload())
+    actionMessage.value = result?.message || content.value.createSuccess
+    closeUserModal()
+    newUser.value = createEmptyUser()
+    await loadUsers()
+  } catch (error) {
+    modalErrorMessage.value = error.message || "Impossible de créer l'utilisateur."
+  } finally {
+    savingUser.value = false
+  }
 }
 
 function toggleSidebar() {
@@ -844,7 +908,7 @@ function closeSidebar() {
 }
 
 .users-header {
-  display: none;
+  display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
@@ -889,6 +953,11 @@ function closeSidebar() {
 .primary-button {
   background: #6a9a2a;
   color: #f7f9f3;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
 }
 
 .secondary-button {
@@ -1098,6 +1167,24 @@ function closeSidebar() {
   overflow-x: auto;
 }
 
+.users-state {
+  margin: 14px 20px 0;
+  border: 1px solid rgba(247, 249, 243, 0.14);
+  border-radius: 8px;
+  background: rgba(247, 249, 243, 0.08);
+  padding: 12px 14px;
+  color: rgba(247, 249, 243, 0.78);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.users-empty-cell {
+  padding: 28px 18px;
+  text-align: center;
+  color: rgba(247, 249, 243, 0.78);
+  font-weight: 850;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -1157,24 +1244,19 @@ tbody tr:hover {
   font-weight: 950;
 }
 
-.avatar-slate {
-  background: rgba(106, 154, 42, 0.2);
-  color: #f7f9f3;
+.avatar-admin {
+  background: rgba(230, 184, 0, 0.24);
+  color: #a07800;
 }
 
-.avatar-indigo {
-  background: rgba(106, 154, 42, 0.22);
-  color: #f7f9f3;
+.avatar-technician {
+  background: rgba(255, 102, 0, 0.2);
+  color: #ff6600;
 }
 
-.avatar-teal {
-  background: rgba(232, 179, 0, 0.2);
-  color: #f7f9f3;
-}
-
-.avatar-stone {
-  background: rgba(255, 106, 0, 0.2);
-  color: #fff0cf;
+.avatar-operator {
+  background: rgba(204, 24, 24, 0.16);
+  color: #cc1818;
 }
 
 .user-cell strong,
@@ -1215,21 +1297,21 @@ tbody tr:hover {
 }
 
 .role-pill.admin {
-  border: 1px solid rgba(106, 154, 42, 0.46);
-  background: rgba(106, 154, 42, 0.16);
-  color: #b6c65b;
+  border: 1px solid rgba(230, 184, 0, 0.52);
+  background: rgba(230, 184, 0, 0.16);
+  color: #b08a00;
 }
 
 .role-pill.technician {
-  border: 1px solid rgba(255, 106, 0, 0.46);
-  background: rgba(255, 106, 0, 0.16);
-  color: #ffb15f;
+  border: 1px solid rgba(255, 102, 0, 0.52);
+  background: rgba(255, 102, 0, 0.16);
+  color: #ff6600;
 }
 
 .role-pill.operator {
-  border: 1px solid rgba(227, 30, 36, 0.46);
-  background: rgba(227, 30, 36, 0.16);
-  color: #ff9ca7;
+  border: 1px solid rgba(204, 24, 24, 0.48);
+  background: rgba(204, 24, 24, 0.14);
+  color: #cc1818;
 }
 
 .status-pill.active {
@@ -1390,18 +1472,18 @@ tbody tr:hover {
 }
 
 .user-profile-modal.admin {
-  --role-color: #6a9a2a;
-  --role-soft: rgba(106, 154, 42, 0.16);
+  --role-color: #e6b800;
+  --role-soft: rgba(230, 184, 0, 0.16);
 }
 
 .user-profile-modal.technician {
-  --role-color: #ff6a00;
-  --role-soft: rgba(255, 106, 0, 0.16);
+  --role-color: #ff6600;
+  --role-soft: rgba(255, 102, 0, 0.16);
 }
 
 .user-profile-modal.operator {
-  --role-color: #e31e24;
-  --role-soft: rgba(227, 30, 36, 0.16);
+  --role-color: #cc1818;
+  --role-soft: rgba(204, 24, 24, 0.16);
 }
 
 .profile-close {
@@ -1791,6 +1873,28 @@ tbody tr:hover {
   gap: 10px;
 }
 
+.modal-error {
+  margin: 0;
+  border: 1px solid rgba(227, 30, 36, 0.22);
+  border-radius: 8px;
+  background: rgba(227, 30, 36, 0.08);
+  padding: 10px 12px;
+  color: #e31e24;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.modal-warning {
+  margin: 0;
+  border: 1px solid rgba(232, 179, 0, 0.26);
+  border-radius: 8px;
+  background: rgba(232, 179, 0, 0.12);
+  padding: 10px 12px;
+  color: #8a6500;
+  font-size: 12px;
+  font-weight: 850;
+}
+
 .edit-permissions-panel {
   display: grid;
   gap: 8px;
@@ -1868,6 +1972,11 @@ tbody tr:hover {
 :global(:root[data-theme='dark']) thead,
 :global(:root[data-theme='dark']) tr {
   background: transparent;
+}
+
+:global(:root[data-theme='dark']) .users-state,
+:global(:root[data-theme='dark']) .users-empty-cell {
+  color: #cbd5e1;
 }
 
 :global(:root[data-theme='dark']) tbody tr:hover {
@@ -1992,41 +2101,36 @@ tbody tr:hover {
 }
 
 :global(:root[data-theme='dark']) .role-pill.admin {
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  background: rgba(16, 185, 129, 0.1);
-  color: #34d399;
+  border: 1px solid rgba(230, 184, 0, 0.26);
+  background: rgba(230, 184, 0, 0.12);
+  color: #facc15;
 }
 
 :global(:root[data-theme='dark']) .role-pill.technician {
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  background: rgba(245, 158, 11, 0.1);
-  color: #fbbf24;
+  border: 1px solid rgba(255, 102, 0, 0.26);
+  background: rgba(255, 102, 0, 0.12);
+  color: #fb923c;
 }
 
 :global(:root[data-theme='dark']) .role-pill.operator {
-  border: 1px solid rgba(244, 63, 94, 0.2);
-  background: rgba(244, 63, 94, 0.1);
-  color: #fb7185;
+  border: 1px solid rgba(204, 24, 24, 0.28);
+  background: rgba(204, 24, 24, 0.14);
+  color: #f87171;
 }
 
-:global(:root[data-theme='dark']) .avatar-slate {
-  background: #334155;
-  color: #e2e8f0;
+:global(:root[data-theme='dark']) .avatar-admin {
+  background: rgba(230, 184, 0, 0.16);
+  color: #facc15;
 }
 
-:global(:root[data-theme='dark']) .avatar-indigo {
-  background: rgba(16, 185, 129, 0.12);
-  color: #6ee7b7;
+:global(:root[data-theme='dark']) .avatar-technician {
+  background: rgba(255, 102, 0, 0.16);
+  color: #fb923c;
 }
 
-:global(:root[data-theme='dark']) .avatar-teal {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fcd34d;
-}
-
-:global(:root[data-theme='dark']) .avatar-stone {
-  background: rgba(244, 63, 94, 0.12);
-  color: #fda4af;
+:global(:root[data-theme='dark']) .avatar-operator {
+  background: rgba(204, 24, 24, 0.16);
+  color: #f87171;
 }
 
 :global(:root[data-theme='dark']) .stats-grid article {
@@ -2137,6 +2241,16 @@ tbody tr:hover {
 :global(:root[data-theme='light']) thead {
   border-color: #edf0e8;
   background: #f7f9f3;
+}
+
+:global(:root[data-theme='light']) .users-state {
+  border-color: rgba(74, 10, 10, 0.1);
+  background: #f7f9f3;
+  color: rgba(74, 10, 10, 0.68);
+}
+
+:global(:root[data-theme='light']) .users-empty-cell {
+  color: rgba(74, 10, 10, 0.68);
 }
 
 :global(:root[data-theme='light']) .toolbar input,

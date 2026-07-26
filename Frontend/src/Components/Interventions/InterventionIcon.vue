@@ -43,6 +43,15 @@
       <path d="M7 10l5 5 5-5" />
       <path d="M12 15V3" />
     </template>
+    <template v-else-if="name === 'refresh'">
+      <path d="M21 12a9 9 0 0 1-9 9 9.7 9.7 0 0 1-6.7-2.7L3 16" />
+      <path d="M3 21v-5h5" />
+      <path d="M3 12a9 9 0 0 1 9-9 9.7 9.7 0 0 1 6.7 2.7L21 8" />
+      <path d="M21 3v5h-5" />
+    </template>
+    <template v-else-if="name === 'filter'">
+      <path d="M22 3H2l8 9.5V20l4 2v-9.5L22 3Z" />
+    </template>
     <template v-else-if="name === 'plus'">
       <path d="M5 12h14" />
       <path d="M12 5v14" />
@@ -59,6 +68,13 @@
       <circle cx="12" cy="12" r="1" />
       <circle cx="19" cy="12" r="1" />
       <circle cx="5" cy="12" r="1" />
+    </template>
+    <template v-else-if="name === 'trash'">
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v5" />
+      <path d="M14 11v5" />
     </template>
     <template v-else-if="name === 'x'">
       <path d="M18 6 6 18" />

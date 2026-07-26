@@ -33,6 +33,11 @@
             </td>
             <td class="py-3 px-4 text-xs text-slate-400">{{ displayTime(item.time) }}</td>
           </tr>
+          <tr v-if="!data?.length">
+            <td colspan="6" class="py-8 px-4 text-center text-sm font-bold text-slate-500">
+              {{ content.unavailable }}
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -53,7 +58,10 @@ import { RouterLink } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
 
 defineProps({
-  data: Array,
+  data: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const languageStore = useLanguageStore()
@@ -63,6 +71,7 @@ const tableContent = {
   FR: {
     title: 'Dernieres Interventions',
     viewAll: 'Voir toutes les interventions',
+    unavailable: 'Donnees indisponibles',
     columns: {
       id: 'ID',
       machine: 'Machine',
@@ -75,6 +84,7 @@ const tableContent = {
   EN: {
     title: 'Latest Interventions',
     viewAll: 'View all interventions',
+    unavailable: 'Data unavailable',
     columns: {
       id: 'ID',
       machine: 'Machine',
@@ -87,6 +97,7 @@ const tableContent = {
   AR: {
     title: 'آخر التدخلات',
     viewAll: 'عرض كل التدخلات',
+    unavailable: 'Donnees indisponibles',
     columns: {
       id: 'المعرف',
       machine: 'الآلة',
@@ -100,140 +111,15 @@ const tableContent = {
 
 const content = computed(() => tableContent[language.value] || tableContent.FR)
 
-const machineLabels = {
-  'Pasteurisateur #2': {
-    FR: 'Pasteurisateur #2',
-    EN: 'Pasteurizer #2',
-    AR: 'المبستر #2',
-  },
-  'Pasteurizer #2': {
-    FR: 'Pasteurisateur #2',
-    EN: 'Pasteurizer #2',
-    AR: 'المبستر #2',
-  },
-  'المبستر #2': {
-    FR: 'Pasteurisateur #2',
-    EN: 'Pasteurizer #2',
-    AR: 'المبستر #2',
-  },
-  'Convoyeur #4': {
-    FR: 'Convoyeur #4',
-    EN: 'Conveyor #4',
-    AR: 'الناقل #4',
-  },
-  'Conveyor #4': {
-    FR: 'Convoyeur #4',
-    EN: 'Conveyor #4',
-    AR: 'الناقل #4',
-  },
-  'الناقل #4': {
-    FR: 'Convoyeur #4',
-    EN: 'Conveyor #4',
-    AR: 'الناقل #4',
-  },
-  'Pompe #1': {
-    FR: 'Pompe #1',
-    EN: 'Pump #1',
-    AR: 'المضخة #1',
-  },
-  'Pump #1': {
-    FR: 'Pompe #1',
-    EN: 'Pump #1',
-    AR: 'المضخة #1',
-  },
-  'المضخة #1': {
-    FR: 'Pompe #1',
-    EN: 'Pump #1',
-    AR: 'المضخة #1',
-  },
-}
+const displayMachine = (item) => item.machine || '-'
 
-const typeLabels = {
-  preventive: {
-    FR: 'Preventif',
-    EN: 'Preventive',
-    AR: 'وقائي',
-  },
-  curative: {
-    FR: 'Curatif',
-    EN: 'Curative',
-    AR: 'إصلاحي',
-  },
-  improvement: {
-    FR: 'Amélioration',
-    EN: 'Improvement',
-    AR: 'تحسين',
-  },
-}
+const displayType = (item) => item.type || '-'
 
-const technicianLabels = {
-  Ahmed: {
-    FR: 'Ahmed',
-    EN: 'Ahmed',
-    AR: 'أحمد',
-  },
-  Nabil: {
-    FR: 'Nabil',
-    EN: 'Nabil',
-    AR: 'نبيل',
-  },
-  Youssef: {
-    FR: 'Youssef',
-    EN: 'Youssef',
-    AR: 'يوسف',
-  },
-}
+const displayTechnician = (item) => item.technician || '-'
 
-const statusLabels = {
-  inProgress: {
-    FR: 'En cours',
-    EN: 'In progress',
-    AR: 'قيد الإنجاز',
-  },
-  pending: {
-    FR: 'En attente',
-    EN: 'Pending',
-    AR: 'في الانتظار',
-  },
-  completed: {
-    FR: 'Termine',
-    EN: 'Completed',
-    AR: 'مكتمل',
-  },
-}
+const displayStatus = (item) => item.status || '-'
 
-const relativeTimeLabels = {
-  Hier: {
-    FR: 'Hier',
-    EN: 'Yesterday',
-    AR: 'أمس',
-  },
-  Yesterday: {
-    FR: 'Hier',
-    EN: 'Yesterday',
-    AR: 'أمس',
-  },
-  'أمس': {
-    FR: 'Hier',
-    EN: 'Yesterday',
-    AR: 'أمس',
-  },
-}
-
-function pickLabel(labels, key, fallback) {
-  return labels[key]?.[language.value] || fallback
-}
-
-const displayMachine = (item) => pickLabel(machineLabels, item.machine, item.machine)
-
-const displayType = (item) => pickLabel(typeLabels, item.typeKey, item.type)
-
-const displayTechnician = (item) => pickLabel(technicianLabels, item.technician, item.technician)
-
-const displayStatus = (item) => pickLabel(statusLabels, item.statusKey, item.status)
-
-const displayTime = (time) => pickLabel(relativeTimeLabels, time, time)
-
+const displayTime = (time) => time || '-'
 const getStatusClass = (item) => {
   if (item.statusKey === 'inProgress') return 'bg-amber-100 text-amber-800'
   if (item.statusKey === 'pending') return 'bg-rose-100 text-rose-800'

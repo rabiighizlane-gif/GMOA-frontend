@@ -35,7 +35,7 @@
             {{ translate('results', result) }}
           </option>
         </select>
-        <button type="button" @click="resetFilters">{{ content.reset }}</button>
+        <button type="button" class="reset-button" @click="resetFilters">{{ content.reset }}</button>
       </section>
 
       <section class="activity-card">
@@ -287,7 +287,8 @@ function closeSidebar() {
 .activity-layout[dir='rtl'] .filters-card { grid-template-columns: 150px 180px 220px minmax(260px, 1fr); }
 .filters-card input, .filters-card select, .filters-card button { min-height: 46px; min-width: 0; padding: 0 14px; border: 1px solid rgba(126, 146, 170, 0.28); border-radius: 8px; background: #0d1520; color: #f4f7fb; font: inherit; font-weight: 850; }
 .filters-card input::placeholder { color: #6f7e91; }
-.filters-card button { color: #d7e0ec; cursor: pointer; }
+.filters-card .reset-button { background: #ffffff; border-color: rgba(182, 198, 91, 0.36); color: var(--sc-dark); cursor: pointer; box-shadow: 0 8px 18px rgba(74, 10, 10, 0.04); }
+.filters-card .reset-button:hover { border-color: var(--sc-secondary); background: var(--sc-bg); color: var(--sc-primary); }
 .activity-card { overflow: hidden; background: rgba(17, 27, 38, 0.92); border: 1px solid rgba(116, 135, 158, 0.28); border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24); }
 .activity-row { display: grid; grid-template-columns: 130px 220px minmax(0, 1fr) 110px; align-items: center; gap: 18px; padding: 18px 22px; border-top: 1px solid rgba(126, 146, 170, 0.18); }
 .activity-layout[dir='rtl'] .activity-row { grid-template-columns: 110px minmax(0, 1fr) 220px 130px; }

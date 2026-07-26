@@ -1,11 +1,11 @@
 <template>
   <div class="availability">
     <div class="meta">
-      <strong>{{ value }}%</strong>
+      <strong>{{ hasValue ? `${value}%` : '—' }}</strong>
       <span>{{ label }}</span>
     </div>
     <div class="track">
-      <span class="fill" :class="tone" :style="{ width: `${value}%` }"></span>
+      <span class="fill" :class="tone" :style="{ width: hasValue ? `${value}%` : '0%' }"></span>
     </div>
   </div>
 </template>
@@ -15,12 +15,13 @@ import { computed } from 'vue'
 import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
-  value: { type: Number, required: true },
+  value: { type: Number, default: null },
 })
 
 const languageStore = useLanguageStore()
 const language = computed(() => languageStore.language)
 
+const hasValue = computed(() => typeof props.value === 'number' && Number.isFinite(props.value))
 const label = computed(() => {
   const labels = {
     FR: 'Disponibilite',
@@ -32,9 +33,9 @@ const label = computed(() => {
 })
 
 const tone = computed(() => ({
-  healthy: props.value >= 90,
-  warning: props.value < 90 && props.value >= 75,
-  danger: props.value < 75,
+  healthy: hasValue.value && props.value >= 90,
+  warning: hasValue.value && props.value < 90 && props.value >= 75,
+  danger: hasValue.value && props.value < 75,
 }))
 </script>
 

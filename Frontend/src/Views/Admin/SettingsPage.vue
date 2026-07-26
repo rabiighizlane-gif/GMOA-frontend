@@ -71,6 +71,7 @@ import AppearanceSettings from '@/Components/Settings/AppearanceSettings.vue'
 import BackupSettings from '@/Components/Settings/BackupSettings.vue'
 import CompanySettings from '@/Components/Settings/CompanySettings.vue'
 import EmailSettings from '@/Components/Settings/EmailSettings.vue'
+import EquipmentFieldSettings from '@/Components/Settings/EquipmentFieldSettings.vue'
 import LanguageSettings from '@/Components/Settings/LanguageSettings.vue'
 import NotificationSettings from '@/Components/Settings/NotificationSettings.vue'
 import SecuritySettings from '@/Components/Settings/SecuritySettings.vue'
@@ -124,13 +125,14 @@ const content = computed(() => pageContent[language.value] || pageContent.FR)
 
 const tabs = computed(() => {
   const labels = {
-    FR: ['Entreprise', 'Utilisateurs & roles', 'Langues & region', 'Notifications', 'Securite', 'Email & SMTP', 'Sauvegardes', 'Apparence', 'Systeme', 'A propos'],
-    EN: ['Company', 'Users & roles', 'Language & region', 'Notifications', 'Security', 'Email & SMTP', 'Backups', 'Appearance', 'System', 'About'],
+    FR: ['Entreprise', 'Utilisateurs & roles', 'Proprietes des machines', 'Langues & region', 'Notifications', 'Securite', 'Email & SMTP', 'Sauvegardes', 'Apparence', 'Systeme', 'A propos'],
+    EN: ['Company', 'Users & roles', 'Machine properties', 'Language & region', 'Notifications', 'Security', 'Email & SMTP', 'Backups', 'Appearance', 'System', 'About'],
     AR: ['الشركة', 'المستخدمون والأدوار', 'اللغات والمنطقة', 'الإشعارات', 'الأمان', 'البريد و SMTP', 'النسخ الاحتياطي', 'المظهر', 'النظام', 'حول'],
   }[language.value] || []
   const defs = [
     ['company', '🏢', CompanySettings],
     ['roles', '👤', UserRolesSettings],
+    ['machine-fields', '▦', EquipmentFieldSettings],
     ['language', '🌍', LanguageSettings],
     ['notifications', '🔔', NotificationSettings],
     ['security', '🔒', SecuritySettings],
@@ -141,7 +143,15 @@ const tabs = computed(() => {
     ['about', 'ℹ️', AboutSettings],
   ]
 
-  return defs.map(([id, icon, component], index) => ({ id, icon, label: labels[index], component }))
+  return defs.map(([id, icon, component], index) => {
+    if (id === 'machine-fields') {
+      const machineFieldLabels = { FR: 'Proprietes des machines', EN: 'Machine properties', AR: 'خصائص الآلات' }
+      return { id, icon, label: machineFieldLabels[language.value] || machineFieldLabels.FR, component }
+    }
+
+    const labelIndex = language.value === 'AR' && index > 2 ? index - 1 : index
+    return { id, icon, label: labels[labelIndex], component }
+  })
 })
 
 const kpiCards = computed(() => {

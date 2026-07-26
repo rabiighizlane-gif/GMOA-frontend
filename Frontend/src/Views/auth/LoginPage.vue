@@ -230,7 +230,7 @@ async function handleSubmit() {
   <main class="login-page" :style="pageStyles" :dir="language === 'AR' ? 'rtl' : 'ltr'">
     <section class="login-shell">
       <div class="login-showcase">
-        <RouterLink to="/" class="brand-link" :aria-label="currentContent.brandAria">
+        <RouterLink to="/home" class="brand-link" :aria-label="currentContent.brandAria">
           <AppBrand />
         </RouterLink>
 
@@ -281,7 +281,7 @@ async function handleSubmit() {
           </button>
         </form>
 
-        <RouterLink to="/" class="home-link">{{ currentContent.home }}</RouterLink>
+        <RouterLink to="/home" class="home-link">{{ currentContent.home }}</RouterLink>
       </div>
     </section>
   </main>

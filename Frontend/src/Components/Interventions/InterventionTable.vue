@@ -1,51 +1,83 @@
 <template>
-  <section class="intervention-table-card">
-    <header>
+  <section class="light-intervention-table">
+    <header class="light-panel-header">
       <div>
         <h2>{{ content.title }}</h2>
-        <p>{{ content.count(rows.length) }}</p>
+        <p>{{ content.subtitle }}</p>
       </div>
-      <div class="pagination-mini">{{ content.page(currentPage, totalPages) }}</div>
+      <span>{{ content.count(totalRows) }}</span>
     </header>
 
-    <div class="table-wrap">
+    <div class="light-table-wrap">
       <table>
         <thead>
           <tr>
-            <th v-for="column in columns" :key="column.key">
-              <button type="button" @click="sortBy(column.key)">
-                {{ column.label }}
-                <span>{{ sortIcon(column.key) }}</span>
-              </button>
-            </th>
+            <th>Code</th>
+            <th>Equipement</th>
+            <th>Ligne / Zone</th>
+            <th>Type</th>
+            <th>Priorite</th>
+            <th>Technicien</th>
+            <th>Planification</th>
+            <th>Duree</th>
+            <th>Statut</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in paginatedRows" :key="item.id">
-            <td><strong class="row-id">{{ item.id }}</strong></td>
-            <td>{{ displayMachine(item.machine) }}</td>
-            <td>{{ displayLine(item.line) }}</td>
-            <td>{{ displayType(item.type) }}</td>
-            <td><span class="badge priority" :class="priorityTone(item.priority)">{{ displayPriority(item.priority) }}</span></td>
-            <td>
-              <div class="technician-cell">
-                <span class="avatar" :style="{ background: item.technician.color }">{{ item.technician.initials }}</span>
-                <span>{{ displayTechnician(item.technician.name) }}</span>
+          <tr v-for="item in rows" :key="`light-${item.raw?.id || item.id}`">
+            <td data-label="Code"><span class="code-badge">{{ item.code }}</span></td>
+            <td data-label="Equipement">
+              <div class="stacked-cell" :title="item.machine">
+                <strong>{{ equipmentName(item) }}</strong>
+                <small>{{ equipmentCode(item) }}</small>
               </div>
             </td>
-            <td>{{ item.start }}</td>
-            <td>{{ item.end }}</td>
-            <td><span class="badge status" :class="statusTone(item.status)">{{ displayStatus(item.status) }}</span></td>
-            <td>
+            <td data-label="Ligne / Zone">
+              <div class="stacked-cell" :title="`${item.line} - ${item.zone}`">
+                <strong>{{ item.raw?.production_line?.name || item.line }}</strong>
+                <small>{{ item.raw?.production_zone?.name || item.zone }}</small>
+              </div>
+            </td>
+            <td data-label="Type"><span class="light-badge type"><i></i>{{ item.typeLabel }}</span></td>
+            <td data-label="Priorite"><span class="light-badge" :class="priorityTone(item.priority)"><i></i>{{ item.priorityLabel }}</span></td>
+            <td data-label="Technicien">
+              <div class="technician-cell">
+                <span class="avatar" :style="{ background: item.technician.color }">{{ item.technician.initials }}</span>
+                <span>{{ item.technician.name }}</span>
+              </div>
+            </td>
+            <td data-label="Planification">
+              <div class="stacked-cell compact">
+                <span>{{ content.plannedStart }}: {{ item.start }}</span>
+                <small>{{ content.plannedEnd }}: {{ item.end === '-' ? content.notCompleted : item.end }}</small>
+              </div>
+            </td>
+            <td data-label="Duree">{{ item.duration }}</td>
+            <td data-label="Statut"><span class="light-badge status" :class="statusTone(item.status)"><i></i>{{ item.statusLabel }}</span></td>
+            <td data-label="Actions">
               <div class="actions">
-                <button type="button" :title="content.view" @click="$emit('view', item)">
+                <button type="button" :aria-label="content.view" :title="content.view" @click="$emit('view', item)">
                   <InterventionIcon name="eye" />
                 </button>
-                <button v-if="canManage" type="button" :title="content.edit">
+                <button v-if="canManage" type="button" :aria-label="content.edit" :title="content.edit" @click="$emit('edit', item)">
                   <InterventionIcon name="edit" />
                 </button>
-                <button v-if="canManage" type="button" :title="content.more">
-                  <InterventionIcon name="more" />
+                <button v-if="canManage" type="button" :aria-label="content.assign" :title="content.assign" @click="$emit('edit', item)">
+                  <InterventionIcon name="users" />
+                </button>
+                <button v-if="canManage" type="button" :aria-label="content.statusAction" :title="content.statusAction" @click="$emit('edit', item)">
+                  <InterventionIcon name="clock" />
+                </button>
+                <button
+                  v-if="canManage"
+                  type="button"
+                  class="danger-action"
+                  :aria-label="content.delete"
+                  :title="content.delete"
+                  @click="$emit('delete', item)"
+                >
+                  <InterventionIcon name="trash" />
                 </button>
               </div>
             </td>
@@ -55,22 +87,110 @@
     </div>
 
     <footer>
-      <button type="button" :disabled="currentPage === 1" @click="currentPage -= 1">{{ content.previous }}</button>
-      <span>{{ firstRow }}-{{ lastRow }} {{ content.of }} {{ rows.length }}</span>
-      <button type="button" :disabled="currentPage === totalPages" @click="currentPage += 1">{{ content.next }}</button>
+      <button type="button" :disabled="currentPage <= 1" @click="$emit('page-change', currentPage - 1)">
+        {{ content.previous }}
+      </button>
+      <span>{{ firstRow }}-{{ lastRow }} {{ content.of }} {{ totalRows }}</span>
+      <button type="button" :disabled="currentPage >= totalPages" @click="$emit('page-change', currentPage + 1)">
+        {{ content.next }}
+      </button>
+    </footer>
+  </section>
+
+  <section class="intervention-table-card">
+    <header>
+      <div>
+        <h2>{{ content.title }}</h2>
+        <p>{{ content.count(totalRows) }}</p>
+      </div>
+      <div class="pagination-mini">{{ content.page(currentPage, totalPages) }}</div>
+    </header>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th v-for="column in columns" :key="column.key">
+              <button type="button" :disabled="column.key === 'actions'" @click="sortBy(column.key)">
+                {{ column.label }}
+                <span>{{ sortIcon(column.key) }}</span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in rows" :key="item.raw?.id || item.id">
+            <td><strong class="row-id">{{ item.code }}</strong></td>
+            <td>{{ item.machine }}</td>
+            <td>{{ item.line }}</td>
+            <td>{{ item.zone }}</td>
+            <td>{{ item.typeLabel }}</td>
+            <td><span class="badge priority" :class="priorityTone(item.priority)">{{ item.priorityLabel }}</span></td>
+            <td>
+              <div class="technician-cell">
+                <span class="avatar" :style="{ background: item.technician.color }">{{ item.technician.initials }}</span>
+                <span>{{ item.technician.name }}</span>
+              </div>
+            </td>
+            <td>{{ item.start }}</td>
+            <td>{{ item.end }}</td>
+            <td>{{ item.duration }}</td>
+            <td><span class="badge status" :class="statusTone(item.status)">{{ item.statusLabel }}</span></td>
+            <td>
+              <div class="actions">
+                <button type="button" :aria-label="content.view" :title="content.view" @click="$emit('view', item)">
+                  <InterventionIcon name="eye" />
+                </button>
+                <button
+                  v-if="canManage"
+                  type="button"
+                  :aria-label="content.edit"
+                  :title="content.edit"
+                  @click="$emit('edit', item)"
+                >
+                  <InterventionIcon name="edit" />
+                </button>
+                <button
+                  v-if="canManage"
+                  type="button"
+                  class="danger-action"
+                  :aria-label="content.delete"
+                  :title="content.delete"
+                  @click="$emit('delete', item)"
+                >
+                  <InterventionIcon name="trash" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      <button type="button" :disabled="currentPage <= 1" @click="$emit('page-change', currentPage - 1)">
+        {{ content.previous }}
+      </button>
+      <span>{{ firstRow }}-{{ lastRow }} {{ content.of }} {{ totalRows }}</span>
+      <button type="button" :disabled="currentPage >= totalPages" @click="$emit('page-change', currentPage + 1)">
+        {{ content.next }}
+      </button>
     </footer>
   </section>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import InterventionIcon from './InterventionIcon.vue'
-import { useLanguageStore } from '@/stores/language'
 
 const props = defineProps({
   rows: {
     type: Array,
     default: () => [],
+  },
+  pagination: {
+    type: Object,
+    default: () => ({ page: 1, limit: 10, total: 0, total_pages: 0 }),
   },
   canManage: {
     type: Boolean,
@@ -82,69 +202,28 @@ const props = defineProps({
   },
 })
 
-defineEmits(['view'])
-
-const languageStore = useLanguageStore()
-const language = computed(() => languageStore.language)
+const emit = defineEmits(['delete', 'edit', 'page-change', 'sort', 'view'])
+const sort = ref({ key: 'created_at', direction: 'desc' })
 const columns = computed(() => [
-  { key: 'id', label: props.content.columns.id },
-  { key: 'machine', label: props.content.columns.machine },
-  { key: 'line', label: props.content.columns.line },
+  { key: 'code', label: props.content.columns.code },
+  { key: 'equipment', label: props.content.columns.machine },
+  { key: 'production_line', label: props.content.columns.line },
+  { key: 'production_zone', label: props.content.columns.zone },
   { key: 'type', label: props.content.columns.type },
   { key: 'priority', label: props.content.columns.priority },
-  { key: 'technicianName', label: props.content.columns.technicianName },
-  { key: 'start', label: props.content.columns.start },
-  { key: 'end', label: props.content.columns.end },
+  { key: 'technician', label: props.content.columns.technicianName },
+  { key: 'started_at', label: props.content.columns.start },
+  { key: 'completed_at', label: props.content.columns.end },
+  { key: 'duration_minutes', label: props.content.columns.duration },
   { key: 'status', label: props.content.columns.status },
   { key: 'actions', label: props.content.columns.actions },
 ])
-
-const displayValues = {
-  EN: {
-    statuses: { Terminee: 'Completed', 'En cours': 'In progress', 'En attente': 'Pending' },
-    priorities: { Critique: 'Critical', Haute: 'High', Moyenne: 'Medium', Basse: 'Low' },
-    types: { Corrective: 'Corrective', Preventive: 'Preventive', Amelioration: 'Improvement' },
-    lines: { 'Ligne Production 1': 'Production Line 1', 'Ligne Production 2': 'Production Line 2', 'Ligne Conditionnement': 'Packaging Line', 'Ligne Utilites': 'Utilities Line' },
-    machines: { 'Tour usinage M-102': 'Machining lathe M-102', 'Presse hydraulique M-215': 'Hydraulic press M-215', 'Convoyeur a bande M-309': 'Belt conveyor M-309', "Compresseur d'air M-412": 'Air compressor M-412', 'Etiqueteuse E-330': 'Labeler E-330', 'Pompe CIP P-101': 'CIP pump P-101', 'Pasteurisateur P-204': 'Pasteurizer P-204', 'Remplisseuse R-118': 'Filling machine R-118' },
-    technicians: { 'Nabil Amrani': 'Nabil Amrani', 'Ahmed El Mansouri': 'Ahmed El Mansouri', 'Youssef Berrada': 'Youssef Berrada', 'Sara El Idrissi': 'Sara El Idrissi', 'Karim El Fassi': 'Karim El Fassi' },
-  },
-  AR: {
-    statuses: { Terminee: '\u0645\u0643\u062a\u0645\u0644\u0629', 'En cours': '\u0642\u064a\u062f \u0627\u0644\u062a\u0646\u0641\u064a\u0630', 'En attente': '\u0641\u064a \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631' },
-    priorities: { Critique: '\u062d\u0631\u062c\u0629', Haute: '\u0639\u0627\u0644\u064a\u0629', Moyenne: '\u0645\u062a\u0648\u0633\u0637\u0629', Basse: '\u0645\u0646\u062e\u0641\u0636\u0629' },
-    types: { Corrective: '\u062a\u0635\u062d\u064a\u062d\u064a', Preventive: '\u0648\u0642\u0627\u0626\u064a', Amelioration: '\u062a\u062d\u0633\u064a\u0646' },
-    lines: { 'Ligne Production 1': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 1', 'Ligne Production 2': '\u062e\u0637 \u0627\u0644\u0625\u0646\u062a\u0627\u062c 2', 'Ligne Conditionnement': '\u062e\u0637 \u0627\u0644\u062a\u0639\u0628\u0626\u0629', 'Ligne Utilites': '\u062e\u0637 \u0627\u0644\u0645\u0631\u0627\u0641\u0642' },
-    machines: { 'Tour usinage M-102': '\u0645\u062e\u0631\u0637\u0629 \u062a\u0635\u0646\u064a\u0639 M-102', 'Presse hydraulique M-215': '\u0645\u0643\u0628\u0633 \u0647\u064a\u062f\u0631\u0648\u0644\u064a\u0643\u064a M-215', 'Convoyeur a bande M-309': '\u0646\u0627\u0642\u0644 \u0628\u0627\u0644\u062d\u0632\u0627\u0645 M-309', "Compresseur d'air M-412": '\u0636\u0627\u063a\u0637 \u0647\u0648\u0627\u0621 M-412', 'Etiqueteuse E-330': '\u0622\u0644\u0629 \u0648\u0633\u0645 E-330', 'Pompe CIP P-101': '\u0645\u0636\u062e\u0629 CIP P-101', 'Pasteurisateur P-204': '\u0628\u0633\u062a\u0631\u0629 P-204', 'Remplisseuse R-118': '\u0622\u0644\u0629 \u062a\u0639\u0628\u0626\u0629 R-118' },
-    technicians: { 'Nabil Amrani': '\u0646\u0628\u064a\u0644 \u0627\u0644\u0639\u0645\u0631\u0627\u0646\u064a', 'Ahmed El Mansouri': '\u0623\u062d\u0645\u062f \u0627\u0644\u0645\u0646\u0635\u0648\u0631\u064a', 'Youssef Berrada': '\u064a\u0648\u0633\u0641 \u0628\u0631\u0627\u062f\u0629', 'Sara El Idrissi': '\u0633\u0627\u0631\u0629 \u0627\u0644\u0625\u062f\u0631\u064a\u0633\u064a', 'Karim El Fassi': '\u0643\u0631\u064a\u0645 \u0627\u0644\u0641\u0627\u0633\u064a' },
-  },
-}
-
-const pageSize = 6
-const currentPage = ref(1)
-const sort = ref({ key: 'id', direction: 'asc' })
-
-const sortedRows = computed(() => {
-  const rows = [...props.rows]
-  const direction = sort.value.direction === 'asc' ? 1 : -1
-
-  return rows.sort((a, b) => {
-    if (sort.value.key === 'actions') return 0
-    const left = sortValue(a, sort.value.key)
-    const right = sortValue(b, sort.value.key)
-    return String(left).localeCompare(String(right), 'fr', { numeric: true }) * direction
-  })
-})
-
-const totalPages = computed(() => Math.max(1, Math.ceil(sortedRows.value.length / pageSize)))
-const firstRow = computed(() => (sortedRows.value.length ? (currentPage.value - 1) * pageSize + 1 : 0))
-const lastRow = computed(() => Math.min(currentPage.value * pageSize, sortedRows.value.length))
-const paginatedRows = computed(() => sortedRows.value.slice(firstRow.value - 1, lastRow.value))
-
-watch(
-  () => props.rows.length,
-  () => {
-    currentPage.value = 1
-  },
-)
+const currentPage = computed(() => Number(props.pagination?.page || 1))
+const pageLimit = computed(() => Number(props.pagination?.limit || 10))
+const totalRows = computed(() => Number(props.pagination?.total ?? props.rows.length))
+const totalPages = computed(() => Math.max(1, Number(props.pagination?.total_pages || Math.ceil(totalRows.value / pageLimit.value) || 1)))
+const firstRow = computed(() => (totalRows.value ? (currentPage.value - 1) * pageLimit.value + 1 : 0))
+const lastRow = computed(() => Math.min(currentPage.value * pageLimit.value, totalRows.value))
 
 function sortBy(key) {
   if (key === 'actions') return
@@ -152,47 +231,259 @@ function sortBy(key) {
     key,
     direction: sort.value.key === key && sort.value.direction === 'asc' ? 'desc' : 'asc',
   }
+  emit('sort', sort.value)
 }
 
 function sortIcon(key) {
   if (key === 'actions') return ''
-  if (sort.value.key !== key) return '\u2195'
-  return sort.value.direction === 'asc' ? '\u2191' : '\u2193'
-}
-
-function sortValue(row, key) {
-  if (key === 'technicianName') return row.technician.name
-  return row[key]
+  if (sort.value.key !== key) return '+'
+  return sort.value.direction === 'asc' ? '^' : 'v'
 }
 
 function statusTone(status) {
-  if (status === 'En cours') return 'in-progress'
-  if (status === 'En attente') return 'pending'
+  if (status === 'in_progress') return 'in-progress'
+  if (['pending', 'planned'].includes(status)) return 'pending'
+  if (['cancelled'].includes(status)) return 'cancelled'
   return 'done'
 }
 
 function priorityTone(priority) {
-  if (priority === 'Critique') return 'critical'
-  if (priority === 'Haute') return 'warning'
-  if (priority === 'Moyenne') return 'attention'
+  if (priority === 'critical') return 'critical'
+  if (priority === 'high') return 'warning'
+  if (priority === 'medium') return 'attention'
   return 'low'
 }
 
-function displayStatus(status) { return displayValues[language.value]?.statuses?.[status] || status }
-function displayPriority(priority) { return displayValues[language.value]?.priorities?.[priority] || priority }
-function displayType(type) { return displayValues[language.value]?.types?.[type] || type }
-function displayLine(line) { return displayValues[language.value]?.lines?.[line] || line }
-function displayMachine(machine) { return displayValues[language.value]?.machines?.[machine] || machine }
-function displayTechnician(name) { return displayValues[language.value]?.technicians?.[name] || name }
+function equipmentName(item) {
+  return item.raw?.equipment?.name || item.machine || '-'
+}
+
+function equipmentCode(item) {
+  return item.raw?.equipment?.code || '-'
+}
 </script>
 
 <style scoped>
+.light-intervention-table {
+  display: none;
+}
+
 .intervention-table-card {
   overflow: hidden;
   border: 1px solid rgba(116, 135, 158, 0.28);
   border-radius: 8px;
   background: rgba(17, 27, 38, 0.9);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
+}
+
+:global(html[data-theme='light']) .light-intervention-table {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #edf0e8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(74, 10, 10, 0.07);
+}
+
+:global(html[data-theme='light']) .intervention-table-card {
+  display: none;
+}
+
+:global(html[data-theme='light']) .light-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid #edf0e8;
+}
+
+:global(html[data-theme='light']) .light-panel-header h2 {
+  margin: 0;
+  color: #4a0a0a;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+:global(html[data-theme='light']) .light-panel-header p {
+  margin: 6px 0 0;
+  color: #53667f;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+:global(html[data-theme='light']) .light-panel-header > span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #e3edcf;
+  color: #6a9a2a;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+:global(html[data-theme='light']) .light-table-wrap {
+  overflow-x: auto;
+  padding: 8px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table th,
+:global(html[data-theme='light']) .light-intervention-table td {
+  padding: 14px 15px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table th {
+  background: transparent;
+  color: #53667f;
+  font-weight: 950;
+}
+
+:global(html[data-theme='light']) .light-intervention-table td {
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  background: #ffffff;
+  color: #4a0a0a;
+  font-weight: 780;
+}
+
+:global(html[data-theme='light']) .light-intervention-table tbody tr:nth-child(even) td {
+  background: rgba(106, 154, 42, 0.035);
+}
+
+:global(html[data-theme='light']) .light-intervention-table tbody tr:hover td {
+  border-color: rgba(106, 154, 42, 0.16);
+  background: #f7f9f3;
+}
+
+:global(html[data-theme='light']) .light-intervention-table tbody td:first-child {
+  border-left: 1px solid transparent;
+  border-radius: 8px 0 0 8px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table tbody td:last-child {
+  border-right: 1px solid transparent;
+  border-radius: 0 8px 8px 0;
+}
+
+:global(html[data-theme='light']) .code-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border-radius: 6px;
+  background: #f7f9f3;
+  color: #4a0a0a;
+  padding: 0 9px;
+  font-weight: 950;
+}
+
+:global(html[data-theme='light']) .stacked-cell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+:global(html[data-theme='light']) .stacked-cell strong,
+:global(html[data-theme='light']) .stacked-cell span {
+  overflow: hidden;
+  color: #4a0a0a;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(html[data-theme='light']) .stacked-cell small {
+  overflow: hidden;
+  color: #53667f;
+  font-size: 12px;
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(html[data-theme='light']) .stacked-cell.compact span {
+  font-size: 12px;
+}
+
+:global(html[data-theme='light']) .light-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+:global(html[data-theme='light']) .light-badge i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+:global(html[data-theme='light']) .light-badge.type,
+:global(html[data-theme='light']) .light-badge.low,
+:global(html[data-theme='light']) .light-badge.done {
+  background: #edf5de;
+  color: #6a9a2a;
+}
+
+:global(html[data-theme='light']) .light-badge.warning,
+:global(html[data-theme='light']) .light-badge.in-progress {
+  background: #fff0df;
+  color: #ff6a00;
+}
+
+:global(html[data-theme='light']) .light-badge.attention,
+:global(html[data-theme='light']) .light-badge.pending {
+  background: #fff4cf;
+  color: #ad7a00;
+}
+
+:global(html[data-theme='light']) .light-badge.critical,
+:global(html[data-theme='light']) .light-badge.cancelled {
+  background: #ffe2e2;
+  color: #e31e24;
+}
+
+:global(html[data-theme='light']) .light-intervention-table .actions button {
+  background: #ffffff;
+  border-color: #dfe5d6;
+  color: #6a9a2a;
+}
+
+:global(html[data-theme='light']) .light-intervention-table .actions button:hover {
+  background: #edf5de;
+  transform: translateY(-1px);
+}
+
+:global(html[data-theme='light']) .light-intervention-table .actions button.danger-action {
+  color: #e31e24;
+}
+
+:global(html[data-theme='light']) .light-intervention-table footer {
+  border-top: 1px solid #edf0e8;
+  padding: 15px 20px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table footer button {
+  background: #ffffff;
+  border-color: #dfe5d6;
+  color: #4a0a0a;
 }
 
 header,
@@ -233,7 +524,7 @@ footer span {
 
 table {
   width: 100%;
-  min-width: 1180px;
+  min-width: 1400px;
   border-collapse: collapse;
 }
 
@@ -263,6 +554,10 @@ th button {
   font-size: 12px;
   font-weight: 950;
   cursor: pointer;
+}
+
+th button:disabled {
+  cursor: default;
 }
 
 td {
@@ -297,7 +592,8 @@ tbody tr:hover {
 }
 
 .priority.critical,
-.status.pending {
+.status.pending,
+.status.cancelled {
   background: rgba(220, 55, 71, 0.18);
   color: #ff7f8e;
 }
@@ -368,6 +664,10 @@ footer button {
   font-size: 16px;
 }
 
+.actions button.danger-action {
+  color: #ff7f8e;
+}
+
 .actions button:hover,
 footer button:hover:not(:disabled) {
   background: rgba(24, 38, 53, 0.92);
@@ -396,6 +696,98 @@ footer button:disabled {
   footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+:global(html[data-theme='light']) .light-intervention-table {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #edf0e8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(74, 10, 10, 0.07);
+}
+
+:global(html[data-theme='light']) .intervention-table-card {
+  display: none;
+}
+
+:global(html[data-theme='light']) .light-intervention-table .light-table-wrap table {
+  min-width: 1180px;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+:global(html[data-theme='light']) .light-intervention-table th {
+  background: transparent;
+  color: #53667f;
+}
+
+:global(html[data-theme='light']) .light-intervention-table td {
+  border-color: transparent;
+  background: #ffffff;
+  color: #4a0a0a;
+}
+
+@media (max-width: 760px) {
+  :global(html[data-theme='light']) .light-panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  :global(html[data-theme='light']) .light-table-wrap {
+    padding: 12px;
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table table,
+  :global(html[data-theme='light']) .light-intervention-table thead,
+  :global(html[data-theme='light']) .light-intervention-table tbody,
+  :global(html[data-theme='light']) .light-intervention-table tr,
+  :global(html[data-theme='light']) .light-intervention-table th,
+  :global(html[data-theme='light']) .light-intervention-table td {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table tbody tr {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid #edf0e8;
+    border-left: 5px solid #6a9a2a;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 10px 26px rgba(74, 10, 10, 0.06);
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 0;
+    border-radius: 0;
+    padding: 12px 14px;
+  }
+
+  :global(html[data-theme='light']) .light-intervention-table td::before {
+    content: attr(data-label);
+    color: #53667f;
+    font-size: 12px;
+    font-weight: 950;
   }
 }
 </style>

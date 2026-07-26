@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --sc-dark: #4a0a0a;
-  --sc-primary: #6a9a2a;
-  --sc-secondary: #b6c65b;
-  --sc-danger: #e31e24;
-  --sc-warning: #ff6a00;
-  --sc-attention: #e8b300;
-  --sc-bg: #f7f9f3;
+  --sc-dark: #4A0A0A;
+  --sc-primary: #6A9A2A;
+  --sc-secondary: #B6C65B;
+  --sc-danger: #E31E24;
+  --sc-warning: #FF6A00;
+  --sc-attention: #E8B300;
+  --sc-bg: #F7F9F3;
   --sc-surface: #ffffff;
   --sc-border: rgba(74, 10, 10, 0.1);
   --sc-muted: rgba(74, 10, 10, 0.62);
@@ -260,8 +260,8 @@
 :root[data-theme='light'] .mark-button,
 :root[data-theme='light'] .apply-button,
 :root[data-theme='light'] .new-button {
-  background: #5f8f22 !important;
-  border-color: #5f8f22 !important;
+  background: #6A9A2A !important;
+  border-color: #6A9A2A !important;
   color: #ffffff !important;
   box-shadow: 0 12px 28px rgba(95, 143, 34, 0.18) !important;
 }
@@ -286,8 +286,8 @@
 :root[data-theme='light'] .drawer-tabs button.active,
 :root[data-theme='light'] .choice-row button.active {
   background: #e3edcf !important;
-  border-color: #c7d9a8 !important;
-  color: #5f8f22 !important;
+  border-color: #B6C65B !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .danger-button,
@@ -363,7 +363,7 @@
 :root[data-theme='light'] .status-completed,
 :root[data-theme='light'] .deadline-green {
   background: #edf5de !important;
-  color: #5f8f22 !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .status-warning,
@@ -396,11 +396,11 @@
 :root[data-theme='light'] .low,
 :root[data-theme='light'] .result.success {
   background: #edf5de !important;
-  color: #5f8f22 !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .text-green {
-  color: #5f8f22 !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .text-orange {
@@ -420,7 +420,7 @@
 :root[data-theme='light'] .logo-box,
 :root[data-theme='light'] .brand-mark {
   background: #e3edcf !important;
-  color: #5f8f22 !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .kpi-icon--orange,
@@ -445,7 +445,7 @@
 :root[data-theme='light'] .live-badge,
 :root[data-theme='light'] .year-badge {
   background: #e3edcf !important;
-  color: #5f8f22 !important;
+  color: #6A9A2A !important;
 }
 
 :root[data-theme='light'] .progress-track,
@@ -716,7 +716,7 @@ html[data-theme='light'] body #app main[class*='-layout'] .live-control {
 
 html[data-theme='light'] body #app main[class*='-layout'] .live-control {
   background: #e3edcf !important;
-  border-color: #c7d9a8 !important;
+  border-color: #B6C65B !important;
   color: #6a9a2a !important;
 }
 

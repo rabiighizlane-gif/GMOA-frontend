@@ -8,7 +8,16 @@
         </div>
         <span>2026</span>
       </header>
-      <apexchart type="bar" height="260" :options="monthlyOptions" :series="monthlySeries" />
+      <div v-if="preventiveChartLoading" class="chart-state" role="status">
+        Chargement des donnees...
+      </div>
+      <div v-else-if="preventiveChartErrorMessage" class="chart-state chart-state--error" role="alert">
+        {{ preventiveChartErrorMessage }}
+      </div>
+      <div v-else-if="!hasPreventiveChartData" class="chart-state">
+        Aucune donnee disponible
+      </div>
+      <apexchart v-else type="bar" height="300" :options="preventiveChartOptions" :series="preventiveChartSeries" />
     </article>
 
     <article class="chart-card">
@@ -30,7 +39,16 @@
         </div>
         <span>Mix</span>
       </header>
-      <apexchart type="donut" height="260" :options="frequencyOptions" :series="frequencySeries" />
+      <div v-if="loading" class="chart-state" role="status">
+        Chargement des donnees...
+      </div>
+      <div v-else-if="errorMessage" class="chart-state chart-state--error" role="alert">
+        {{ errorMessage }}
+      </div>
+      <div v-else-if="!hasDistributionData" class="chart-state">
+        Aucune donnee disponible
+      </div>
+      <apexchart v-else type="bar" height="300" :options="chartOptions" :series="chartSeries" />
     </article>
 
     <article class="chart-card">
@@ -47,9 +65,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useLanguageStore } from '@/stores/language'
 import VueApexCharts from 'vue3-apexcharts'
+import { getPreventiveChart, getPreventiveDistribution } from '@/services/dashboardService'
 
 const apexchart = VueApexCharts
 const languageStore = useLanguageStore()
@@ -57,12 +76,12 @@ const language = computed(() => languageStore.language)
 
 const translations = {
   FR: {
-    monthlyTitle: 'Preventives realisees',
-    monthlySubtitle: 'Evolution mensuelle',
+    monthlyTitle: 'Suivi mensuel de la maintenance preventive',
+    monthlySubtitle: 'Comparaison des operations planifiees, realisees et en retard',
     slaTitle: 'Respect du planning',
     slaSubtitle: 'Maintenances realisees a temps',
-    frequencyTitle: 'Repartition par frequence',
-    frequencySubtitle: 'Organisation des plans',
+    frequencyTitle: 'Repartition de la maintenance preventive',
+    frequencySubtitle: 'Nombre de machines par periodicite et par usine',
     lateTitle: 'Retards par ligne',
     lateSubtitle: 'Plans necessitant une action',
     alerts: 'Alertes',
@@ -77,12 +96,12 @@ const translations = {
     lines: ['Conditionnement', 'Production 1', 'Utilites', 'Emballage'],
   },
   EN: {
-    monthlyTitle: 'Completed preventive tasks',
-    monthlySubtitle: 'Monthly trend',
+    monthlyTitle: 'Monthly preventive maintenance tracking',
+    monthlySubtitle: 'Comparison of planned, completed, and overdue operations',
     slaTitle: 'Schedule compliance',
     slaSubtitle: 'Maintenance completed on time',
-    frequencyTitle: 'Breakdown by frequency',
-    frequencySubtitle: 'Plan organization',
+    frequencyTitle: 'Preventive maintenance distribution',
+    frequencySubtitle: 'Number of machines by frequency and factory',
     lateTitle: 'Overdue by line',
     lateSubtitle: 'Plans requiring action',
     alerts: 'Alerts',
@@ -120,28 +139,168 @@ const translations = {
 
 const content = computed(() => translations[language.value] || translations.FR)
 
-const monthlySeries = computed(() => [
-  {
-    name: content.value.completedName,
-    data: [18, 22, 20, 27, 31, 29, 38],
+const preventiveChartSeries = ref([])
+const preventiveChartCategories = ref([])
+const preventiveChartOptions = ref({
+  chart: {
+    type: 'bar',
+    toolbar: { show: false },
+    fontFamily: 'inherit',
+    animations: { enabled: true, speed: 800 },
+    foreColor: '#aeb9c8',
   },
-])
-
-const monthlyOptions = computed(() => ({
-  chart: { toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true, speed: 800 }, foreColor: '#aeb9c8' },
-  colors: ['#83B95C'],
-  plotOptions: { bar: { borderRadius: 7, columnWidth: '46%' } },
+  colors: ['#83B95C', '#38BDF8', '#DC3747'],
+  plotOptions: { bar: { borderRadius: 6, columnWidth: '48%' } },
   dataLabels: { enabled: false },
+  legend: {
+    show: true,
+    position: 'bottom',
+    fontSize: '11px',
+    labels: { colors: '#aeb9c8' },
+  },
   xaxis: {
-    categories: content.value.months,
+    categories: [],
     axisBorder: { show: false },
     axisTicks: { show: false },
     labels: { style: { colors: '#aeb9c8', fontSize: '10px' } },
   },
   yaxis: { labels: { style: { colors: '#aeb9c8' } } },
   grid: { borderColor: 'rgba(126, 146, 170, 0.16)', strokeDashArray: 4 },
-  tooltip: { y: { formatter: (value) => `${value} ${content.value.maintenanceUnit}` } },
-}))
+  tooltip: {
+    enabled: true,
+    y: { formatter: (value) => `${value} ${content.value.maintenanceUnit}` },
+  },
+  responsive: [
+    {
+      breakpoint: 750,
+      options: {
+        plotOptions: { bar: { columnWidth: '62%' } },
+        legend: { position: 'bottom' },
+        xaxis: { labels: { rotate: -35, trim: true } },
+      },
+    },
+  ],
+})
+const preventiveChartLoading = ref(true)
+const preventiveChartErrorMessage = ref('')
+
+const hasPreventiveChartData = computed(() => {
+  if (!preventiveChartCategories.value.length || !preventiveChartSeries.value.length) return false
+
+  return preventiveChartSeries.value.some((serie) =>
+    Array.isArray(serie.data) && serie.data.some((value) => Number(value) !== 0),
+  )
+})
+
+async function loadPreventiveChart() {
+  try {
+    preventiveChartLoading.value = true
+    preventiveChartErrorMessage.value = ''
+
+    const chart = await getPreventiveChart()
+
+    preventiveChartCategories.value = Array.isArray(chart?.categories) ? chart.categories : []
+    preventiveChartSeries.value = Array.isArray(chart?.series) ? chart.series : []
+    preventiveChartOptions.value = {
+      ...preventiveChartOptions.value,
+      xaxis: {
+        ...preventiveChartOptions.value.xaxis,
+        categories: preventiveChartCategories.value,
+      },
+    }
+  } catch (error) {
+    preventiveChartErrorMessage.value = error.message || 'Erreur lors du chargement du graphe.'
+  } finally {
+    preventiveChartLoading.value = false
+  }
+}
+
+const chartSeries = ref([])
+const chartCategories = ref([])
+const chartOptions = ref({
+  chart: {
+    type: 'bar',
+    toolbar: { show: false },
+    fontFamily: 'inherit',
+    animations: { enabled: true, speed: 800 },
+    foreColor: '#aeb9c8',
+  },
+  colors: ['#38BDF8', '#83B95C'],
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      borderRadius: 6,
+      columnWidth: '46%',
+    },
+  },
+  dataLabels: { enabled: false },
+  legend: {
+    show: true,
+    position: 'bottom',
+    fontSize: '11px',
+    labels: { colors: '#aeb9c8' },
+  },
+  xaxis: {
+    categories: [],
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: { style: { colors: '#aeb9c8', fontSize: '10px' } },
+  },
+  yaxis: { labels: { style: { colors: '#aeb9c8' } } },
+  grid: { borderColor: 'rgba(126, 146, 170, 0.16)', strokeDashArray: 4 },
+  tooltip: {
+    enabled: true,
+    y: { formatter: (value) => `${value} ${content.value.planUnit}` },
+  },
+  responsive: [
+    {
+      breakpoint: 750,
+      options: {
+        plotOptions: { bar: { columnWidth: '62%' } },
+        legend: { position: 'bottom' },
+        xaxis: { labels: { rotate: -35, trim: true } },
+      },
+    },
+  ],
+})
+const loading = ref(true)
+const errorMessage = ref('')
+
+const hasDistributionData = computed(() => {
+  if (!chartCategories.value.length || !chartSeries.value.length) return false
+
+  return chartSeries.value.some((serie) =>
+    Array.isArray(serie.data) && serie.data.some((value) => Number(value) !== 0),
+  )
+})
+
+async function loadPreventiveDistribution() {
+  try {
+    loading.value = true
+    errorMessage.value = ''
+
+    const distribution = await getPreventiveDistribution()
+
+    chartCategories.value = Array.isArray(distribution?.categories) ? distribution.categories : []
+    chartSeries.value = Array.isArray(distribution?.series) ? distribution.series : []
+    chartOptions.value = {
+      ...chartOptions.value,
+      xaxis: {
+        ...chartOptions.value.xaxis,
+        categories: chartCategories.value,
+      },
+    }
+  } catch (error) {
+    errorMessage.value = error.message || 'Impossible de charger les donnees de maintenance preventive.'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadPreventiveChart()
+  loadPreventiveDistribution()
+})
 
 const slaSeries = computed(() => [92])
 
@@ -168,29 +327,6 @@ const slaOptions = computed(() => ({
   },
   stroke: { lineCap: 'round' },
   labels: [content.value.onTime],
-}))
-
-const frequencySeries = computed(() => [12, 22, 18, 8, 4])
-
-const frequencyOptions = computed(() => ({
-  chart: { type: 'donut', fontFamily: 'inherit', foreColor: '#aeb9c8' },
-  labels: content.value.frequencies,
-  colors: ['#38BDF8', '#83B95C', '#B6C65B', '#FACC15', '#F97316'],
-  stroke: { width: 4, colors: ['#101924'] },
-  dataLabels: { enabled: false },
-  legend: { position: 'bottom', fontSize: '10px', labels: { colors: '#aeb9c8' } },
-  plotOptions: {
-    pie: {
-      donut: {
-        size: '66%',
-        labels: {
-          show: true,
-          total: { show: true, label: content.value.totalPlans, color: '#aeb9c8', formatter: () => '64' },
-        },
-      },
-    },
-  },
-  tooltip: { y: { formatter: (value) => `${value} ${content.value.planUnit}` } },
 }))
 
 const lateSeries = computed(() => [
@@ -275,6 +411,26 @@ const lateOptions = computed(() => ({
 .chart-card :deep(svg),
 .chart-card :deep(foreignObject) {
   max-width: 100%;
+}
+
+.chart-state {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  padding: 24px;
+  border: 1px dashed rgba(126, 146, 170, 0.24);
+  border-radius: 8px;
+  background: rgba(13, 21, 32, 0.34);
+  color: #aeb9c8;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.chart-state--error {
+  border-color: rgba(220, 55, 71, 0.36);
+  background: rgba(220, 55, 71, 0.12);
+  color: #fda4af;
 }
 
 @media (max-width: 1400px) {
